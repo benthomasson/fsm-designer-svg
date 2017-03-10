@@ -1,7 +1,10 @@
 var app = angular.module('triangular', []);
 
+var scope;
+
 app.controller('MainCtrl', function($scope) {
-  $scope.graph = {'width': 100, 'height': 100}
+  scope = $scope
+  $scope.graph = {'width': window.innerWidth, 'height': window.innerHeight}
   $scope.circles = [
   	{'x': 15, 'y': 20, 'r':15},
   	{'x': 50, 'y': 60, 'r':20},
