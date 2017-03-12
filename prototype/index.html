@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html ng-app="triangular">
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <script data-require="angular.js@1.2.x" src="http://code.angularjs.org/1.2.1/angular.js" data-semver="1.2.1"></script>
+    <script src="app.js"></script>
+    <script src="hamster.js"></script>
+  </head>
+  <body ng-controller="MainCtrl">
+    <svg ng-attr-height="{{graph.height}}" ng-attr-width="{{graph.width}}" id="frame">
+        <g transform="scale(0.5)" id="frame_g">
+    	<circle ng-repeat="circle in circles"
+    		ng-attr-cx="{{circle.x}}"
+    		ng-attr-cy="{{circle.y}}"
+    		ng-attr-r="{{circle.r}}">
+    	</circle>
+        </g>
+        <text ng-attr-x="{{graph.right_column}}" y="15" fill="red">width: {{graph.width}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="35" fill="red">height: {{graph.height}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="55" fill="red">rc: {{graph.right_column}}</text>
+    </svg>
+    <script>
+      (function() {
+          var svg = document.getElementById('frame');
+          var g = document.getElementById('frame_g');
+          var current_scale = 1.0;
+          console.log(svg);
+
+          Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
+            console.log(delta);
+            current_scale = (current_scale + delta / 100);
+            g.setAttribute('transform','scale(' + current_scale + ')');
+            event.preventDefault();
+          });
+       })();
+       console.log('done');
+    </script>
+  </body>
+</html>
+
