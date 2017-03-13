@@ -2,7 +2,7 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 
-app.controller('MainCtrl', function($scope) {
+app.controller('MainCtrl', function($scope, $document) {
 
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
@@ -22,6 +22,7 @@ app.controller('MainCtrl', function($scope) {
   $scope.view_controller = new fsm.FSMController($scope, view.Start);
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
+  $scope.debug = {'hidden': false};
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
@@ -121,6 +122,19 @@ app.controller('MainCtrl', function($scope) {
       $scope.view_controller.state.onMouseWheel($scope.view_controller, event, delta, deltaX, deltaY);
       event.preventDefault();
     };
+
+    $scope.onKeyUp = function (event) {
+        if (event.key === 'd') {
+            $scope.debug.hidden = !$scope.debug.hidden;
+        }
+        if (event.key === 'p') {
+            $scope.cursor.hidden = !$scope.cursor.hidden;
+        }
+        $scope.$apply();
+        event.preventDefault();
+    }
+
+    $document.bind("keypress", $scope.onKeyUp);
 });
 
 exports.app = app;

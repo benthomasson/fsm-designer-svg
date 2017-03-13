@@ -2,7 +2,7 @@
 <html ng-app="triangular">
   <head>
     <link rel="stylesheet" href="style.css" />
-    <script data-require="angular.js@1.2.x" src="http://code.angularjs.org/1.2.1/angular.js" data-semver="1.2.1"></script>
+    <script data-require="angular.js@1.6.2" src="http://code.angularjs.org/1.6.2/angular.js" data-semver="1.6.2"></script>
     <script src="bundle.js"></script>
     <script src="hamster.js"></script>
     <script src="mousewheel.js"></script>
@@ -31,6 +31,7 @@
     	</circle>
         </g>
         </g>
+        <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="35">height: {{graph.height}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="55">rc: {{graph.right_column}}</text>
@@ -44,6 +45,7 @@
         <text ng-attr-x="{{graph.right_column}}" y="215">Pan X: {{panX.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="235">Pan Y: {{panY.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="255">View State: {{view_controller.state.name}}</text>
+        </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" />
             <line x1="0" y1="-15" x2="0" y2="15" />
