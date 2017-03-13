@@ -15,6 +15,10 @@ app.controller('MainCtrl', function($scope) {
   $scope.mouseY = 0;
   $scope.panX = 0;
   $scope.panY = 0;
+  $scope.pressedX = 0;
+  $scope.pressedY = 0;
+  $scope.lastPanX = 0;
+  $scope.lastPanY = 0;
   $scope.view_controller = new fsm.FSMController($scope, view.Start);
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
@@ -102,6 +106,7 @@ app.controller('MainCtrl', function($scope) {
       $scope.cursor.y = coords.y;
       $scope.mouseX = coords.x;
       $scope.mouseY = coords.y;
+      $scope.view_controller.state.onMouseMove($scope.view_controller);
       $scope.onMouseMoveResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };

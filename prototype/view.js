@@ -49,6 +49,10 @@ exports.Pan = Pan;
 
 _Ready.prototype.onMouseDown = function (controller) {
 
+    controller.scope.pressedX = controller.scope.mouseX;
+    controller.scope.pressedY = controller.scope.mouseY;
+    controller.scope.lastPanX = controller.scope.panX;
+    controller.scope.lastPanY = controller.scope.panY;
     controller.changeState(Pressed);
 
 };
@@ -98,13 +102,16 @@ _Pressed.prototype.onMouseUp = function (controller) {
 _Pressed.prototype.onMouseMove = function (controller) {
 
     controller.changeState(Pan);
-    controller.state.onMouseMove
+    controller.state.onMouseMove(controller)
 };
 
 
 _Pan.prototype.onMouseMove = function (controller) {
 
-    controller.changeState(Pan);
+    var g = document.getElementById('frame_g');
+    controller.scope.panX = (controller.scope.mouseX - controller.scope.pressedX) + controller.scope.lastPanX;
+    controller.scope.panY = (controller.scope.mouseY - controller.scope.pressedY) + controller.scope.lastPanY;
+    g.setAttribute('transform','translate(' + controller.scope.panX + ',' + controller.scope.panY + ') scale(' + controller.scope.current_scale + ')');
 };
 
 
