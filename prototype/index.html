@@ -19,17 +19,21 @@
          ng-mouseover="onMouseOver($event)"
          msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)"
          >
-        <g transform="scale(0.5)" id="frame_g">
-        <g ng-repeat="link in links">
-            <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" />
-        </g>
-        <g ng-repeat="device in devices" ng-attr-transform="translate({{device.x}},{{device.y}})">
-    	<circle
-    		cx="0"
-    		cy="0"
-    		ng-attr-r="{{device.r}}">
-    	</circle>
-        </g>
+        <g transform="scale(1.0)" id="frame_g">
+            <g ng-repeat="link in links">
+                <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" />
+            </g>
+            <g ng-repeat="device in devices" ng-attr-transform="translate({{device.x}},{{device.y}})">
+                <circle
+                    cx="0"
+                    cy="0"
+                    ng-attr-r="{{device.r}}">
+                </circle>
+            </g>
+            <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" >
+                <line x1="-5" y1="0" x2="5" y2="0" />
+                <line x1="0" y1="-5" x2="0" y2="5" />
+            </g>
         </g>
         <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
@@ -45,6 +49,10 @@
         <text ng-attr-x="{{graph.right_column}}" y="215">Pan X: {{panX.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="235">Pan Y: {{panY.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="255">View State: {{view_controller.state.name}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="275">Mouse X: {{mouseX.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="295">Mouse Y: {{mouseY.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="315">Scaled X: {{scaledX.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="335">Scaled Y: {{scaledY.toFixed(2)}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" />

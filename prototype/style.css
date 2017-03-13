@@ -28,6 +28,11 @@ svg line {
     stroke-width: 2;
 }
 
+.debug line {
+    stroke: #337AB7;
+    stroke-width: 4;
+}
+
 
 .hidden {
     display: none;

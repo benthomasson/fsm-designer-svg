@@ -13,6 +13,8 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.current_scale = 1.0;
   $scope.mouseX = 0;
   $scope.mouseY = 0;
+  $scope.scaledX = 0;
+  $scope.scaledY = 0;
   $scope.panX = 0;
   $scope.panY = 0;
   $scope.pressedX = 0;
@@ -100,6 +102,11 @@ app.controller('MainCtrl', function($scope, $document) {
 	  $event.preventDefault();
     };
 
+    $scope.updateScaledXY = function() {
+        $scope.scaledX = ($scope.mouseX - $scope.panX) / $scope.current_scale;
+        $scope.scaledY = ($scope.mouseY - $scope.panY) / $scope.current_scale;
+    };
+
     $scope.onMouseMove = function ($event) {
       var coords = getCrossBrowserElementCoords($event);
       $scope.cursor.hidden = false;
@@ -107,6 +114,7 @@ app.controller('MainCtrl', function($scope, $document) {
       $scope.cursor.y = coords.y;
       $scope.mouseX = coords.x;
       $scope.mouseY = coords.y;
+      $scope.updateScaledXY();
       $scope.view_controller.state.onMouseMove($scope.view_controller);
       $scope.onMouseMoveResult = getMouseEventResult($event);
 	  $event.preventDefault();
@@ -130,9 +138,12 @@ app.controller('MainCtrl', function($scope, $document) {
         if (event.key === 'p') {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
+        if (event.key === 'a') {
+            $scope.devices.push({'x': $scope.scaledX, 'y': $scope.scaledY, 'r': 15});
+        }
         $scope.$apply();
         event.preventDefault();
-    }
+    };
 
     $document.bind("keypress", $scope.onKeyUp);
 });
