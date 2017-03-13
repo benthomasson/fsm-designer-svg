@@ -1,7 +1,5 @@
 var app = angular.module('triangular', []);
 
-var scope;
-
 app.controller('MainCtrl', function($scope) {
 
   $scope.onMouseDownResult = "";
@@ -9,9 +7,9 @@ app.controller('MainCtrl', function($scope) {
   $scope.onMouseEnterResult = "";
   $scope.onMouseLeaveResult = "";
   $scope.onMouseMoveResult = "";
-  $scope.onMouseOverResult = "";
+  $scope.onMouseMoveResult = "";
+  $scope.current_scale = "";
 
-  scope = $scope
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight}
@@ -66,7 +64,7 @@ app.controller('MainCtrl', function($scope) {
     var getMouseEventResult = function (mouseEvent, mouseEventDesc)
     {
       var coords = getCrossBrowserElementCoords(mouseEvent);
-      return mouseEventDesc + " at (" + coords.x + ", " + coords.y + ")";
+      return "(" + coords.x + ", " + coords.y + ")";
     };
 
     $scope.onMouseDown = function ($event) {
@@ -99,3 +97,5 @@ app.controller('MainCtrl', function($scope) {
 	  $event.preventDefault();
     };
 });
+
+exports.app = app

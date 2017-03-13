@@ -3,10 +3,10 @@
   <head>
     <link rel="stylesheet" href="style.css" />
     <script data-require="angular.js@1.2.x" src="http://code.angularjs.org/1.2.1/angular.js" data-semver="1.2.1"></script>
-    <script src="app.js"></script>
+    <script src="bundle.js"></script>
     <script src="hamster.js"></script>
   </head>
-  <body ng-controller="MainCtrl">
+  <body ng-controller="MainCtrl" id="Main">
     <svg id="frame"
          ng-attr-height="{{graph.height}}"
          ng-attr-width="{{graph.width}}"
@@ -38,18 +38,24 @@
         <text ng-attr-x="{{graph.right_column}}" y="135">Mouse over: {{onMouseOverResult}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="155">Mouse enter: {{onMouseEnterResult}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="175">Mouse leave: {{onMouseLeaveResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="195">Current scale: {{current_scale}}</text>
     </svg>
     <script>
       (function() {
           var svg = document.getElementById('frame');
           var g = document.getElementById('frame_g');
           var current_scale = 1.0;
+          var panX = 0;
+          var panY = 0;
           console.log(svg);
 
           Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
+            var scope = angular.element(document.getElementById('Main')).scope();
             console.log(delta);
             current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
-            g.setAttribute('transform','scale(' + current_scale + ')');
+            scope.current_scale = current_scale.toFixed(2);
+            scope.$apply();
+            g.setAttribute('transform','translate(' + panX + ',' + panY + ') scale(' + current_scale + ')');
             event.preventDefault();
           });
        })();
