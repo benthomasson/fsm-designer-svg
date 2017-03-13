@@ -37,12 +37,10 @@ app.controller('MainCtrl', function($scope) {
     // coordinates relative to the target element.
     var getCrossBrowserElementCoords = function (mouseEvent)
     {
-      console.log(mouseEvent);
       var result = {
         x: 0,
         y: 0
       };
-      console.log(result);
 
       if (!mouseEvent)
       {
@@ -61,7 +59,6 @@ app.controller('MainCtrl', function($scope) {
         result.y = mouseEvent.clientY + document.body.scrollTop +
           document.documentElement.scrollTop;
       }
-      console.log(result);
 
       return result;
     };
