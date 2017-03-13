@@ -8,7 +8,7 @@ app.controller('MainCtrl', function($scope) {
   $scope.onMouseLeaveResult = "";
   $scope.onMouseMoveResult = "";
   $scope.onMouseMoveResult = "";
-  $scope.current_scale = "";
+  $scope.current_scale = 1.0;
   $scope.mouseX = 0;
   $scope.mouseY = 0;
   $scope.panX = 0;

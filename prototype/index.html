@@ -59,9 +59,9 @@
             var scope = angular.element(document.getElementById('Main')).scope();
             console.log(delta);
             current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
+            panX = scope.mouseX - current_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
+            panY = scope.mouseY - current_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
             scope.current_scale = current_scale.toFixed(2);
-            panX = scope.mouseX - current_scale * scope.mouseX;
-            panY = scope.mouseY - current_scale * scope.mouseY;
             scope.panX = panX;
             scope.panY = panY;
             scope.$apply();
