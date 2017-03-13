@@ -18,11 +18,16 @@
          ng-mouseover="onMouseOver($event)"
          >
         <g transform="scale(0.5)" id="frame_g">
-    	<circle ng-repeat="circle in circles"
-    		ng-attr-cx="{{circle.x}}"
-    		ng-attr-cy="{{circle.y}}"
-    		ng-attr-r="{{circle.r}}">
+        <g ng-repeat="link in links">
+            <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" />
+        </g>
+        <g ng-repeat="device in devices" ng-attr-transform="translate({{device.x}},{{device.y}})">
+    	<circle
+    		cx="0"
+    		cy="0"
+    		ng-attr-r="{{device.r}}">
     	</circle>
+        </g>
         </g>
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="35">height: {{graph.height}}</text>
@@ -43,7 +48,7 @@
 
           Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
             console.log(delta);
-            current_scale = (current_scale + delta / 100);
+            current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
             g.setAttribute('transform','scale(' + current_scale + ')');
             event.preventDefault();
           });

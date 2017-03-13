@@ -15,11 +15,18 @@ app.controller('MainCtrl', function($scope) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight}
-  $scope.circles = [
+  $scope.devices = [
   	{'x': 15, 'y': 20, 'r':15},
-  	{'x': 50, 'y': 60, 'r':20},
-  	{'x': 80, 'y': 10, 'r':10},
+  	{'x': 50, 'y': 60, 'r':15},
+  	{'x': 80, 'y': 10, 'r':15},
   ]
+
+  $scope.links = [
+  	{'x1': 15, 'y1': 20, 'x2': 50, 'y2': 60},
+  	{'x1': 50, 'y1': 60, 'x2': 80, 'y2': 10},
+  	{'x1': 15, 'y1': 20, 'x2': 80, 'y2': 10},
+  ]
+
 
     // Utility functions
 
