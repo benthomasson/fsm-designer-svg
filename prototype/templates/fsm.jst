@@ -1,6 +1,20 @@
 var inhertits = require('inherits');
-fsm = require('./fsm.js');
+var fsm = require('./fsm.js');
 
-{%for state in states%}
-{{state}}
+{%for state, functions in states%}
+function _{{state}} () {
+}
+inhertits('_{{state}}', fsm._State);
+var {{state}} = _{{state}}();
+exports.{{state}} = {{state}};
+{%endfor%}
+
+{%for state, functions in states%}
+{%for fn, transitions in functions%}
+_{{state}}.prototype.{{fn}} = function (controller) {
+{%for tn in transitions %}
+    controller.changeState({{tn.to_state}});
+{%endfor%}
+};
+{%endfor%}
 {%endfor%}
