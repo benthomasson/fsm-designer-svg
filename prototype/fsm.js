@@ -1,5 +1,6 @@
 function FSMController (initial_state) {
     this.state = initial_state;
+    this.state.start(this);
 }
 exports.FSMController = FSMController;
 

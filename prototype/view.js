@@ -5,32 +5,40 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
+_State.prototype.mouseMove = function () {
+};
+
 
 function _Ready () {
+    this.name = 'Ready';
 }
 inherits(_Ready, _State);
 var Ready = new _Ready();
 exports.Ready = Ready;
 
 function _Start () {
+    this.name = 'Start';
 }
 inherits(_Start, _State);
 var Start = new _Start();
 exports.Start = Start;
 
 function _Scale () {
+    this.name = 'Scale';
 }
 inherits(_Scale, _State);
 var Scale = new _Scale();
 exports.Scale = Scale;
 
 function _Pressed () {
+    this.name = 'Pressed';
 }
 inherits(_Pressed, _State);
 var Pressed = new _Pressed();
 exports.Pressed = Pressed;
 
 function _Pan () {
+    this.name = 'Pan';
 }
 inherits(_Pan, _State);
 var Pan = new _Pan();
@@ -78,9 +86,13 @@ _Pressed.prototype.mouseUp = function (controller) {
 _Pressed.prototype.mouseMove = function (controller) {
 
     controller.changeState(Pan);
-
 };
 
+
+_Pan.prototype.mouseMove = function (controller) {
+
+    controller.changeState(Pan);
+};
 
 
 _Pan.prototype.mouseUp = function (controller) {

@@ -41,6 +41,7 @@
         <text ng-attr-x="{{graph.right_column}}" y="195">Current scale: {{current_scale.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="215">Pan X: {{panX.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="235">Pan Y: {{panY.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="255">View State: {{view_controller.state.name}}</text>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" />
             <line x1="0" y1="-15" x2="0" y2="15" />
@@ -50,20 +51,17 @@
       (function() {
           var svg = document.getElementById('frame');
           var g = document.getElementById('frame_g');
-          var current_scale = 1.0;
-          var panX = 0;
-          var panY = 0;
 
           Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
             var scope = angular.element(document.getElementById('Main')).scope();
-            current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
-            panX = scope.mouseX - current_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
-            panY = scope.mouseY - current_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
-            scope.current_scale = current_scale;
-            scope.panX = panX;
-            scope.panY = panY;
+            var new_scale = Math.max(0.1, Math.min(10, (scope.current_scale + delta / 100)));
+            var new_panX = scope.mouseX - new_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
+            var new_panY = scope.mouseY - new_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
+            scope.current_scale = new_scale;
+            scope.panX = new_panX;
+            scope.panY = new_panY;
             scope.$apply();
-            g.setAttribute('transform','translate(' + panX + ',' + panY + ') scale(' + current_scale + ')');
+            g.setAttribute('transform','translate(' + scope.panX + ',' + scope.panY + ') scale(' + scope.current_scale + ')');
             event.preventDefault();
           });
        })();
