@@ -28,20 +28,20 @@ transitions:
   label: start
   to_state: Ready
 - from_state: Ready
-  label: mouseWheel
+  label: onMouseWheel
   to_state: Scale
 - from_state: Scale
-  label: timeout
+  label: onTimeout
   to_state: Ready
 - from_state: Ready
-  label: mouseDown
+  label: onMouseDown
   to_state: Pressed
 - from_state: Pressed
-  label: mouseMove
+  label: onMouseMove
   to_state: Pan
 - from_state: Pressed
-  label: mouseUp
+  label: onMouseUp
   to_state: Ready
 - from_state: Pan
-  label: mouseUp
+  label: onMouseUp
   to_state: Ready

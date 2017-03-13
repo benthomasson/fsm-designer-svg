@@ -5,7 +5,7 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
-_State.prototype.mouseMove = function () {
+_State.prototype.onMouseMove = function () {
 };
 
 
@@ -47,7 +47,7 @@ exports.Pan = Pan;
 
 
 
-_Ready.prototype.mouseDown = function (controller) {
+_Ready.prototype.onMouseDown = function (controller) {
 
     controller.changeState(Pressed);
 
@@ -89,25 +89,26 @@ _Scale.prototype.onMouseWheel = function (controller, event, delta, deltaX, delt
 };
 
 
-_Pressed.prototype.mouseUp = function (controller) {
+_Pressed.prototype.onMouseUp = function (controller) {
 
     controller.changeState(Ready);
 
 };
 
-_Pressed.prototype.mouseMove = function (controller) {
+_Pressed.prototype.onMouseMove = function (controller) {
+
+    controller.changeState(Pan);
+    controller.state.onMouseMove
+};
+
+
+_Pan.prototype.onMouseMove = function (controller) {
 
     controller.changeState(Pan);
 };
 
 
-_Pan.prototype.mouseMove = function (controller) {
-
-    controller.changeState(Pan);
-};
-
-
-_Pan.prototype.mouseUp = function (controller) {
+_Pan.prototype.onMouseUp = function (controller) {
 
     controller.changeState(Ready);
 

@@ -72,13 +72,13 @@ app.controller('MainCtrl', function($scope) {
     };
 
     $scope.onMouseDown = function ($event) {
-      $scope.view_controller.state.mouseDown($scope.view_controller);
+      $scope.view_controller.state.onMouseDown($scope.view_controller);
       $scope.onMouseDownResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
 
     $scope.onMouseUp = function ($event) {
-      $scope.view_controller.state.mouseUp($scope.view_controller);
+      $scope.view_controller.state.onMouseUp($scope.view_controller);
       $scope.onMouseUpResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
