@@ -80,7 +80,7 @@ _Scale.prototype.timeout = function (controller) {
 };
 
 
-_Scale.prototype.onMouseWheel = function (controller, event, delta, deltaX, deltaY) {
+_Scale.prototype.onMouseWheel = function (controller, event, delta) {
       var g = document.getElementById('frame_g');
       var new_scale = Math.max(0.1, Math.min(10, (controller.scope.current_scale + delta / 100)));
       var new_panX = controller.scope.mouseX - new_scale * ((controller.scope.mouseX - controller.scope.panX) / controller.scope.current_scale);
@@ -102,7 +102,7 @@ _Pressed.prototype.onMouseUp = function (controller) {
 _Pressed.prototype.onMouseMove = function (controller) {
 
     controller.changeState(Pan);
-    controller.state.onMouseMove(controller)
+    controller.state.onMouseMove(controller);
 };
 
 
