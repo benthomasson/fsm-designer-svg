@@ -21,7 +21,7 @@
          >
         <g transform="scale(1.0)" id="frame_g">
             <g ng-repeat="link in links">
-                <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" />
+                <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" class="link"/>
             </g>
             <g ng-repeat="device in devices" ng-attr-transform="translate({{device.x}},{{device.y}})">
                 <circle
@@ -29,10 +29,16 @@
                     cy="0"
                     ng-attr-r="{{device.r}}">
                 </circle>
+                <circle
+                    cx="0"
+                    cy="0"
+                    ng-attr-r="{{device.r + 2}}"
+                    ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
+                </circle>
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" >
-                <line x1="-5" y1="0" x2="5" y2="0" />
-                <line x1="0" y1="-5" x2="0" y2="5" />
+                <line x1="-5" y1="0" x2="5" y2="0"/>
+                <line x1="0" y1="-5" x2="0" y2="5"/>
             </g>
         </g>
         <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
@@ -55,8 +61,8 @@
         <text ng-attr-x="{{graph.right_column}}" y="335">Scaled Y: {{scaledY.toFixed(2)}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
-            <line x1="-15" y1="0" x2="15" y2="0" />
-            <line x1="0" y1="-15" x2="0" y2="15" />
+            <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>
+            <line x1="0" y1="-15" x2="0" y2="15" class="cursor"/>
         </g>
     </svg>
   </body>

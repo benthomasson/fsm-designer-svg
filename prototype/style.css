@@ -19,11 +19,20 @@ svg text {
 }
 
 svg circle {
-    fill: #707070;
+    fill: #D7D7D7;
 }
 
+circle.selected {
+    stroke: #337AB7;
+    stroke-width: 2;
+}
 
-svg line {
+svg line.link {
+    stroke: #D7D7D7;
+    stroke-width: 2;
+}
+
+svg line.cursor {
     stroke: #707070;
     stroke-width: 2;
 }

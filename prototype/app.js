@@ -21,6 +21,8 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.pressedY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
+  $scope.selected_device = null;
+  $scope.selected_link = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start);
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
@@ -29,9 +31,9 @@ app.controller('MainCtrl', function($scope, $document) {
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.devices = [
-  	{'x': 15, 'y': 20, 'r':15},
-  	{'x': 50, 'y': 60, 'r':15},
-  	{'x': 80, 'y': 10, 'r':15},
+  	{'x': 15, 'y': 20, 'r':15, selected:false},
+  	{'x': 50, 'y': 60, 'r':15, selected:false},
+  	{'x': 80, 'y': 10, 'r':15, selected:true},
   ];
 
   $scope.links = [
