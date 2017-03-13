@@ -10,7 +10,8 @@ body {
 }
 
 svg {
-    background-color: white
+    background-color: white;
+    cursor: none;
 }
 
 svg text {
@@ -27,3 +28,7 @@ svg line {
     stroke-width: 2;
 }
 
+
+.hidden {
+    display: none;
+}

@@ -1,2 +1,2 @@
-var app = require('./app.js')
-exports.app = app
+var app = require('./app.js');
+exports.app = app;

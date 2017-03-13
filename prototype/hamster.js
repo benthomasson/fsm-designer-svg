@@ -157,7 +157,7 @@ Hamster.event = {
 
     // remove original and normalised handlers from the instance
     for (var h in hamster.handlers) {
-      if (hamster.handlers[h] == handlers) {
+      if (hamster.handlers[h] === handlers) {
         hamster.handlers.splice(h, 1);
         break;
       }
