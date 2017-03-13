@@ -38,9 +38,9 @@
         <text ng-attr-x="{{graph.right_column}}" y="135">Mouse over: {{onMouseOverResult}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="155">Mouse enter: {{onMouseEnterResult}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="175">Mouse leave: {{onMouseLeaveResult}}</text>
-        <text ng-attr-x="{{graph.right_column}}" y="195">Current scale: {{current_scale}}</text>
-        <text ng-attr-x="{{graph.right_column}}" y="215">Pan X: {{panX}}</text>
-        <text ng-attr-x="{{graph.right_column}}" y="235">Pan Y: {{panY}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="195">Current scale: {{current_scale.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="215">Pan X: {{panX.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="235">Pan Y: {{panY.toFixed(2)}}</text>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" />
             <line x1="0" y1="-15" x2="0" y2="15" />
@@ -59,7 +59,7 @@
             current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
             panX = scope.mouseX - current_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
             panY = scope.mouseY - current_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
-            scope.current_scale = current_scale.toFixed(2);
+            scope.current_scale = current_scale;
             scope.panX = panX;
             scope.panY = panY;
             scope.$apply();
