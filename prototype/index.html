@@ -5,6 +5,7 @@
     <script data-require="angular.js@1.2.x" src="http://code.angularjs.org/1.2.1/angular.js" data-semver="1.2.1"></script>
     <script src="bundle.js"></script>
     <script src="hamster.js"></script>
+    <script src="mousewheel.js"></script>
   </head>
   <body ng-controller="MainCtrl" id="Main">
     <svg id="frame"
@@ -16,6 +17,7 @@
          ng-mouseleave="onMouseLeave($event)"
          ng-mousemove="onMouseMove($event)"
          ng-mouseover="onMouseOver($event)"
+         msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)"
          >
         <g transform="scale(0.5)" id="frame_g">
         <g ng-repeat="link in links">
@@ -47,25 +49,6 @@
             <line x1="0" y1="-15" x2="0" y2="15" />
         </g>
     </svg>
-    <script>
-      (function() {
-          var svg = document.getElementById('frame');
-          var g = document.getElementById('frame_g');
-
-          Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
-            var scope = angular.element(document.getElementById('Main')).scope();
-            var new_scale = Math.max(0.1, Math.min(10, (scope.current_scale + delta / 100)));
-            var new_panX = scope.mouseX - new_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
-            var new_panY = scope.mouseY - new_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
-            scope.current_scale = new_scale;
-            scope.panX = new_panX;
-            scope.panY = new_panY;
-            scope.$apply();
-            g.setAttribute('transform','translate(' + scope.panX + ',' + scope.panY + ') scale(' + scope.current_scale + ')');
-            event.preventDefault();
-          });
-       })();
-    </script>
   </body>
 </html>
 

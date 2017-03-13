@@ -1,4 +1,4 @@
-var app = angular.module('triangular', []);
+var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 
@@ -110,6 +110,18 @@ app.controller('MainCtrl', function($scope) {
       $scope.onMouseOverResult = getMouseEventResult($event);
       $scope.cursor.hidden = false;
 	  $event.preventDefault();
+    };
+
+    $scope.onMouseWheel = function (event, delta, deltaX, deltaY) {
+      var g = document.getElementById('frame_g');
+      var new_scale = Math.max(0.1, Math.min(10, ($scope.current_scale + delta / 100)));
+      var new_panX = $scope.mouseX - new_scale * (($scope.mouseX - $scope.panX) / $scope.current_scale);
+      var new_panY = $scope.mouseY - new_scale * (($scope.mouseY - $scope.panY) / $scope.current_scale);
+      $scope.current_scale = new_scale;
+      $scope.panX = new_panX;
+      $scope.panY = new_panY;
+      g.setAttribute('transform','translate(' + $scope.panX + ',' + $scope.panY + ') scale(' + $scope.current_scale + ')');
+      event.preventDefault();
     };
 });
 
