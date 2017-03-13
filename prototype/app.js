@@ -1,4 +1,5 @@
 var app = angular.module('triangular', []);
+var view = require('./view.js');
 
 app.controller('MainCtrl', function($scope) {
 

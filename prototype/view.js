@@ -5,31 +5,31 @@ var fsm = require('./fsm.js');
 function _Ready () {
 }
 inhertits('_Ready', fsm._State);
-var Ready = _Ready();
+var Ready = new _Ready();
 exports.Ready = Ready;
 
 function _Start () {
 }
 inhertits('_Start', fsm._State);
-var Start = _Start();
+var Start = new _Start();
 exports.Start = Start;
 
 function _Scale () {
 }
 inhertits('_Scale', fsm._State);
-var Scale = _Scale();
+var Scale = new _Scale();
 exports.Scale = Scale;
 
 function _Pressed () {
 }
 inhertits('_Pressed', fsm._State);
-var Pressed = _Pressed();
+var Pressed = new _Pressed();
 exports.Pressed = Pressed;
 
 function _Pan () {
 }
 inhertits('_Pan', fsm._State);
-var Pan = _Pan();
+var Pan = new _Pan();
 exports.Pan = Pan;
 
 

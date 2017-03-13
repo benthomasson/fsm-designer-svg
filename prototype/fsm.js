@@ -3,7 +3,7 @@ function FSMController () {
 }
 exports.FSMController = FSMController;
 
-FSMController.prototoype.changeState = function (state) {
+FSMController.prototype.changeState = function (state) {
     if(this.state !== null) {
         this.state.end(this);
     }
@@ -14,12 +14,12 @@ FSMController.prototoype.changeState = function (state) {
 };
 
 function _State () {
+}
+
+_State.prototype.start = function () {
 };
 
-_State.prototoype.start = function (controller) {
-};
-
-_State.prototoype.end = function (controller) {
+_State.prototype.end = function () {
 };
 
 var State = new _State();
