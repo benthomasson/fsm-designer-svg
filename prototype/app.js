@@ -15,7 +15,7 @@ app.controller('MainCtrl', function($scope) {
   $scope.mouseY = 0;
   $scope.panX = 0;
   $scope.panY = 0;
-  $scope.view_controller = new fsm.FSMController(view.Start);
+  $scope.view_controller = new fsm.FSMController($scope, view.Start);
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
   $scope.graph = {'width': window.innerWidth,
@@ -113,14 +113,7 @@ app.controller('MainCtrl', function($scope) {
     };
 
     $scope.onMouseWheel = function (event, delta, deltaX, deltaY) {
-      var g = document.getElementById('frame_g');
-      var new_scale = Math.max(0.1, Math.min(10, ($scope.current_scale + delta / 100)));
-      var new_panX = $scope.mouseX - new_scale * (($scope.mouseX - $scope.panX) / $scope.current_scale);
-      var new_panY = $scope.mouseY - new_scale * (($scope.mouseY - $scope.panY) / $scope.current_scale);
-      $scope.current_scale = new_scale;
-      $scope.panX = new_panX;
-      $scope.panY = new_panY;
-      g.setAttribute('transform','translate(' + $scope.panX + ',' + $scope.panY + ') scale(' + $scope.current_scale + ')');
+      $scope.view_controller.state.onMouseWheel($scope.view_controller, event, delta, deltaX, deltaY);
       event.preventDefault();
     };
 });

@@ -1,4 +1,5 @@
-function FSMController (initial_state) {
+function FSMController (scope, initial_state) {
+    this.scope = scope;
     this.state = initial_state;
     this.state.start(this);
 }
