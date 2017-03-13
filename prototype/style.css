@@ -1,10 +1,23 @@
 /* Put your css in here */
 
 body {
-    background-color: yellow
+    background-color: yellow;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 svg {
     background-color: white
+}
+
+svg text {
+    fill: #337AB7;
+}
+
+svg circle {
+    fill: #707070;
 }
 

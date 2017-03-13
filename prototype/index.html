@@ -7,7 +7,16 @@
     <script src="hamster.js"></script>
   </head>
   <body ng-controller="MainCtrl">
-    <svg ng-attr-height="{{graph.height}}" ng-attr-width="{{graph.width}}" id="frame">
+    <svg id="frame"
+         ng-attr-height="{{graph.height}}"
+         ng-attr-width="{{graph.width}}"
+         ng-mousedown="onMouseDown($event)"
+         ng-mouseup="onMouseUp($event)"
+         ng-mouseenter="onMouseEnter($event)"
+         ng-mouseleave="onMouseLeave($event)"
+         ng-mousemove="onMouseMove($event)"
+         ng-mouseover="onMouseOver($event)"
+         >
         <g transform="scale(0.5)" id="frame_g">
     	<circle ng-repeat="circle in circles"
     		ng-attr-cx="{{circle.x}}"
@@ -15,9 +24,15 @@
     		ng-attr-r="{{circle.r}}">
     	</circle>
         </g>
-        <text ng-attr-x="{{graph.right_column}}" y="15" fill="red">width: {{graph.width}}</text>
-        <text ng-attr-x="{{graph.right_column}}" y="35" fill="red">height: {{graph.height}}</text>
-        <text ng-attr-x="{{graph.right_column}}" y="55" fill="red">rc: {{graph.right_column}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="35">height: {{graph.height}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="55">rc: {{graph.right_column}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="75">Mouse down: {{onMouseDownResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="95">Mouse up: {{onMouseUpResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="115">Mouse move: {{onMouseMoveResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="135">Mouse over: {{onMouseOverResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="155">Mouse enter: {{onMouseEnterResult}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="175">Mouse leave: {{onMouseLeaveResult}}</text>
     </svg>
     <script>
       (function() {
