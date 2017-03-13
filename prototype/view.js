@@ -1,34 +1,38 @@
-var inhertits = require('inherits');
+var inherits = require('inherits');
 var fsm = require('./fsm.js');
+
+function _State () {
+}
+inherits(_State, fsm._State);
 
 
 function _Ready () {
 }
-inhertits('_Ready', fsm._State);
+inherits(_Ready, _State);
 var Ready = new _Ready();
 exports.Ready = Ready;
 
 function _Start () {
 }
-inhertits('_Start', fsm._State);
+inherits(_Start, _State);
 var Start = new _Start();
 exports.Start = Start;
 
 function _Scale () {
 }
-inhertits('_Scale', fsm._State);
+inherits(_Scale, _State);
 var Scale = new _Scale();
 exports.Scale = Scale;
 
 function _Pressed () {
 }
-inhertits('_Pressed', fsm._State);
+inherits(_Pressed, _State);
 var Pressed = new _Pressed();
 exports.Pressed = Pressed;
 
 function _Pan () {
 }
-inhertits('_Pan', fsm._State);
+inherits(_Pan, _State);
 var Pan = new _Pan();
 exports.Pan = Pan;
 

@@ -1,5 +1,5 @@
-function FSMController () {
-    this.state = null;
+function FSMController (initial_state) {
+    this.state = initial_state;
 }
 exports.FSMController = FSMController;
 

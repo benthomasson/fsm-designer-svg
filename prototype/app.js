@@ -1,4 +1,5 @@
 var app = angular.module('triangular', []);
+var fsm = require('./fsm.js');
 var view = require('./view.js');
 
 app.controller('MainCtrl', function($scope) {
@@ -14,6 +15,7 @@ app.controller('MainCtrl', function($scope) {
   $scope.mouseY = 0;
   $scope.panX = 0;
   $scope.panY = 0;
+  $scope.view_controller = new fsm.FSMController(view.Start);
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
   $scope.graph = {'width': window.innerWidth,

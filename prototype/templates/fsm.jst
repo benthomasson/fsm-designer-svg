@@ -1,10 +1,14 @@
-var inhertits = require('inherits');
+var inherits = require('inherits');
 var fsm = require('./fsm.js');
+
+function _State () {
+}
+inherits(_State, fsm._State);
 
 {%for state, functions in states%}
 function _{{state}} () {
 }
-inhertits('_{{state}}', fsm._State);
+inherits(_{{state}}, _State);
 var {{state}} = new _{{state}}();
 exports.{{state}} = {{state}};
 {%endfor%}
