@@ -53,11 +53,9 @@
           var current_scale = 1.0;
           var panX = 0;
           var panY = 0;
-          console.log(svg);
 
           Hamster(svg).wheel(function(event, delta, deltaX, deltaY){
             var scope = angular.element(document.getElementById('Main')).scope();
-            console.log(delta);
             current_scale = Math.max(0.1, Math.min(10, (current_scale + delta / 100)));
             panX = scope.mouseX - current_scale * ((scope.mouseX - scope.panX) / scope.current_scale);
             panY = scope.mouseY - current_scale * ((scope.mouseY - scope.panY) / scope.current_scale);
@@ -69,7 +67,6 @@
             event.preventDefault();
           });
        })();
-       console.log('done');
     </script>
   </body>
 </html>
