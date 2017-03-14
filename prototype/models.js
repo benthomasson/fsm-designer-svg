@@ -1,9 +1,9 @@
-function Device(x, y, selected) {
+function Device(x, y, type) {
     this.x = x;
     this.y = y;
     this.size = 50;
-    this.selected = selected;
-    this.type = "router";
+    this.selected = false;
+    this.type = type;
 }
 exports.Device = Device;
 

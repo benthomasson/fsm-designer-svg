@@ -43,9 +43,9 @@ app.controller('MainCtrl', function($scope, $document) {
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.devices = [
-    new models.Device(15*4, 20*4, false),
-    new models.Device(50*4, 60*4, false),
-    new models.Device(80*4, 10*4, false)
+    new models.Device(15*4, 20*4, "router"),
+    new models.Device(50*4, 60*4, "rack"),
+    new models.Device(80*4, 10*4, "switch")
   ];
 
   $scope.links = [
@@ -204,8 +204,14 @@ app.controller('MainCtrl', function($scope, $document) {
         if ($event.key === 'p') {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
+        if ($event.key === 'r') {
+            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, "router"));
+        }
+        if ($event.key === 's') {
+            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, "switch"));
+        }
         if ($event.key === 'a') {
-            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, false));
+            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, "rack"));
         }
         if ($event.key === 'l') {
             $scope.first_controller.state.onNewLink($scope.first_controller, $event);

@@ -55,11 +55,13 @@ svg line.debug {
 
 .router circle {
     fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
 }
 
 .router circle.selected {
     stroke: #337AB7;
-    stroke-width: 2;
+    stroke-width: 4;
 }
 
 .router line {
@@ -68,5 +70,52 @@ svg line.debug {
 }
 
 .router polygon {
+    fill: #ffffff;
+}
+
+.switch rect {
+    fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+.switch rect.selected {
+    stroke: #337AB7;
+    stroke-width: 10;
+}
+
+.switch line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.switch polygon {
+    fill: #ffffff;
+}
+
+.rack rect {
+    fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+.rack rect.background {
+    fill: #ffffff;
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.rack rect.selected {
+    fill: #337AB7;
+    stroke: #337AB7;
+    stroke-width: 10;
+}
+
+.rack line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.rack circle {
     fill: #ffffff;
 }
