@@ -8,6 +8,12 @@ inherits(_State, fsm._State);
 _State.prototype.onMouseMove = function () {
 };
 
+_State.prototype.onMouseUp = function () {
+};
+
+_State.prototype.onMouseDown = function () {
+};
+
 
 function _Ready () {
     this.name = 'Ready';

@@ -32,6 +32,12 @@ line.selected {
     stroke-width: 6;
 }
 
+svg rect.debug {
+    fill-opacity: 0;
+    stroke: rgb(77,200,242);
+    stroke-width: 1;
+}
+
 svg line.link {
     stroke: #D7D7D7;
     stroke-width: 2;
@@ -42,11 +48,15 @@ svg line.cursor {
     stroke-width: 2;
 }
 
-.debug line {
-    stroke: #337AB7;
-    stroke-width: 4;
+svg line.debug {
+    stroke: rgb(77,200,242);
+    stroke-width: 1;
 }
 
+.debug-cursor line {
+    stroke: rgb(77,200,242);
+    stroke-width: 4;
+}
 
 .hidden {
     display: none;

@@ -57,10 +57,37 @@ exports.Selected1 = Selected1;
 
 
 
-_Ready.prototype.onMouseDown = function (controller) {
+_Ready.prototype.onMouseDown = function (controller, $event) {
 
-    controller.changeState(Selected1);
+    var i = 0;
+    var devices = controller.scope.devices;
+    var links = controller.scope.links;
+    var selected_device = null;
 
+    if (!$event.shiftKey) {
+        controller.scope.selected_devices = [];
+        controller.scope.selected_links = [];
+        for (i = 0; i < devices.length; i++) {
+            devices[i].selected = false;
+        }
+        for (i = 0; i < links.length; i++) {
+            links[i].selected = false;
+        }
+    }
+
+    for (i = 0; i < devices.length; i++) {
+        if (devices[i].is_selected(controller.scope.scaledX, controller.scope.scaledY)) {
+            devices[i].selected = true;
+            selected_device = devices[i];
+            controller.scope.selected_devices.push(devices[i]);
+        }
+    }
+
+    if (selected_device !== null) {
+        controller.changeState(Selected1);
+    } else {
+        controller.next_controller.state.onMouseDown(controller.next_controller, $event);
+    }
 };
 
 
@@ -73,10 +100,10 @@ _Start.prototype.start = function (controller) {
 
 
 
-_Selected2.prototype.onMouseDown = function (controller) {
+_Selected2.prototype.onMouseDown = function (controller, $event) {
 
-    controller.changeState(Selected1);
-
+    controller.changeState(Ready);
+    controller.state.onMouseDown(controller, $event);
 };
 
 
@@ -93,5 +120,12 @@ _Selected1.prototype.onMouseUp = function (controller) {
 
     controller.changeState(Selected2);
 
+};
+
+
+_Move.prototype.onMouseUp = function (controller, $event) {
+
+    controller.changeState(Ready);
+    controller.state.onMouseUp(controller, $event);
 };
 

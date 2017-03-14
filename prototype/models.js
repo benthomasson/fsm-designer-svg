@@ -6,7 +6,14 @@ function Device(x, y, size, selected) {
 }
 exports.Device = Device;
 
+Device.prototype.is_selected = function (x, y) {
 
+    return (x > this.x - this.size &&
+            x < this.x + this.size &&
+            y > this.y - this.size &&
+            y < this.y + this.size);
+
+};
 
 function Link(x1, y1, x2, y2, selected) {
     this.x1 = x1;

@@ -34,6 +34,21 @@
             </g>
             <g ng-repeat="device in devices"
                ng-attr-transform="translate({{device.x}},{{device.y}})">
+                 <line ng-attr-x1="{{-device.size - 10}}"
+                       ng-attr-y1="0"
+                       ng-attr-x2="{{device.size + 10}}"
+                       ng-attr-y2="0"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+                 <line ng-attr-x1="0"
+                       ng-attr-y1="{{-device.size - 10}}"
+                       ng-attr-x2="0"
+                       ng-attr-y2="{{device.size + 10}}"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+                 <rect ng-attr-x="{{-device.size}}"
+                       ng-attr-y="{{-device.size}}"
+                       ng-attr-width="{{device.size * 2}}"
+                       ng-attr-height="{{device.size * 2}}"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
                 <circle
                     cx="0"
                     cy="0"
@@ -46,7 +61,7 @@
                     ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
                 </circle>
             </g>
-            <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" >
+            <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>
                 <line x1="0" y1="-5" x2="0" y2="5"/>
             </g>
@@ -72,6 +87,8 @@
         <text ng-attr-x="{{graph.right_column}}" y="355">Key: {{last_key}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="375">Key Code: {{last_key_code}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="395">Move State: {{move_controller.state.name}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="415">Selected devices: {{selected_devices.length}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="435">Selected links: {{selected_links.length}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>

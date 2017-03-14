@@ -33,18 +33,18 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.last_event = null;
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
-  $scope.debug = {'hidden': false};
+  $scope.debug = {'hidden': true};
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.devices = [
-    new models.Device(15, 20, 15, true),
+    new models.Device(15, 20, 15, false),
     new models.Device(50, 60, 15, false),
     new models.Device(80, 10, 15, false)
   ];
 
   $scope.links = [
-    new models.Link(15, 20, 50, 60, true),
+    new models.Link(15, 20, 50, 60, false),
     new models.Link(50, 60, 80, 10, false),
     new models.Link(15, 20, 80, 10, false)
   ];
@@ -89,14 +89,14 @@ app.controller('MainCtrl', function($scope, $document) {
 
     $scope.onMouseDown = function ($event) {
       $scope.last_event = $event;
-      $scope.first_controller.state.onMouseDown($scope.first_controller);
+      $scope.first_controller.state.onMouseDown($scope.first_controller, $event);
       $scope.onMouseDownResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
 
     $scope.onMouseUp = function ($event) {
       $scope.last_event = $event;
-      $scope.first_controller.state.onMouseUp($scope.first_controller);
+      $scope.first_controller.state.onMouseUp($scope.first_controller, $event);
       $scope.onMouseUpResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -126,7 +126,7 @@ app.controller('MainCtrl', function($scope, $document) {
       $scope.mouseX = coords.x;
       $scope.mouseY = coords.y;
       $scope.updateScaledXY();
-      $scope.first_controller.state.onMouseMove($scope.first_controller);
+      $scope.first_controller.state.onMouseMove($scope.first_controller, $event);
       $scope.onMouseMoveResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -152,7 +152,7 @@ app.controller('MainCtrl', function($scope, $document) {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
         if ($event.key === 'a') {
-            $scope.devices.push(new Device($scope.scaledX, $scope.scaledY, 15, false));
+            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, 15, false));
         }
         $scope.last_key = $event.key;
         $scope.last_key_code = $event.keyCode;
