@@ -34,52 +34,52 @@
             </g>
             <g ng-repeat="device in devices"
                ng-attr-transform="translate({{device.x}},{{device.y}})"
-               class="router">
-                 <line ng-attr-x1="{{-device.size - 10}}"
+               ng-attr-class="{{device.type}}">
+                 <line ng-attr-x1="{{-50 - 10}}"
                        ng-attr-y1="0"
-                       ng-attr-x2="{{device.size + 10}}"
+                       ng-attr-x2="{{50 + 10}}"
                        ng-attr-y2="0"
                        ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
                  <line ng-attr-x1="0"
-                       ng-attr-y1="{{-device.size - 10}}"
+                       ng-attr-y1="{{-50 - 10}}"
                        ng-attr-x2="0"
-                       ng-attr-y2="{{device.size + 10}}"
+                       ng-attr-y2="{{50 + 10}}"
                        ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
-                 <rect ng-attr-x="{{-device.size}}"
-                       ng-attr-y="{{-device.size}}"
-                       ng-attr-width="{{device.size * 2}}"
-                       ng-attr-height="{{device.size * 2}}"
+                 <rect ng-attr-x="{{-50}}"
+                       ng-attr-y="{{-50}}"
+                       ng-attr-width="{{50 * 2}}"
+                       ng-attr-height="{{50 * 2}}"
                        ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.size + 2}}"
+                    ng-attr-r="{{50 + 2}}"
                     ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
                 </circle>
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.size}}">
+                    ng-attr-r="{{50}}">
                 </circle>
                 <g transform="rotate(45)">
                 <line ng-attr-x1="12"
                       ng-attr-y1="0"
-                      ng-attr-x2="{{device.size-18}}"
+                      ng-attr-x2="{{50-18}}"
                       ng-attr-y2="0"/>
                 <line ng-attr-x1="-12"
                       ng-attr-y1="0"
-                      ng-attr-x2="{{-device.size+18}}"
+                      ng-attr-x2="{{-50+18}}"
                       ng-attr-y2="0"/>
-                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(0) translate({{device.size-22}}, -20) scale(2.0)"/>
-                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(180) translate({{device.size-22}}, -20) scale(2.0)"/>
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(0) translate({{50-22}}, -20) scale(2.0)"/>
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(180) translate({{50-22}}, -20) scale(2.0)"/>
                 <line ng-attr-x1="0"
                       ng-attr-y1="17"
                       ng-attr-x2="0"
-                      ng-attr-y2="{{device.size-5}}"/>
+                      ng-attr-y2="{{50-5}}"/>
                 <line ng-attr-x1="0"
                       ng-attr-y1="-17"
                       ng-attr-x2="0"
-                      ng-attr-y2="{{-device.size+5}}"/>
+                      ng-attr-y2="{{-50+5}}"/>
                 <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(90) translate(-22, -20) scale(2.0)" />
                 <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(270) translate(-22, -20) scale(2.0)"/>
                 </g>

@@ -132,6 +132,10 @@ _Selected1.prototype.onMouseUp = function (controller) {
 
 };
 
+_Selected1.prototype.onMouseDown = function () {
+
+};
+
 _Move.prototype.onMouseMove = function (controller) {
 
     var devices = controller.scope.selected_devices;
