@@ -21,6 +21,8 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.panY = 0;
   $scope.pressedX = 0;
   $scope.pressedY = 0;
+  $scope.pressedScaledX = 0;
+  $scope.pressedScaledY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
   $scope.selected_devices = [];
@@ -44,9 +46,9 @@ app.controller('MainCtrl', function($scope, $document) {
   ];
 
   $scope.links = [
-    new models.Link(15, 20, 50, 60, false),
-    new models.Link(50, 60, 80, 10, false),
-    new models.Link(15, 20, 80, 10, false)
+    new models.Link($scope.devices[0], $scope.devices[1], false),
+    new models.Link($scope.devices[1], $scope.devices[2], false),
+    new models.Link($scope.devices[0], $scope.devices[2], false),
   ];
 
 

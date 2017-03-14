@@ -15,11 +15,9 @@ Device.prototype.is_selected = function (x, y) {
 
 };
 
-function Link(x1, y1, x2, y2, selected) {
-    this.x1 = x1;
-    this.y1 = y1;
-    this.x2 = x2;
-    this.y2 = y2;
+function Link(from_device, to_device, selected) {
+    this.from_device = from_device;
+    this.to_device = to_device;
     this.selected = selected;
 }
 exports.Link = Link;

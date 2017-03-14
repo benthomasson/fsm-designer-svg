@@ -64,6 +64,11 @@ _Ready.prototype.onMouseDown = function (controller, $event) {
     var links = controller.scope.links;
     var selected_device = null;
 
+    controller.scope.pressedX = controller.scope.mouseX;
+    controller.scope.pressedY = controller.scope.mouseY;
+    controller.scope.pressedScaledX = controller.scope.scaledX;
+    controller.scope.pressedScaledY = controller.scope.scaledY;
+
     if (!$event.shiftKey) {
         controller.scope.selected_devices = [];
         controller.scope.selected_links = [];
@@ -79,7 +84,12 @@ _Ready.prototype.onMouseDown = function (controller, $event) {
         if (devices[i].is_selected(controller.scope.scaledX, controller.scope.scaledY)) {
             devices[i].selected = true;
             selected_device = devices[i];
-            controller.scope.selected_devices.push(devices[i]);
+            if (controller.scope.selected_devices.indexOf(devices[i]) === -1) {
+                controller.scope.selected_devices.push(devices[i]);
+            }
+            if (!$event.shiftKey) {
+                break;
+            }
         }
     }
 
@@ -120,6 +130,21 @@ _Selected1.prototype.onMouseUp = function (controller) {
 
     controller.changeState(Selected2);
 
+};
+
+_Move.prototype.onMouseMove = function (controller) {
+
+    var devices = controller.scope.selected_devices;
+
+    var diffX = controller.scope.scaledX - controller.scope.pressedScaledX;
+    var diffY = controller.scope.scaledY - controller.scope.pressedScaledY;
+    var i = 0;
+    for (i = 0; i < devices.length; i++) {
+        devices[i].x = devices[i].x + diffX;
+        devices[i].y = devices[i].y + diffY;
+    }
+    controller.scope.pressedScaledX = controller.scope.scaledX;
+    controller.scope.pressedScaledY = controller.scope.scaledY;
 };
 
 
