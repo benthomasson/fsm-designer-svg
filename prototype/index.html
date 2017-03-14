@@ -23,13 +23,13 @@
             <g ng-repeat="link in links">
                 <line ng-attr-x1="{{link.from_device.x}}"
                       ng-attr-y1="{{link.from_device.y}}"
-                      ng-attr-x2="{{link.to_device.x}}"
-                      ng-attr-y2="{{link.to_device.y}}"
+                      ng-attr-x2="{{link.to_device !== null ? link.to_device.x : scaledX}}"
+                      ng-attr-y2="{{link.to_device !== null ? link.to_device.y : scaledY}}"
                       ng-attr-class="{{link.selected && 'selected' || 'hidden'}}"/>
                 <line ng-attr-x1="{{link.from_device.x}}"
                       ng-attr-y1="{{link.from_device.y}}"
-                      ng-attr-x2="{{link.to_device.x}}"
-                      ng-attr-y2="{{link.to_device.y}}"
+                      ng-attr-x2="{{link.to_device !== null ? link.to_device.x : scaledX}}"
+                      ng-attr-y2="{{link.to_device !== null ? link.to_device.y : scaledY}}"
                       class="link"/>
             </g>
             <g ng-repeat="device in devices"
@@ -89,6 +89,7 @@
         <text ng-attr-x="{{graph.right_column}}" y="395">Move State: {{move_controller.state.name}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="415">Selected devices: {{selected_devices.length}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="435">Selected links: {{selected_links.length}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="455">Link State: {{link_controller.state.name}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>

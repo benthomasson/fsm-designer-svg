@@ -2,6 +2,7 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
+var link = require('./link.js');
 var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document) {
@@ -27,9 +28,11 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.lastPanY = 0;
   $scope.selected_devices = [];
   $scope.selected_links = [];
+  $scope.new_link = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
-  $scope.first_controller = $scope.move_controller;
+  $scope.link_controller = new fsm.FSMController($scope, link.Start, $scope.move_controller);
+  $scope.first_controller = $scope.link_controller;
   $scope.last_key = "";
   $scope.last_key_code = null;
   $scope.last_event = null;
@@ -89,6 +92,59 @@ app.controller('MainCtrl', function($scope, $document) {
       return "(" + coords.x + ", " + coords.y + ")";
     };
 
+    $scope.updateScaledXY = function() {
+        $scope.scaledX = ($scope.mouseX - $scope.panX) / $scope.current_scale;
+        $scope.scaledY = ($scope.mouseY - $scope.panY) / $scope.current_scale;
+    };
+
+    $scope.clear_selections = function () {
+
+        var i = 0;
+        var devices = $scope.devices;
+        var links = $scope.links;
+        $scope.selected_devices = [];
+        $scope.selected_links = [];
+        for (i = 0; i < devices.length; i++) {
+            devices[i].selected = false;
+        }
+        for (i = 0; i < links.length; i++) {
+            links[i].selected = false;
+        }
+    };
+
+    $scope.select_devices = function (multiple_selection) {
+
+        var i = 0;
+        var devices = $scope.devices;
+        var last_selected_device = null;
+
+        $scope.pressedX = $scope.mouseX;
+        $scope.pressedY = $scope.mouseY;
+        $scope.pressedScaledX = $scope.scaledX;
+        $scope.pressedScaledY = $scope.scaledY;
+
+        if (!multiple_selection) {
+            $scope.clear_selections();
+        }
+
+        for (i = 0; i < devices.length; i++) {
+            if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                devices[i].selected = true;
+                last_selected_device = devices[i];
+                if ($scope.selected_devices.indexOf(devices[i]) === -1) {
+                    $scope.selected_devices.push(devices[i]);
+                }
+                if (!multiple_selection) {
+                    break;
+                }
+            }
+        }
+        return last_selected_device;
+    };
+
+
+    // Event Handlers
+
     $scope.onMouseDown = function ($event) {
       $scope.last_event = $event;
       $scope.first_controller.state.onMouseDown($scope.first_controller, $event);
@@ -113,11 +169,6 @@ app.controller('MainCtrl', function($scope, $document) {
       $scope.onMouseLeaveResult = getMouseEventResult($event);
       $scope.cursor.hidden = true;
 	  $event.preventDefault();
-    };
-
-    $scope.updateScaledXY = function() {
-        $scope.scaledX = ($scope.mouseX - $scope.panX) / $scope.current_scale;
-        $scope.scaledY = ($scope.mouseY - $scope.panY) / $scope.current_scale;
     };
 
     $scope.onMouseMove = function ($event) {
@@ -145,7 +196,7 @@ app.controller('MainCtrl', function($scope, $document) {
       event.preventDefault();
     };
 
-    $scope.onKeyUp = function ($event) {
+    $scope.onKeyDown = function ($event) {
       $scope.last_event = $event;
         if ($event.key === 'd') {
             $scope.debug.hidden = !$scope.debug.hidden;
@@ -156,13 +207,17 @@ app.controller('MainCtrl', function($scope, $document) {
         if ($event.key === 'a') {
             $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, 15, false));
         }
+        if ($event.key === 'l') {
+            $scope.first_controller.state.onNewLink($scope.first_controller, $event);
+        }
         $scope.last_key = $event.key;
         $scope.last_key_code = $event.keyCode;
+        $scope.first_controller.state.onKeyDown($scope.first_controller, $event);
         $scope.$apply();
         $event.preventDefault();
     };
 
-    $document.bind("keypress", $scope.onKeyUp);
+    $document.bind("keydown", $scope.onKeyDown);
 });
 
 exports.app = app;
