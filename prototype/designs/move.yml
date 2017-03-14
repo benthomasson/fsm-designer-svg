@@ -1,0 +1,41 @@
+app: move
+panX: -42
+panY: -27
+scaleXY: 1
+states:
+- label: Start
+  size: 100
+  x: 533
+  y: 121
+- label: Ready
+  size: 100
+  x: 531
+  y: 320
+- label: Selected1
+  size: 100
+  x: 226
+  y: 325
+- label: Selected2
+  size: 100
+  x: 230
+  y: 576
+- label: Move
+  size: 100
+  x: 548
+  y: 558
+transitions:
+- from_state: Start
+  label: start
+  to_state: Ready
+- from_state: Ready
+  label: onMouseDown
+  to_state: Selected1
+- from_state: Selected1
+  label: onMouseUp
+  to_state: Selected2
+- from_state: Selected1
+  label: onMouseMove
+  to_state: Move
+- from_state: Selected2
+  label: onMouseDown
+  to_state: Selected1
