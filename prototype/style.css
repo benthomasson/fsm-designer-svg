@@ -27,6 +27,11 @@ circle.selected {
     stroke-width: 2;
 }
 
+line.selected {
+    stroke: #337AB7;
+    stroke-width: 6;
+}
+
 svg line.link {
     stroke: #D7D7D7;
     stroke-width: 2;

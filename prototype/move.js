@@ -5,6 +5,19 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
+_State.prototype.onMouseMove = function (controller, $event) {
+    controller.next_controller.state.onMouseMove(controller.next_controller, $event);
+};
+_State.prototype.onMouseUp = function (controller, $event) {
+    controller.next_controller.state.onMouseUp(controller.next_controller, $event);
+};
+_State.prototype.onMouseDown = function (controller, $event) {
+    controller.next_controller.state.onMouseDown(controller.next_controller, $event);
+};
+_State.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
+    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
+};
+
 
 function _Ready () {
     this.name = 'Ready';

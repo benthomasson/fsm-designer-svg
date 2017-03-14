@@ -25,6 +25,11 @@
                       ng-attr-y1="{{link.y1}}"
                       ng-attr-x2="{{link.x2}}"
                       ng-attr-y2="{{link.y2}}"
+                      ng-attr-class="{{link.selected && 'selected' || 'hidden'}}"/>
+                <line ng-attr-x1="{{link.x1}}"
+                      ng-attr-y1="{{link.y1}}"
+                      ng-attr-x2="{{link.x2}}"
+                      ng-attr-y2="{{link.y2}}"
                       class="link"/>
             </g>
             <g ng-repeat="device in devices"
@@ -32,12 +37,12 @@
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.r}}">
+                    ng-attr-r="{{device.size}}">
                 </circle>
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.r + 2}}"
+                    ng-attr-r="{{device.size + 2}}"
                     ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
                 </circle>
             </g>
@@ -66,6 +71,7 @@
         <text ng-attr-x="{{graph.right_column}}" y="335">Scaled Y: {{scaledY.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="355">Key: {{last_key}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="375">Key Code: {{last_key_code}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="395">Move State: {{move_controller.state.name}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>

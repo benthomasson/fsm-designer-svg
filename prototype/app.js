@@ -1,6 +1,8 @@
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
+var move = require('./move.js');
+var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document) {
 
@@ -24,6 +26,8 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.selected_devices = [];
   $scope.selected_links = [];
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
+  $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
+  $scope.first_controller = $scope.move_controller;
   $scope.last_key = "";
   $scope.last_key_code = null;
   $scope.last_event = null;
@@ -34,15 +38,15 @@ app.controller('MainCtrl', function($scope, $document) {
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.devices = [
-  	{'x': 15, 'y': 20, 'r':15, selected:false},
-  	{'x': 50, 'y': 60, 'r':15, selected:false},
-  	{'x': 80, 'y': 10, 'r':15, selected:true},
+    new models.Device(15, 20, 15, true),
+    new models.Device(50, 60, 15, false),
+    new models.Device(80, 10, 15, false)
   ];
 
   $scope.links = [
-  	{'x1': 15, 'y1': 20, 'x2': 50, 'y2': 60},
-  	{'x1': 50, 'y1': 60, 'x2': 80, 'y2': 10},
-  	{'x1': 15, 'y1': 20, 'x2': 80, 'y2': 10},
+    new models.Link(15, 20, 50, 60, true),
+    new models.Link(50, 60, 80, 10, false),
+    new models.Link(15, 20, 80, 10, false)
   ];
 
 
@@ -85,14 +89,14 @@ app.controller('MainCtrl', function($scope, $document) {
 
     $scope.onMouseDown = function ($event) {
       $scope.last_event = $event;
-      $scope.view_controller.state.onMouseDown($scope.view_controller);
+      $scope.first_controller.state.onMouseDown($scope.first_controller);
       $scope.onMouseDownResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
 
     $scope.onMouseUp = function ($event) {
       $scope.last_event = $event;
-      $scope.view_controller.state.onMouseUp($scope.view_controller);
+      $scope.first_controller.state.onMouseUp($scope.first_controller);
       $scope.onMouseUpResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -122,7 +126,7 @@ app.controller('MainCtrl', function($scope, $document) {
       $scope.mouseX = coords.x;
       $scope.mouseY = coords.y;
       $scope.updateScaledXY();
-      $scope.view_controller.state.onMouseMove($scope.view_controller);
+      $scope.first_controller.state.onMouseMove($scope.first_controller);
       $scope.onMouseMoveResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -135,7 +139,7 @@ app.controller('MainCtrl', function($scope, $document) {
 
     $scope.onMouseWheel = function ($event, delta, deltaX, deltaY) {
       $scope.last_event = $event;
-      $scope.view_controller.state.onMouseWheel($scope.view_controller, $event, delta, deltaX, deltaY);
+      $scope.first_controller.state.onMouseWheel($scope.first_controller, $event, delta, deltaX, deltaY);
       event.preventDefault();
     };
 
@@ -148,7 +152,7 @@ app.controller('MainCtrl', function($scope, $document) {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
         if ($event.key === 'a') {
-            $scope.devices.push({'x': $scope.scaledX, 'y': $scope.scaledY, 'r': 15});
+            $scope.devices.push(new Device($scope.scaledX, $scope.scaledY, 15, false));
         }
         $scope.last_key = $event.key;
         $scope.last_key_code = $event.keyCode;

@@ -9,4 +9,4 @@ generate:
 	fsm-designer generate-js --template templates/fsm.jst designs/view.yml view.js
 
 lint:
-	jshint --verbose hamster.js main.js app.js view.js fsm.js
+	jshint --verbose hamster.js main.js app.js view.js fsm.js models.js move.js
