@@ -1,7 +1,8 @@
-function FSMController (scope, initial_state) {
+function FSMController (scope, initial_state, next_controller) {
     this.scope = scope;
     this.state = initial_state;
     this.state.start(this);
+    this.next_controller = next_controller;
 }
 exports.FSMController = FSMController;
 

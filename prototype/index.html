@@ -19,11 +19,16 @@
          ng-mouseover="onMouseOver($event)"
          msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)"
          >
-        <g transform="scale(1.0)" id="frame_g">
+         <g transform="scale(1.0)" id="frame_g">
             <g ng-repeat="link in links">
-                <line ng-attr-x1="{{link.x1}}" ng-attr-y1="{{link.y1}}" ng-attr-x2="{{link.x2}}" ng-attr-y2="{{link.y2}}" class="link"/>
+                <line ng-attr-x1="{{link.x1}}"
+                      ng-attr-y1="{{link.y1}}"
+                      ng-attr-x2="{{link.x2}}"
+                      ng-attr-y2="{{link.y2}}"
+                      class="link"/>
             </g>
-            <g ng-repeat="device in devices" ng-attr-transform="translate({{device.x}},{{device.y}})">
+            <g ng-repeat="device in devices"
+               ng-attr-transform="translate({{device.x}},{{device.y}})">
                 <circle
                     cx="0"
                     cy="0"
@@ -59,6 +64,8 @@
         <text ng-attr-x="{{graph.right_column}}" y="295">Mouse Y: {{mouseY.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="315">Scaled X: {{scaledX.toFixed(2)}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="335">Scaled Y: {{scaledY.toFixed(2)}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="355">Key: {{last_key}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="375">Key Code: {{last_key_code}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>

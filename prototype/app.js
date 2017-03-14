@@ -21,9 +21,12 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.pressedY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
-  $scope.selected_device = null;
-  $scope.selected_link = null;
-  $scope.view_controller = new fsm.FSMController($scope, view.Start);
+  $scope.selected_devices = [];
+  $scope.selected_links = [];
+  $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
+  $scope.last_key = "";
+  $scope.last_key_code = null;
+  $scope.last_event = null;
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
   $scope.debug = {'hidden': false};
@@ -81,12 +84,14 @@ app.controller('MainCtrl', function($scope, $document) {
     };
 
     $scope.onMouseDown = function ($event) {
+      $scope.last_event = $event;
       $scope.view_controller.state.onMouseDown($scope.view_controller);
       $scope.onMouseDownResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
 
     $scope.onMouseUp = function ($event) {
+      $scope.last_event = $event;
       $scope.view_controller.state.onMouseUp($scope.view_controller);
       $scope.onMouseUpResult = getMouseEventResult($event);
 	  $event.preventDefault();
@@ -128,23 +133,27 @@ app.controller('MainCtrl', function($scope, $document) {
 	  $event.preventDefault();
     };
 
-    $scope.onMouseWheel = function (event, delta, deltaX, deltaY) {
-      $scope.view_controller.state.onMouseWheel($scope.view_controller, event, delta, deltaX, deltaY);
+    $scope.onMouseWheel = function ($event, delta, deltaX, deltaY) {
+      $scope.last_event = $event;
+      $scope.view_controller.state.onMouseWheel($scope.view_controller, $event, delta, deltaX, deltaY);
       event.preventDefault();
     };
 
-    $scope.onKeyUp = function (event) {
-        if (event.key === 'd') {
+    $scope.onKeyUp = function ($event) {
+      $scope.last_event = $event;
+        if ($event.key === 'd') {
             $scope.debug.hidden = !$scope.debug.hidden;
         }
-        if (event.key === 'p') {
+        if ($event.key === 'p') {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
-        if (event.key === 'a') {
+        if ($event.key === 'a') {
             $scope.devices.push({'x': $scope.scaledX, 'y': $scope.scaledY, 'r': 15});
         }
+        $scope.last_key = $event.key;
+        $scope.last_key_code = $event.keyCode;
         $scope.$apply();
-        event.preventDefault();
+        $event.preventDefault();
     };
 
     $document.bind("keypress", $scope.onKeyUp);
