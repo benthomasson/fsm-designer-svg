@@ -43,9 +43,9 @@ app.controller('MainCtrl', function($scope, $document) {
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.devices = [
-    new models.Device(15, 20, 15, false),
-    new models.Device(50, 60, 15, false),
-    new models.Device(80, 10, 15, false)
+    new models.Device(15*4, 20*4, 50, false),
+    new models.Device(50*4, 60*4, 50, false),
+    new models.Device(80*4, 10*4, 50, false)
   ];
 
   $scope.links = [
@@ -205,7 +205,7 @@ app.controller('MainCtrl', function($scope, $document) {
             $scope.cursor.hidden = !$scope.cursor.hidden;
         }
         if ($event.key === 'a') {
-            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, 15, false));
+            $scope.devices.push(new models.Device($scope.scaledX, $scope.scaledY, 50, false));
         }
         if ($event.key === 'l') {
             $scope.first_controller.state.onNewLink($scope.first_controller, $event);

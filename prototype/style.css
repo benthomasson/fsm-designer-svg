@@ -61,3 +61,12 @@ svg line.debug {
 .hidden {
     display: none;
 }
+
+.router line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.router polygon {
+    fill: #ffffff;
+}

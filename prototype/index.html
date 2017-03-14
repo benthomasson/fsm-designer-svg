@@ -33,7 +33,8 @@
                       class="link"/>
             </g>
             <g ng-repeat="device in devices"
-               ng-attr-transform="translate({{device.x}},{{device.y}})">
+               ng-attr-transform="translate({{device.x}},{{device.y}})"
+               class="router">
                  <line ng-attr-x1="{{-device.size - 10}}"
                        ng-attr-y1="0"
                        ng-attr-x2="{{device.size + 10}}"
@@ -52,14 +53,36 @@
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.size}}">
+                    ng-attr-r="{{device.size + 2}}"
+                    ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
                 </circle>
                 <circle
                     cx="0"
                     cy="0"
-                    ng-attr-r="{{device.size + 2}}"
-                    ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
+                    ng-attr-r="{{device.size}}">
                 </circle>
+                <g transform="rotate(45)">
+                <line ng-attr-x1="12"
+                      ng-attr-y1="0"
+                      ng-attr-x2="{{device.size-18}}"
+                      ng-attr-y2="0"/>
+                <line ng-attr-x1="-12"
+                      ng-attr-y1="0"
+                      ng-attr-x2="{{-device.size+18}}"
+                      ng-attr-y2="0"/>
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(0) translate({{device.size-22}}, -20) scale(2.0)"/>
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(180) translate({{device.size-22}}, -20) scale(2.0)"/>
+                <line ng-attr-x1="0"
+                      ng-attr-y1="17"
+                      ng-attr-x2="0"
+                      ng-attr-y2="{{device.size-5}}"/>
+                <line ng-attr-x1="0"
+                      ng-attr-y1="-17"
+                      ng-attr-x2="0"
+                      ng-attr-y2="{{-device.size+5}}"/>
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(90) translate(-22, -20) scale(2.0)" />
+                <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(270) translate(-22, -20) scale(2.0)"/>
+                </g>
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>
