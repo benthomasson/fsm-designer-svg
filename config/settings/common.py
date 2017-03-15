@@ -47,6 +47,7 @@ LOCAL_APPS = (
     'ansible-network-ui.users',  # custom users app
     # Your stuff: custom apps go here
     'myapp',
+    'prototype',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
