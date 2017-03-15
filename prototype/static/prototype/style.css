@@ -1,0 +1,122 @@
+/* Put your css in here */
+
+body {
+    background-color: yellow;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+svg {
+    background-color: white;
+    cursor: none;
+}
+
+svg text {
+    fill: #337AB7;
+}
+
+
+line.selected {
+    stroke: #337AB7;
+    stroke-width: 6;
+}
+
+svg rect.debug {
+    fill-opacity: 0;
+    stroke: rgb(77,200,242);
+    stroke-width: 1;
+}
+
+svg line.link {
+    stroke: #D7D7D7;
+    stroke-width: 2;
+}
+
+svg line.cursor {
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+svg line.debug {
+    stroke: rgb(77,200,242);
+    stroke-width: 1;
+}
+
+.debug-cursor line {
+    stroke: rgb(77,200,242);
+    stroke-width: 4;
+}
+
+.hidden {
+    display: none;
+}
+
+.router circle {
+    fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+.router circle.selected {
+    stroke: #337AB7;
+    stroke-width: 4;
+}
+
+.router line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.router polygon {
+    fill: #ffffff;
+}
+
+.switch rect {
+    fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+.switch rect.selected {
+    stroke: #337AB7;
+    stroke-width: 10;
+}
+
+.switch line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.switch polygon {
+    fill: #ffffff;
+}
+
+.rack rect {
+    fill: #D7D7D7;
+    stroke: #707070;
+    stroke-width: 2;
+}
+
+.rack rect.background {
+    fill: #ffffff;
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.rack rect.selected {
+    fill: #337AB7;
+    stroke: #337AB7;
+    stroke-width: 10;
+}
+
+.rack line {
+    stroke: #ffffff;
+    stroke-width: 20;
+}
+
+.rack circle {
+    fill: #ffffff;
+}
