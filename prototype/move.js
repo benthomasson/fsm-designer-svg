@@ -70,6 +70,7 @@ _Ready.prototype.onMouseDown = function (controller, $event) {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
     }
 };
+_Ready.prototype.onMouseDown.transitions = ['Selected1']
 
 
 
@@ -78,6 +79,7 @@ _Start.prototype.start = function (controller) {
     controller.changeState(Ready);
 
 };
+_Start.prototype.start.transitions = ['Ready']
 
 
 
@@ -86,6 +88,7 @@ _Selected2.prototype.onMouseDown = function (controller, $event) {
     controller.changeState(Ready);
     controller.state.onMouseDown(controller, $event);
 };
+_Selected2.prototype.onMouseDown.transitions = ['Ready']
 
 _Selected2.prototype.onKeyDown = function (controller, $event) {
 
@@ -118,6 +121,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         }
     }
 };
+_Selected2.prototype.onMouseUp.transitions = ['Ready']
 
 
 _Selected1.prototype.onMouseMove = function (controller) {
@@ -125,12 +129,14 @@ _Selected1.prototype.onMouseMove = function (controller) {
     controller.changeState(Move);
 
 };
+_Selected1.prototype.onMouseMove.transitions = ['Move']
 
 _Selected1.prototype.onMouseUp = function (controller) {
 
     controller.changeState(Selected2);
 
 };
+_Selected1.prototype.onMouseUp.transitions = ['Selected2']
 
 _Selected1.prototype.onMouseDown = function () {
 
@@ -157,4 +163,5 @@ _Move.prototype.onMouseUp = function (controller, $event) {
     controller.changeState(Selected2);
     controller.state.onMouseUp(controller, $event);
 };
+_Move.prototype.onMouseUp.transitions = ['Selected2']
 

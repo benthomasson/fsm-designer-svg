@@ -1,6 +1,6 @@
 app: move
-panX: -42
-panY: -27
+panX: 246
+panY: -54
 scaleXY: 1
 states:
 - label: Start
@@ -18,11 +18,11 @@ states:
 - label: Selected2
   size: 100
   x: 230
-  y: 576
+  y: 582
 - label: Move
   size: 100
-  x: 548
-  y: 558
+  x: -54
+  y: 587
 transitions:
 - from_state: Start
   label: start
@@ -38,4 +38,7 @@ transitions:
   to_state: Move
 - from_state: Selected2
   label: onMouseDown
-  to_state: Selected1
+  to_state: Ready
+- from_state: Move
+  label: onMouseUp
+  to_state: Selected2

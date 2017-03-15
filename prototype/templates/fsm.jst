@@ -21,5 +21,6 @@ _{{state}}.prototype.{{fn}} = function (controller) {
     controller.changeState({{tn.to_state}});
 {%endfor%}
 };
+_{{state}}.prototype.{{f_name}}.transitions = [{%for t in transitions%}'{{t.to_state}}'{% if not loop.last%}, {%endif%}{%endfor%}]
 {%endfor%}
 {%endfor%}
