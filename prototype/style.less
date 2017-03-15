@@ -1,5 +1,13 @@
 /* Put your css in here */
 
+@selected-blue: #337AB7;
+@light-background: #ffffff;
+@light-widget-detail: #ffffff;
+@dark-widget-detail: #707070;
+@widget-body: #D7D7D7;
+@link: #D7D7D7;
+@debug-copynot: rgb(77,200,242);
+
 body {
     background-color: yellow;
     padding: 0;
@@ -10,43 +18,43 @@ body {
 }
 
 svg {
-    background-color: white;
+    background-color: @light-background;
     cursor: none;
 }
 
 svg text {
-    fill: #337AB7;
+    fill: @selected-blue;
 }
 
 
 line.selected {
-    stroke: #337AB7;
+    stroke: @selected-blue;
     stroke-width: 6;
 }
 
 svg rect.debug {
     fill-opacity: 0;
-    stroke: rgb(77,200,242);
+    stroke: @debug-copynot;
     stroke-width: 1;
 }
 
 svg line.link {
-    stroke: #D7D7D7;
+    stroke: @link;
     stroke-width: 2;
 }
 
 svg line.cursor {
-    stroke: #707070;
+    stroke: @dark-widget-detail;
     stroke-width: 2;
 }
 
 svg line.debug {
-    stroke: rgb(77,200,242);
+    stroke: @debug-copynot;
     stroke-width: 1;
 }
 
 .debug-cursor line {
-    stroke: rgb(77,200,242);
+    stroke: @debug-copynot;
     stroke-width: 4;
 }
 
@@ -55,68 +63,68 @@ svg line.debug {
 }
 
 .router circle {
-    fill: #D7D7D7;
-    stroke: #707070;
+    fill: @widget-body;
+    stroke: @dark-widget-detail;
     stroke-width: 2;
 }
 
 .router circle.selected {
-    stroke: #337AB7;
+    stroke: @selected-blue;
     stroke-width: 4;
 }
 
 .router line {
-    stroke: #ffffff;
+    stroke: @light-widget-detail;
     stroke-width: 20;
 }
 
 .router polygon {
-    fill: #ffffff;
+    fill: @light-widget-detail;
 }
 
 .switch rect {
-    fill: #D7D7D7;
-    stroke: #707070;
+    fill: @widget-body;
+    stroke: @dark-widget-detail;
     stroke-width: 2;
 }
 
 .switch rect.selected {
-    stroke: #337AB7;
+    stroke: @selected-blue;
     stroke-width: 10;
 }
 
 .switch line {
-    stroke: #ffffff;
+    stroke: @light-widget-detail;
     stroke-width: 20;
 }
 
 .switch polygon {
-    fill: #ffffff;
+    fill: @light-widget-detail;
 }
 
 .rack rect {
-    fill: #D7D7D7;
-    stroke: #707070;
+    fill: @widget-body;
+    stroke: @dark-widget-detail;
     stroke-width: 2;
 }
 
 .rack rect.background {
-    fill: #ffffff;
-    stroke: #ffffff;
+    fill: @light-background;
+    stroke: @light-background;
     stroke-width: 2;
 }
 
 .rack rect.selected {
-    fill: #337AB7;
-    stroke: #337AB7;
+    fill: @selected-blue;
+    stroke: @selected-blue;
     stroke-width: 10;
 }
 
 .rack line {
-    stroke: #ffffff;
+    stroke: @light-widget-detail;
     stroke-width: 20;
 }
 
 .rack circle {
-    fill: #ffffff;
+    fill: @light-widget-detail;
 }
