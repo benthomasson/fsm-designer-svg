@@ -1,4 +1,5 @@
-function Device(x, y, type) {
+function Device(name, x, y, type) {
+    this.name = name;
     this.x = x;
     this.y = y;
     this.size = 50;
