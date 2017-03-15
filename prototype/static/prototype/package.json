@@ -11,8 +11,9 @@
   "dependencies": {
     "browserify": "",
     "inherits": "",
-    "eslint": "",
-    "require": ""
+    "require": "",
+    "jshint": "",
+    "less": ""
   },
   "devDependencies": {
     "eslint": "^3.17.1",
