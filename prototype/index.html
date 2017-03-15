@@ -19,6 +19,12 @@
          ng-mouseover="onMouseOver($event)"
          msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)"
          >
+        <defs>
+		<filter x="0" y="0" width="1" height="1" id="selected">
+		  <feFlood flood-color="#b3d8fd"/>
+		  <feComposite in="SourceGraphic" operator="xor"/>
+		</filter>
+		</defs>
          <g transform="scale(1.0)" id="frame_g">
             <g ng-repeat="link in links">
                 <line ng-attr-x1="{{link.from_device.x}}"
@@ -86,7 +92,12 @@
                         <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(270) translate(-22, -20) scale(2.0)"/>
                     </g>
                     <text></text>
-                    <text text-anchor="middle" x="0" y="75">{{device.name}}</text>
+                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+						  filter="url(#selected)"
+                          text-anchor="middle"
+						  x="0"
+						  y="75"> {{device.name}}</text>
+                    <text text-anchor="middle" x="0" y="75">{{device.name}}{{device.edit_label?'_':''}}</text>
                </g> <!-- end router -->
 
                <g ng-switch-when="switch"> <!-- begin switch -->
@@ -145,7 +156,12 @@
                     <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(180) translate(28, -6) scale(2.0)"/>
             
              
-                    <text text-anchor="middle" x="0" y="75">{{device.name}}</text>
+                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+						  filter="url(#selected)"
+                          text-anchor="middle"
+						  x="0"
+						  y="75"> {{device.name}} </text>
+                    <text text-anchor="middle" x="0" y="75">{{device.name}}{{device.edit_label?'_':''}}</text>
                </g> <!-- end switch -->
 
                <g ng-switch-when="rack"> <!-- begin rack -->
@@ -205,7 +221,12 @@
                     <circle cx="30" cy="0" r=7 />
                     <circle cx="30" cy="35" r=7 />
                     </circle>
-                    <text text-anchor="middle" x="0" y="75">{{device.name}}</text>
+                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+						  filter="url(#selected)"
+                          text-anchor="middle"
+						  x="0"
+						  y="75"> {{device.name}} </text>
+                    <text text-anchor="middle" x="0" y="75">{{device.name}}{{device.edit_label?'_':''}}</text>
                </g> <!-- end rack -->
 
                <g ng-switch-default> <!-- begin default -->
@@ -235,7 +256,12 @@
                         cy="0"
                         ng-attr-r="{{50}}">
                     </circle>
-                    <text text-anchor="middle" x="0" y="75">{{device.name}}</text>
+                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+						  filter="url(#selected)"
+                          text-anchor="middle"
+						  x="0"
+						  y="75"> {{device.name}} </text>
+                    <text text-anchor="middle" x="0" y="75">{{device.name}}{{device.edit_label?'_':''}}</text>
                </g> <!-- end default -->
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >

@@ -197,25 +197,7 @@ app.controller('MainCtrl', function($scope, $document) {
     };
 
     $scope.onKeyDown = function ($event) {
-      $scope.last_event = $event;
-        if ($event.key === 'd') {
-            $scope.debug.hidden = !$scope.debug.hidden;
-        }
-        if ($event.key === 'p') {
-            $scope.cursor.hidden = !$scope.cursor.hidden;
-        }
-        if ($event.key === 'r') {
-            $scope.devices.push(new models.Device("Router", $scope.scaledX, $scope.scaledY, "router"));
-        }
-        if ($event.key === 's') {
-            $scope.devices.push(new models.Device("Switch", $scope.scaledX, $scope.scaledY, "switch"));
-        }
-        if ($event.key === 'a') {
-            $scope.devices.push(new models.Device("Rack", $scope.scaledX, $scope.scaledY, "rack"));
-        }
-        if ($event.key === 'l') {
-            $scope.first_controller.state.onNewLink($scope.first_controller, $event);
-        }
+        $scope.last_event = $event;
         $scope.last_key = $event.key;
         $scope.last_key_code = $event.keyCode;
         $scope.first_controller.state.onKeyDown($scope.first_controller, $event);

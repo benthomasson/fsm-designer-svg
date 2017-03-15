@@ -72,6 +72,19 @@ _Ready.prototype.onMouseWheel = function (controller, event, delta, deltaX, delt
     controller.state.onMouseWheel(controller, event, delta, deltaX, deltaY);
 };
 
+_Ready.prototype.onKeyDown = function(controller, $event) {
+
+	var scope = controller.scope;
+
+    if ($event.key === 'd') {
+        scope.debug.hidden = !scope.debug.hidden;
+        return;
+    }
+    if ($event.key === 'p') {
+        scope.cursor.hidden = !scope.cursor.hidden;
+        return;
+    }
+};
 
 
 _Start.prototype.start = function (controller) {

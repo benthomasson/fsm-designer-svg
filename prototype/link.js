@@ -62,6 +62,15 @@ exports.Selecting = Selecting;
 
 
 
+_Ready.prototype.onKeyDown = function(controller, $event) {
+
+    if ($event.key === 'l') {
+        controller.state.onNewLink(controller, $event);
+    }
+
+	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+};
+
 _Ready.prototype.onNewLink = function (controller) {
 
     controller.scope.clear_selections();

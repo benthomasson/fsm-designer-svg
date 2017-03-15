@@ -3,8 +3,9 @@ function Device(name, x, y, type) {
     this.x = x;
     this.y = y;
     this.size = 50;
-    this.selected = false;
     this.type = type;
+    this.selected = false;
+    this.edit_label = false;
 }
 exports.Device = Device;
 
