@@ -7,6 +7,7 @@ var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document) {
 
+  $scope.control_socket = new WebSocket("ws://" + window.location.host + "/prototype/");
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
   $scope.onMouseEnterResult = "";
@@ -206,6 +207,17 @@ app.controller('MainCtrl', function($scope, $document) {
     };
 
     $document.bind("keydown", $scope.onKeyDown);
+
+    $scope.control_socket.onmessage = function(e) {
+		console.log(e.data);
+	};
+	$scope.control_socket.onopen = function() {
+		$scope.control_socket.send("hello world");
+	};
+	// Call onopen directly if $scope.control_socket is already open
+	if ($scope.control_socket.readyState === WebSocket.OPEN) {
+		$scope.control_socket.onopen();
+	}
 });
 
 exports.app = app;
