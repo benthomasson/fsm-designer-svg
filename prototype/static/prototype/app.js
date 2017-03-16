@@ -3,6 +3,7 @@ var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
 var link = require('./link.js');
+var buttons = require('./buttons.js');
 var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document) {
@@ -33,7 +34,8 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
   $scope.link_controller = new fsm.FSMController($scope, link.Start, $scope.move_controller);
-  $scope.first_controller = $scope.link_controller;
+  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.link_controller);
+  $scope.first_controller = $scope.buttons_controller;
   $scope.last_key = "";
   $scope.last_key_code = null;
   $scope.last_event = null;
@@ -49,11 +51,24 @@ app.controller('MainCtrl', function($scope, $document) {
     new models.Device("S1", 80*4, 10*4, "switch")
   ];
 
+  $scope.stencils = [
+    {"name": "router", "size":50, 'x':10, 'y':100},
+    {"name": "switch", "size":50, 'x':10, 'y':160},
+    {"name": "rack", "size":50, 'x':10, 'y':220},
+  ];
+
+  $scope.layers = [
+    {"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
+    {"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
+    {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
+  ];
+
   $scope.links = [
     new models.Link($scope.devices[0], $scope.devices[1], false),
     new models.Link($scope.devices[1], $scope.devices[2], false),
     new models.Link($scope.devices[0], $scope.devices[2], false),
   ];
+
 
 
     // Utility functions
@@ -208,6 +223,31 @@ app.controller('MainCtrl', function($scope, $document) {
 
     $document.bind("keydown", $scope.onKeyDown);
 
+    // Button Event Handlers
+
+    $scope.onSaveButton = function (button) {
+        console.log(button.name);
+    };
+
+    $scope.onLoadButton = function (button) {
+        console.log(button.name);
+    };
+
+    $scope.onDeployButton = function (button) {
+        console.log(button.name);
+    };
+
+    // Buttons
+
+    $scope.buttons = [
+      new models.Button("Save", 10, 10, 50, 50, $scope.onSaveButton),
+      new models.Button("Load", 70, 10, 50, 50, $scope.onLoadButton),
+      new models.Button("Deploy", 130, 10, 60, 50, $scope.onDeployButton)
+    ];
+
+
+    // Create a web socket to connect to the backend server
+
     $scope.control_socket.onmessage = function(e) {
 		console.log(e.data);
 	};
@@ -218,6 +258,8 @@ app.controller('MainCtrl', function($scope, $document) {
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();
 	}
+
+    // End web socket
 });
 
 exports.app = app;
