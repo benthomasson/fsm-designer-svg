@@ -133,7 +133,6 @@
                         ng-attr-height="{{100}}"
                         rx=10>
                     </rect>
-                    
                     <line ng-attr-x1="2"
                           ng-attr-y1="-28"
                           ng-attr-x2="38"
@@ -144,7 +143,6 @@
                           ng-attr-x2="38"
                           ng-attr-y2="14"/>
                     <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(0) translate(28, -6) scale(2.0)"/>
- 
                     <line ng-attr-x1="-2"
                           ng-attr-y1="28"
                           ng-attr-x2="-38"
@@ -155,8 +153,6 @@
                           ng-attr-x2="-38"
                           ng-attr-y2="-14"/>
                     <polygon points="0 0, 10 10, 0 20" ng-attr-transform="rotate(180) translate(28, -6) scale(2.0)"/>
-            
-             
                     <g ng-show="current_scale > 0.5">
                     <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
 						  filter="url(#selected)"
@@ -276,6 +272,54 @@
                 <line x1="0" y1="-5" x2="0" y2="5"/>
             </g>
         </g>
+        <g> <!-- buttons -->
+            <g ng-repeat="button in buttons"
+               ng-attr-transform="translate({{button.x}},{{button.y}})"
+               ng-attr-class="{{button.is_pressed ? 'button-pressed' : button.mouse_over ? 'button-hover' : 'button'}}">
+                <rect x=0
+                      y=0
+                      ng-attr-width={{button.width}}
+                      ng-attr-height={{button.height}}
+                      rx=10></rect>
+                <text ng-attr-x="{{button.width/2}}"
+                      ng-attr-y="{{button.height/2}}"
+                      dy=".3em"
+                      text-anchor="middle">{{button.name}}</text>
+            </g>
+        </g> <!-- end buttons -->
+
+        <g> <!-- stencils -->
+            <g ng-repeat="stencil in stencils"
+               ng-attr-transform="translate({{stencil.x}},{{stencil.y}})"
+               class="button">
+                <rect x=0
+                      y=0
+                      ng-attr-width={{stencil.size}}
+                      ng-attr-height={{stencil.size}}
+                      rx=10></rect>
+                <text ng-attr-x="{{stencil.size/2}}"
+                      ng-attr-y="{{stencil.size/2}}"
+                      dy=".3em"
+                      text-anchor="middle">{{stencil.name}}</text>
+            </g>
+        </g> <!-- end stencils -->
+
+        <g> <!-- layers -->
+            <g ng-repeat="layer in layers"
+               ng-attr-transform="translate({{layer.x}},{{layer.y}})"
+               class="button">
+                <rect x=0
+                      y=0
+                      ng-attr-width={{layer.size}}
+                      ng-attr-height={{layer.size}}
+                      rx=3></rect>
+                <text ng-attr-x="{{layer.size/2}}"
+                      ng-attr-y="{{layer.size/2}}"
+                      dy=".3em"
+                      text-anchor="middle">{{layer.name}}</text>
+            </g>
+        </g> <!-- end layers -->
+
         <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="35">height: {{graph.height}}</text>
@@ -300,6 +344,7 @@
         <text ng-attr-x="{{graph.right_column}}" y="415">Selected devices: {{selected_devices.length}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="435">Selected links: {{selected_links.length}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="455">Link State: {{link_controller.state.name}}</text>
+        <text ng-attr-x="{{graph.right_column}}" y="475">Buttons State: {{buttons_controller.state.name}}</text>
         </g>
         <g ng-attr-transform="translate({{cursor.x}},{{cursor.y}})" ng-attr-class="{{cursor.hidden && 'hidden' || ''}}" >
             <line x1="-15" y1="0" x2="15" y2="0" class="cursor"/>

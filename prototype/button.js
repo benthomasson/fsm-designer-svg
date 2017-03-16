@@ -5,6 +5,18 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
+_State.prototype.onMouseMove = function () {
+};
+
+_State.prototype.onMouseUp = function () {
+};
+
+_State.prototype.onMouseDown = function () {
+};
+
+_State.prototype.onKeyDown = function () {
+};
+
 
 function _Ready () {
     this.name = 'Ready';
@@ -36,14 +48,12 @@ exports.Pressed = Pressed;
 
 
 
-
 _Ready.prototype.onMouseDown = function (controller) {
 
     controller.changeState(Pressed);
 
 };
 _Ready.prototype.onMouseDown.transitions = ['Pressed'];
-
 
 
 _Start.prototype.start = function (controller) {
@@ -54,15 +64,18 @@ _Start.prototype.start = function (controller) {
 _Start.prototype.start.transitions = ['Ready'];
 
 
-
 _Clicked.prototype.start = function (controller) {
 
+    controller.scope.callback(controller.scope);
+    controller.scope.is_pressed = false;
     controller.changeState(Ready);
-
 };
 _Clicked.prototype.start.transitions = ['Ready'];
 
 
+_Pressed.prototype.start = function (controller) {
+    controller.scope.is_pressed = true;
+};
 
 _Pressed.prototype.onMouseUp = function (controller) {
 

@@ -7,6 +7,11 @@
 @widget-body: #D7D7D7;
 @link: #D7D7D7;
 @debug-copynot: rgb(77,200,242);
+@button-body: #f6f6f6;
+@button-text: #707070;
+@button-outline: #b4b6b4;
+@button-body-hover: #dfdfdf;
+@button-body-pressed: #d5d5d5;
 
 body {
     background-color: yellow;
@@ -127,4 +132,34 @@ svg line.debug {
 
 .rack circle {
     fill: @light-widget-detail;
+}
+
+.button rect {
+    fill: @button-body;
+    stroke: @button-outline;
+    stroke-width: 1;
+}
+
+.button text {
+    fill: @button-text;
+}
+
+.button-pressed rect {
+    fill: @button-body-pressed;
+    stroke: @button-outline;
+    stroke-width: 1;
+}
+
+.button-pressed text {
+    fill: @button-text;
+}
+
+.button-hover rect {
+    fill: @button-body-hover;
+    stroke: @button-outline;
+    stroke-width: 1;
+}
+
+.button-hover text {
+    fill: @button-text;
 }
