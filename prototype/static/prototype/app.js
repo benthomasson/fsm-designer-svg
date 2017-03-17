@@ -11,7 +11,7 @@ var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document, $location) {
 
-  $scope.control_socket = new WebSocket("ws://" + window.location.host + "/prototype/");
+  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype/", null, {debug: true, reconnectInterval: 300});
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
