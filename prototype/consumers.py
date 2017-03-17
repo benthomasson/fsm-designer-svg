@@ -1,5 +1,5 @@
 # In consumers.py
-from channels import Group
+from channels import Group, Channel
 from channels.sessions import channel_session
 
 def _next_id():
@@ -17,7 +17,6 @@ def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
     # Work out room name from path (ignore slashes)
-    print dir(message.channel_session)
     room = message.content['path'].strip("/")
     # Save room in session and add us to the group
     message.channel_session['room'] = room
@@ -27,7 +26,7 @@ def ws_connect(message):
 # Connected to websocket.receive
 @channel_session
 def ws_message(message):
-    print message['text']
+    Channel('console_printer').send({"text": message['text']})
     Group("chat-%s" % message.channel_session['room']).send({
         "text": message['text'],
     })
@@ -41,3 +40,6 @@ def ws_message(message):
 @channel_session
 def ws_disconnect(message):
     Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
+
+def console_printer(message):
+    print message['text']
