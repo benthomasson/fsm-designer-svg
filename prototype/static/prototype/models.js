@@ -1,7 +1,8 @@
 var fsm = require('./fsm.js');
 var button = require('./button.js');
 
-function Device(name, x, y, type) {
+function Device(id, name, x, y, type) {
+    this.id = id;
     this.name = name;
     this.x = x;
     this.y = y;

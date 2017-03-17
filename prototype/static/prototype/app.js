@@ -1,14 +1,18 @@
+
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
 var link = require('./link.js');
 var buttons = require('./buttons.js');
+var util = require('./util.js');
 var models = require('./models.js');
 
-app.controller('MainCtrl', function($scope, $document) {
+app.controller('MainCtrl', function($scope, $document, $location) {
 
   $scope.control_socket = new WebSocket("ws://" + window.location.host + "/prototype/");
+  $scope.client_id = 0;
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
   $scope.onMouseEnterResult = "";
@@ -16,12 +20,12 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.onMouseMoveResult = "";
   $scope.onMouseMoveResult = "";
   $scope.current_scale = 1.0;
+  $scope.panX = 0;
+  $scope.panY = 0;
   $scope.mouseX = 0;
   $scope.mouseY = 0;
   $scope.scaledX = 0;
   $scope.scaledY = 0;
-  $scope.panX = 0;
-  $scope.panY = 0;
   $scope.pressedX = 0;
   $scope.pressedY = 0;
   $scope.pressedScaledX = 0;
@@ -45,10 +49,11 @@ app.controller('MainCtrl', function($scope, $document) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
+  $scope.device_id_seq = util.natural_numbers();
   $scope.devices = [
-    new models.Device("R1", 15*4, 20*4, "router"),
-    new models.Device("Rack1", 50*4, 60*4, "rack"),
-    new models.Device("S1", 80*4, 10*4, "switch")
+    new models.Device($scope.device_id_seq(), "R1", 15*4, 20*4, "router"),
+    new models.Device($scope.device_id_seq(), "Rack1", 50*4, 60*4, "rack"),
+    new models.Device($scope.device_id_seq(), "S1", 80*4, 10*4, "switch")
   ];
 
   $scope.stencils = [
@@ -227,6 +232,11 @@ app.controller('MainCtrl', function($scope, $document) {
 
     $scope.onSaveButton = function (button) {
         console.log(button.name);
+        $scope.control_socket.send(JSON.stringify(['save', {"devices": $scope.devices,
+                                                            "links": $scope.links,
+                                                            "scale": $scope.scale,
+                                                            "panX": $scope.panX,
+                                                            "panY": $scope.panY}]));
     };
 
     $scope.onLoadButton = function (button) {
@@ -247,17 +257,145 @@ app.controller('MainCtrl', function($scope, $document) {
 
 
     // Create a web socket to connect to the backend server
+    //
+
+    $scope.onSave = function(data) {
+        console.log(data);
+        $location.search({topology_id: data.id});
+        //$location.replace();
+        console.log($location.search());
+        $scope.$apply();
+    };
+
+    $scope.onDeviceCreate = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var device = new models.Device(data.id,
+                                       data.name,
+                                       data.x,
+                                       data.y,
+                                       data.type);
+        $scope.devices.push(device);
+        $scope.$apply();
+    };
+
+    $scope.onLinkCreate = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var i = 0;
+        var new_link = new models.Link(null, null, false);
+        for (i = 0; i < $scope.devices.length; i++){
+            if ($scope.devices[i].id === data.from_id) {
+                new_link.from_device = $scope.devices[i];
+            }
+        }
+        for (i = 0; i < $scope.devices.length; i++){
+            if ($scope.devices[i].id === data.to_id) {
+                new_link.to_device = $scope.devices[i];
+            }
+        }
+        if (new_link.from_device !== null && new_link.to_device !== null) {
+            $scope.links.push(new_link);
+            $scope.$apply();
+        }
+    };
+
+    $scope.onDeviceMove = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var i = 0;
+        for (i = 0; i < $scope.devices.length; i++) {
+            if ($scope.devices[i].id === data.id) {
+                $scope.devices[i].x = data.x;
+                $scope.devices[i].y = data.y;
+                $scope.$apply();
+                break;
+            }
+        }
+    };
+
+    $scope.onDeviceDestroy = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+
+        var i = 0;
+        var j = 0;
+        var dindex = -1;
+        var lindex = -1;
+        var devices = $scope.devices.slice();
+        var all_links = $scope.links.slice();
+        for (i = 0; i < devices.length; i++) {
+            if (devices[i].id === data.id) {
+                dindex = $scope.devices.indexOf(devices[i]);
+                if (dindex !== -1) {
+                    $scope.devices.splice(dindex, 1);
+                }
+                lindex = -1;
+                for (j = 0; j < all_links.length; j++) {
+                    if (all_links[j].to_device === devices[i] ||
+                        all_links[j].from_device === devices[i]) {
+                        lindex = $scope.links.indexOf(all_links[j]);
+                        if (lindex !== -1) {
+                            $scope.links.splice(lindex, 1);
+                        }
+                    }
+                }
+            }
+        }
+        $scope.$apply();
+    };
+
+    $scope.onClientId = function(data) {
+        $scope.client_id = data;
+    };
 
     $scope.control_socket.onmessage = function(e) {
-		console.log(e.data);
+        console.log(e.data);
+        var type_data = JSON.parse(e.data);
+        var type = type_data[0];
+        var data = type_data[1];
+
+        if (type === 'save') {
+            $scope.onSave(data);
+        }
+        if (type === 'DeviceCreate') {
+            $scope.onDeviceCreate(data);
+        }
+        if (type === 'LinkCreate') {
+            $scope.onLinkCreate(data);
+        }
+        if (type === 'DeviceMove') {
+            $scope.onDeviceMove(data);
+        }
+        if (type === 'DeviceDestroy') {
+            $scope.onDeviceDestroy(data);
+        }
+        if (type === 'id') {
+            $scope.onClientId(data);
+        }
+
 	};
 	$scope.control_socket.onopen = function() {
-		$scope.control_socket.send("hello world");
+		$scope.control_socket.send(JSON.stringify(["message", "hello world"]));
 	};
 	// Call onopen directly if $scope.control_socket is already open
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();
 	}
+
+    console.log($location.protocol());
+    console.log($location.host());
+    console.log($location.port());
+    console.log($location.path());
+    console.log($location.hash());
+    console.log($location.search());
+    $location.search({topology_id: "0"});
+    console.log($location.search());
+
 
     // End web socket
 });

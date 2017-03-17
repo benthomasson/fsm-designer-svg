@@ -1,6 +1,7 @@
 var inherits = require('inherits');
 var fsm = require('./fsm.js');
 var models = require('./models.js');
+var messages = require('./messages.js');
 
 function _State () {
 }
@@ -90,19 +91,39 @@ _Ready.prototype.onMouseDown.transitions = ['Selected1'];
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
 	var scope = controller.scope;
+    var device = null;
 
 	if ($event.key === 'r') {
-		scope.devices.push(new models.Device("Router", scope.scaledX, scope.scaledY, "router"));
-		return;
+		device = new models.Device(controller.scope.device_id_seq(),
+                                   "Router",
+                                   scope.scaledX,
+                                   scope.scaledY,
+                                   "router");
 	}
-	if ($event.key === 's') {
-		scope.devices.push(new models.Device("Switch", scope.scaledX, scope.scaledY, "switch"));
-		return;
+    else if ($event.key === 's') {
+		device = new models.Device(controller.scope.device_id_seq(),
+                                   "Switch",
+                                   scope.scaledX,
+                                   scope.scaledY,
+                                   "switch");
 	}
-	if ($event.key === 'a') {
-		scope.devices.push(new models.Device("Rack", scope.scaledX, scope.scaledY, "rack"));
-		return;
+    else if ($event.key === 'a') {
+		device = new models.Device(controller.scope.device_id_seq(),
+                                   "Rack",
+                                   scope.scaledX,
+                                   scope.scaledY,
+                                   "rack");
 	}
+
+    if (device !== null) {
+        scope.devices.push(device);
+        scope.control_socket.send(messages.serialize(new messages.DeviceCreate(scope.client_id,
+                                                                               device.id,
+                                                                               device.x,
+                                                                               device.y,
+                                                                               device.name,
+                                                                               device.type)));
+    }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
 };
@@ -135,6 +156,7 @@ _Selected2.prototype.onMouseDown.transitions = ['Ready', 'Selected3'];
 _Selected2.prototype.onKeyDown = function (controller, $event) {
 
     if ($event.keyCode === 8) {
+        //Delete
         controller.changeState(Ready);
 
         var i = 0;
@@ -148,6 +170,8 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
             index = controller.scope.devices.indexOf(devices[i]);
             if (index !== -1) {
                 controller.scope.devices.splice(index, 1);
+                controller.scope.control_socket.send(messages.serialize(new messages.DeviceDestroy(controller.scope.client_id,
+                                                                                                   devices[i].id)));
             }
             for (j = 0; j < all_links.length; j++) {
                 if (all_links[j].to_device === devices[i] ||
@@ -192,6 +216,10 @@ _Move.prototype.onMouseMove = function (controller) {
     for (i = 0; i < devices.length; i++) {
         devices[i].x = devices[i].x + diffX;
         devices[i].y = devices[i].y + diffY;
+        controller.scope.control_socket.send(messages.serialize(new messages.DeviceMove(controller.scope.client_id,
+                                                                                        devices[i].id,
+                                                                                        devices[i].x,
+                                                                                        devices[i].y)));
     }
     controller.scope.pressedScaledX = controller.scope.scaledX;
     controller.scope.pressedScaledY = controller.scope.scaledY;
