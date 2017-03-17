@@ -11,7 +11,10 @@ var models = require('./models.js');
 
 app.controller('MainCtrl', function($scope, $document, $location) {
 
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype/", null, {debug: true, reconnectInterval: 300});
+  $scope.topology_id = $location.search().topology_id || 0;
+  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
+                                                           null,
+                                                           {debug: false, reconnectInterval: 300});
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
@@ -368,6 +371,15 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.client_id = data;
     };
 
+    $scope.onTopology = function(data) {
+        $scope.topology_id = data.topology_id;
+        $scope.panX = data.panX;
+        $scope.panY = data.panX;
+        $scope.current_scale = data.scale;
+        $location.search({topology_id: data.topology_id});
+        $scope.$apply();
+    };
+
     $scope.control_socket.onmessage = function(e) {
         console.log(e.data);
         var type_data = JSON.parse(e.data);
@@ -395,6 +407,9 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         if (type === 'id') {
             $scope.onClientId(data);
         }
+        if (type === 'topology') {
+            $scope.onTopology(data);
+        }
 
 	};
 	$scope.control_socket.onopen = function() {
@@ -404,15 +419,6 @@ app.controller('MainCtrl', function($scope, $document, $location) {
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();
 	}
-
-    console.log($location.protocol());
-    console.log($location.host());
-    console.log($location.port());
-    console.log($location.path());
-    console.log($location.hash());
-    console.log($location.search());
-    $location.search({topology_id: "0"});
-    console.log($location.search());
 
 
     // End web socket
