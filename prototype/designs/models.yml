@@ -1,7 +1,8 @@
 app: models
 external_models: []
 models:
-- fields:
+- display: name
+  fields:
   - name: device_id
     pk: true
     type: AutoField
@@ -38,7 +39,8 @@ models:
   name: Link
   x: 591
   y: 128
-- fields:
+- display: name
+  fields:
   - name: topology_id
     pk: true
     type: AutoField

@@ -8,4 +8,9 @@ class {{model.name}}(models.Model):
     {{field.name}} = models.{{field.type}}( {%if field.ref%}'{{field.ref}}', {%endif%}{%if field.pk%}primary_key=True, {%endif%} {%if field.len%}max_length={{field.len}}, {%endif%}{%if field.related_name%}related_name='{{field.related_name}}', {%endif%})
     {%endfor%}
 
+    {%if model.display%}
+    def __unicode__(self):
+        return self.{{model.display}}
+    {%endif%}
+
 {%endfor%}

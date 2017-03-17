@@ -15,6 +15,9 @@ class Device(models.Model):
 
     id = models.IntegerField()
 
+    def __unicode__(self):
+        return self.name
+
 
 class Link(models.Model):
 
@@ -38,3 +41,6 @@ class Topology(models.Model):
     panX = models.FloatField()
 
     panY = models.FloatField()
+
+    def __unicode__(self):
+        return self.name
