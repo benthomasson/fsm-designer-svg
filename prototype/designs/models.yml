@@ -1,0 +1,63 @@
+app: models
+external_models: []
+models:
+- fields:
+  - name: device_id
+    pk: true
+    type: AutoField
+  - name: topology
+    ref: Topology
+    ref_field: topology_id
+    type: ForeignKey
+  - len: 200
+    name: name
+    type: CharField
+  - name: x
+    type: IntegerField
+  - name: y
+    type: IntegerField
+  - name: id
+    type: IntegerField
+  name: Device
+  x: 348
+  y: 124
+- fields:
+  - name: link_id
+    pk: true
+    type: AutoField
+  - name: from_device
+    ref: Device
+    ref_field: device_id
+    type: ForeignKey
+    related_name: +
+  - name: to_device
+    ref: Device
+    ref_field: device_id
+    type: ForeignKey
+    related_name: +
+  name: Link
+  x: 591
+  y: 128
+- fields:
+  - name: topology_id
+    pk: true
+    type: AutoField
+  - len: 200
+    name: name
+    type: CharField
+  - name: id
+    type: IntegerField
+  - name: scale
+    type: FloatField
+  - name: panX
+    type: FloatField
+  - name: panY
+    type: FloatField
+  name: Topology
+  x: 111
+  y: 127
+modules: []
+view:
+  panX: 25
+  panY: 28
+  scaleXY: 1
