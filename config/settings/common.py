@@ -241,5 +241,6 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgiref.inmemory.ChannelLayer",
         "ROUTING": "config.routing.channel_routing",
+        "CONFIG": {"capacity": 1000, }
     },
 }
