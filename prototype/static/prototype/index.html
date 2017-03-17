@@ -272,53 +272,55 @@
                 <line x1="0" y1="-5" x2="0" y2="5"/>
             </g>
         </g>
-        <g> <!-- buttons -->
-            <g ng-repeat="button in buttons"
-               ng-attr-transform="translate({{button.x}},{{button.y}})"
-               ng-attr-class="{{button.is_pressed ? 'button-pressed' : button.mouse_over ? 'button-hover' : 'button'}}">
-                <rect x=0
-                      y=0
-                      ng-attr-width={{button.width}}
-                      ng-attr-height={{button.height}}
-                      rx=3></rect>
-                <text ng-attr-x="{{button.width/2}}"
-                      ng-attr-y="{{button.height/2}}"
-                      dy=".3em"
-                      text-anchor="middle">{{button.name}}</text>
-            </g>
-        </g> <!-- end buttons -->
+        <g ng-show="!hide_buttons">
+            <g> <!-- buttons -->
+                <g ng-repeat="button in buttons"
+                   ng-attr-transform="translate({{button.x}},{{button.y}})"
+                   ng-attr-class="{{button.is_pressed ? 'button-pressed' : button.mouse_over ? 'button-hover' : 'button'}}">
+                    <rect x=0
+                          y=0
+                          ng-attr-width={{button.width}}
+                          ng-attr-height={{button.height}}
+                          rx=3></rect>
+                    <text ng-attr-x="{{button.width/2}}"
+                          ng-attr-y="{{button.height/2}}"
+                          dy=".3em"
+                          text-anchor="middle">{{button.name}}</text>
+                </g>
+            </g> <!-- end buttons -->
 
-        <g> <!-- stencils -->
-            <g ng-repeat="stencil in stencils"
-               ng-attr-transform="translate({{stencil.x}},{{stencil.y}})"
-               class="button">
-                <rect x=0
-                      y=0
-                      ng-attr-width={{stencil.size}}
-                      ng-attr-height={{stencil.size}}
-                      rx=3></rect>
-                <text ng-attr-x="{{stencil.size/2}}"
-                      ng-attr-y="{{stencil.size/2}}"
-                      dy=".3em"
-                      text-anchor="middle">{{stencil.name}}</text>
-            </g>
-        </g> <!-- end stencils -->
+            <g> <!-- stencils -->
+                <g ng-repeat="stencil in stencils"
+                   ng-attr-transform="translate({{stencil.x}},{{stencil.y}})"
+                   class="button">
+                    <rect x=0
+                          y=0
+                          ng-attr-width={{stencil.size}}
+                          ng-attr-height={{stencil.size}}
+                          rx=3></rect>
+                    <text ng-attr-x="{{stencil.size/2}}"
+                          ng-attr-y="{{stencil.size/2}}"
+                          dy=".3em"
+                          text-anchor="middle">{{stencil.name}}</text>
+                </g>
+            </g> <!-- end stencils -->
 
-        <g> <!-- layers -->
-            <g ng-repeat="layer in layers"
-               ng-attr-transform="translate({{layer.x}},{{layer.y}})"
-               class="button">
-                <rect x=0
-                      y=0
-                      ng-attr-width={{layer.size}}
-                      ng-attr-height={{layer.size}}
-                      rx=3></rect>
-                <text ng-attr-x="{{layer.size/2}}"
-                      ng-attr-y="{{layer.size/2}}"
-                      dy=".3em"
-                      text-anchor="middle">{{layer.name}}</text>
-            </g>
-        </g> <!-- end layers -->
+            <g> <!-- layers -->
+                <g ng-repeat="layer in layers"
+                   ng-attr-transform="translate({{layer.x}},{{layer.y}})"
+                   class="button">
+                    <rect x=0
+                          y=0
+                          ng-attr-width={{layer.size}}
+                          ng-attr-height={{layer.size}}
+                          rx=3></rect>
+                    <text ng-attr-x="{{layer.size/2}}"
+                          ng-attr-y="{{layer.size/2}}"
+                          dy=".3em"
+                          text-anchor="middle">{{layer.name}}</text>
+                </g>
+            </g> <!-- end layers -->
+        </g>
 
         <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>

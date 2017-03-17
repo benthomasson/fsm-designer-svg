@@ -84,6 +84,10 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
         scope.cursor.hidden = !scope.cursor.hidden;
         return;
     }
+    if ($event.key === 'b') {
+        scope.hide_buttons = !scope.hide_buttons;
+        return;
+    }
 };
 
 

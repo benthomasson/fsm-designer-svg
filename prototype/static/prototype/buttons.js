@@ -70,14 +70,17 @@ _Ready.prototype.onMouseDown.transitions = ['ButtonPressed'];
 
 _Ready.prototype.onMouseMove = function (controller, $event) {
 
-    var i = 0;
-    var buttons = controller.scope.buttons;
-    var button = null;
-    for (i = 0; i < buttons.length; i++) {
-        button = buttons[i];
-        button.mouse_over = false;
-        if (button.is_selected(controller.scope.mouseX, controller.scope.mouseY)) {
-            button.mouse_over = true;
+    if (!controller.scope.hide_buttons) {
+
+        var i = 0;
+        var buttons = controller.scope.buttons;
+        var button = null;
+        for (i = 0; i < buttons.length; i++) {
+            button = buttons[i];
+            button.mouse_over = false;
+            if (button.is_selected(controller.scope.mouseX, controller.scope.mouseY)) {
+                button.mouse_over = true;
+            }
         }
     }
 

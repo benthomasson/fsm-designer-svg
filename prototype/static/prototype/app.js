@@ -46,6 +46,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
   $scope.debug = {'hidden': true};
+  $scope.hide_buttons = false;
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
