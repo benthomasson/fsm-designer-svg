@@ -34,8 +34,6 @@ class Topology(models.Model):
 
     name = models.CharField(max_length=200, )
 
-    id = models.IntegerField()
-
     scale = models.FloatField()
 
     panX = models.FloatField()

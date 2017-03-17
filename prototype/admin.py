@@ -24,7 +24,7 @@ admin.site.register(Link, LinkAdmin)
 
 
 class TopologyAdmin(admin.ModelAdmin):
-    fields = ('name', 'id', 'scale', 'panX', 'panY',)
+    fields = ('name', 'scale', 'panX', 'panY',)
     raw_id_fields = ()
 
 

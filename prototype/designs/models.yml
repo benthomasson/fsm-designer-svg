@@ -47,8 +47,6 @@ models:
   - len: 200
     name: name
     type: CharField
-  - name: id
-    type: IntegerField
   - name: scale
     type: FloatField
   - name: panX
