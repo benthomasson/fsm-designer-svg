@@ -266,11 +266,17 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var device = controller.scope.selected_devices[0];
-	if ($event.keyCode === 8 || $event.keyCode === 46) {
+	if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
 		device.name = device.name.slice(0, -1);
-	} else if ($event.keyCode >= 48 && $event.keyCode <=90) {
+	} else if ($event.keyCode >= 48 && $event.keyCode <=90) { //Alphanumeric
         device.name += $event.key;
-	} else if ($event.keyCode >= 186 && $event.keyCode <=222) {
+	} else if ($event.keyCode >= 186 && $event.keyCode <=222) { //Punctuation
         device.name += $event.key;
+	} else if ($event.keyCode === 13) { //Enter
+        controller.changeState(Selected2);
     }
+    controller.scope.control_socket.send(messages.serialize(new messages.DeviceLabelEdit(controller.scope.client_id,
+                                                                                         device.id,
+                                                                                         device.name)));
 };
+_EditLabel.prototype.onKeyDown.transitions = ['Selected2'];

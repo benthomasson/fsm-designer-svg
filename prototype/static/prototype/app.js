@@ -280,6 +280,20 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.$apply();
     };
 
+    $scope.onDeviceLabelEdit = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var i = 0;
+        for (i = 0; i < $scope.devices.length; i++) {
+            if ($scope.devices[i].id === data.id) {
+                $scope.devices[i].name = data.name;
+                break;
+            }
+        }
+        $scope.$apply();
+    };
+
     $scope.onLinkCreate = function(data) {
         if (data.sender === $scope.client_id) {
             return;
@@ -373,6 +387,9 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         }
         if (type === 'DeviceDestroy') {
             $scope.onDeviceDestroy(data);
+        }
+        if (type === 'DeviceLabelEdit') {
+            $scope.onDeviceLabelEdit(data);
         }
         if (type === 'id') {
             $scope.onClientId(data);

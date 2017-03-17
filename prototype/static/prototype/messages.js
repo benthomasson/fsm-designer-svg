@@ -29,6 +29,13 @@ function DeviceDestroy(sender, id) {
 }
 exports.DeviceDestroy = DeviceDestroy;
 
+function DeviceLabelEdit(sender, id, name) {
+    this.sender = sender;
+    this.id = id;
+    this.name = name;
+}
+exports.DeviceLabelEdit = DeviceLabelEdit;
+
 function LinkCreate(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;
