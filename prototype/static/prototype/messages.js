@@ -36,6 +36,18 @@ function DeviceLabelEdit(sender, id, name) {
 }
 exports.DeviceLabelEdit = DeviceLabelEdit;
 
+function DeviceSelected(sender, id) {
+    this.sender = sender;
+    this.id = id;
+}
+exports.DeviceSelected = DeviceSelected;
+
+function DeviceUnSelected(sender, id) {
+    this.sender = sender;
+    this.id = id;
+}
+exports.DeviceUnSelected = DeviceUnSelected;
+
 function LinkCreate(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;

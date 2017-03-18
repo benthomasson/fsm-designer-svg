@@ -1,6 +1,10 @@
 .PHONY: all main lint lessc
 
-all: lessc lint main
+all: clean lessc lint main
+
+clean:
+	rm bundle.js
+	rm style.css
 
 main:
 	browserify main.js  --standalone main -o bundle.js

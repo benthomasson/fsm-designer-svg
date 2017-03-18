@@ -1,5 +1,6 @@
 /* Put your css in here */
 
+@selected-red: #c9232c;
 @selected-mango: #ff5850;
 @selected-blue: #5bbddf;
 @light-background: #ffffff;
@@ -39,6 +40,16 @@ svg text {
 
 line.selected {
     stroke: @selected-blue;
+    stroke-width: 6;
+}
+
+line.remote-selected {
+    stroke: @selected-mango;
+    stroke-width: 6;
+}
+
+line.selected-conflict {
+    stroke: @selected-red;
     stroke-width: 6;
 }
 
@@ -83,6 +94,16 @@ svg line.debug {
     stroke-width: 4;
 }
 
+.router circle.remote-selected {
+    stroke: @selected-mango;
+    stroke-width: 4;
+}
+
+.router circle.selected-conflict {
+    stroke: @selected-red;
+    stroke-width: 4;
+}
+
 .router line {
     stroke: @light-widget-detail;
     stroke-width: 20;
@@ -100,6 +121,16 @@ svg line.debug {
 
 .switch rect.selected {
     stroke: @selected-blue;
+    stroke-width: 10;
+}
+
+.switch rect.remote-selected {
+    stroke: @selected-mango;
+    stroke-width: 10;
+}
+
+.switch rect.selected-conflict {
+    stroke: @selected-red;
     stroke-width: 10;
 }
 
@@ -127,6 +158,18 @@ svg line.debug {
 .rack rect.selected {
     fill: @selected-blue;
     stroke: @selected-blue;
+    stroke-width: 10;
+}
+
+.rack rect.remote-selected {
+    fill: @selected-mango;
+    stroke: @selected-mango;
+    stroke-width: 10;
+}
+
+.rack rect.selected-conflict {
+    fill: @selected-red;
+    stroke: @selected-red;
     stroke-width: 10;
 }
 

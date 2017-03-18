@@ -8,6 +8,7 @@ var link = require('./link.js');
 var buttons = require('./buttons.js');
 var util = require('./util.js');
 var models = require('./models.js');
+var messages = require('./messages.js');
 
 app.controller('MainCtrl', function($scope, $document, $location) {
 
@@ -130,6 +131,9 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.selected_devices = [];
         $scope.selected_links = [];
         for (i = 0; i < devices.length; i++) {
+            if (devices[i].selected) {
+                $scope.control_socket.send(messages.serialize(new messages.DeviceUnSelected($scope.client_id, devices[i].id)));
+            }
             devices[i].selected = false;
         }
         for (i = 0; i < links.length; i++) {
@@ -155,6 +159,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         for (i = 0; i < devices.length; i++) {
             if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 devices[i].selected = true;
+                $scope.control_socket.send(messages.serialize(new messages.DeviceSelected($scope.client_id, devices[i].id)));
                 last_selected_device = devices[i];
                 if ($scope.selected_devices.indexOf(devices[i]) === -1) {
                     $scope.selected_devices.push(devices[i]);
@@ -380,6 +385,34 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.$apply();
     };
 
+    $scope.onDeviceSelected = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var i = 0;
+        for (i = 0; i < $scope.devices.length; i++) {
+            if ($scope.devices[i].id === data.id) {
+                $scope.devices[i].remote_selected = true;
+                console.log($scope.devices[i].remote_selected);
+            }
+        }
+        $scope.$apply();
+    };
+
+    $scope.onDeviceUnSelected = function(data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+        var i = 0;
+        for (i = 0; i < $scope.devices.length; i++) {
+            if ($scope.devices[i].id === data.id) {
+                $scope.devices[i].remote_selected = false;
+                console.log($scope.devices[i].remote_selected);
+            }
+        }
+        $scope.$apply();
+    };
+
     $scope.control_socket.onmessage = function(e) {
         console.log(e.data);
         var type_data = JSON.parse(e.data);
@@ -403,6 +436,12 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         }
         if (type === 'DeviceLabelEdit') {
             $scope.onDeviceLabelEdit(data);
+        }
+        if (type === 'DeviceSelected') {
+            $scope.onDeviceSelected(data);
+        }
+        if (type === 'DeviceUnSelected') {
+            $scope.onDeviceUnSelected(data);
         }
         if (type === 'id') {
             $scope.onClientId(data);

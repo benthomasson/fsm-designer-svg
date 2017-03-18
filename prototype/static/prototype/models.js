@@ -9,6 +9,7 @@ function Device(id, name, x, y, type) {
     this.size = 50;
     this.type = type;
     this.selected = false;
+    this.remote_selected = false;
     this.edit_label = false;
 }
 exports.Device = Device;
