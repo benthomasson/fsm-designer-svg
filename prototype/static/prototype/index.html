@@ -2,11 +2,11 @@
 <html ng-app="triangular">
   <head>
     <link rel="stylesheet" href="style.css" />
-    <script data-require="angular.js@1.6.2" src="http://code.angularjs.org/1.6.2/angular.js" data-semver="1.6.2"></script>
-    <script src="reconnecting-websocket.js"></script>
+    <script data-require="angular.js@1.6.2" src="vendor/angular.js" data-semver="1.6.2"></script>
+    <script src="vendor/reconnecting-websocket.js"></script>
     <script src="bundle.js"></script>
-    <script src="hamster.js"></script>
-    <script src="mousewheel.js"></script>
+    <script src="vendor/hamster.js"></script>
+    <script src="vendor/mousewheel.js"></script>
   </head>
   <body ng-controller="MainCtrl" id="Main">
     <svg id="frame"
@@ -63,7 +63,7 @@
                         cx="0"
                         cy="0"
                         ng-attr-r="{{50 + 2}}"
-                        ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
+                        ng-attr-class="{{device.selected ? 'selected' : 'hidden'}}">
                     </circle>
                     <circle
                         cx="0"
@@ -123,7 +123,7 @@
                         y="-52"
                         ng-attr-width="{{100 + 4}}"
                         ng-attr-height="{{100 + 4}}"
-                        ng-attr-class="{{device.selected && 'selected' || 'hidden'}}"
+                        ng-attr-class="{{device.selected ? 'selected' : 'hidden'}}"
                         rx=10>
                     </rect>
 
@@ -185,7 +185,7 @@
                         y="-52"
                         ng-attr-width="{{100 + 4}}"
                         ng-attr-height="{{100 + 4}}"
-                        ng-attr-class="{{device.selected && 'selected' || 'hidden'}}"
+                        ng-attr-class="{{device.selected ? 'selected' : 'hidden'}}"
                         rx=10>
                     </rect>
                     <rect
@@ -251,7 +251,7 @@
                         cx="0"
                         cy="0"
                         ng-attr-r="{{50 + 2}}"
-                        ng-attr-class="{{device.selected && 'selected' || 'hidden'}}">
+                        ng-attr-class="{{device.selected ? 'selected' : 'hidden'}}">
                     </circle>
                     <circle
                         cx="0"
@@ -323,7 +323,7 @@
             </g> <!-- end layers -->
         </g>
 
-        <g ng-attr-class="{{debug.hidden && 'hidden' || ''}}">
+        <g ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug">
         <text ng-attr-x="{{graph.right_column}}" y="15">width: {{graph.width}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="35">height: {{graph.height}}</text>
         <text ng-attr-x="{{graph.right_column}}" y="55">rc: {{graph.right_column}}</text>
