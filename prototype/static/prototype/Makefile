@@ -3,8 +3,8 @@
 all: clean lessc lint main
 
 clean:
-	rm bundle.js
-	rm style.css
+	rm -f bundle.js
+	rm -f style.css
 
 main:
 	browserify main.js  --standalone main -o bundle.js

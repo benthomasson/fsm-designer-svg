@@ -1,7 +1,7 @@
 
 
-function natural_numbers () {
-    var counter = 1;
+function natural_numbers (start) {
+    var counter = start;
     return function () {return counter += 1;};
 }
 exports.natural_numbers = natural_numbers;

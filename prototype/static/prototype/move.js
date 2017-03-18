@@ -117,12 +117,12 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
 
     if (device !== null) {
         scope.devices.push(device);
-        scope.control_socket.send(messages.serialize(new messages.DeviceCreate(scope.client_id,
-                                                                               device.id,
-                                                                               device.x,
-                                                                               device.y,
-                                                                               device.name,
-                                                                               device.type)));
+        scope.send_control_message(new messages.DeviceCreate(scope.client_id,
+                                                             device.id,
+                                                             device.x,
+                                                             device.y,
+                                                             device.name,
+                                                             device.type));
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
@@ -170,8 +170,8 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
             index = controller.scope.devices.indexOf(devices[i]);
             if (index !== -1) {
                 controller.scope.devices.splice(index, 1);
-                controller.scope.control_socket.send(messages.serialize(new messages.DeviceDestroy(controller.scope.client_id,
-                                                                                                   devices[i].id)));
+                controller.scope.send_control_message(new messages.DeviceDestroy(controller.scope.client_id,
+                                                                                 devices[i].id));
             }
             for (j = 0; j < all_links.length; j++) {
                 if (all_links[j].to_device === devices[i] ||
@@ -216,10 +216,10 @@ _Move.prototype.onMouseMove = function (controller) {
     for (i = 0; i < devices.length; i++) {
         devices[i].x = devices[i].x + diffX;
         devices[i].y = devices[i].y + diffY;
-        controller.scope.control_socket.send(messages.serialize(new messages.DeviceMove(controller.scope.client_id,
-                                                                                        devices[i].id,
-                                                                                        devices[i].x,
-                                                                                        devices[i].y)));
+        controller.scope.send_control_message(new messages.DeviceMove(controller.scope.client_id,
+                                                                      devices[i].id,
+                                                                      devices[i].x,
+                                                                      devices[i].y));
     }
     controller.scope.pressedScaledX = controller.scope.scaledX;
     controller.scope.pressedScaledY = controller.scope.scaledY;
@@ -275,8 +275,8 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
 	} else if ($event.keyCode === 13) { //Enter
         controller.changeState(Selected2);
     }
-    controller.scope.control_socket.send(messages.serialize(new messages.DeviceLabelEdit(controller.scope.client_id,
-                                                                                         device.id,
-                                                                                         device.name)));
+    controller.scope.send_control_message(new messages.DeviceLabelEdit(controller.scope.client_id,
+                                                                       device.id,
+                                                                       device.name));
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];

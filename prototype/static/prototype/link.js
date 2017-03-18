@@ -103,9 +103,9 @@ _Connecting.prototype.onMouseUp = function (controller) {
     var selected_device = controller.scope.select_devices(false);
     if (selected_device !== null) {
         controller.scope.new_link.to_device = selected_device;
-        controller.scope.control_socket.send(messages.serialize(new messages.LinkCreate(controller.scope.client_id,
-                                                                                        controller.scope.new_link.from_device.id,
-                                                                                        controller.scope.new_link.to_device.id)));
+        controller.scope.send_control_message(new messages.LinkCreate(controller.scope.client_id,
+                                                                      controller.scope.new_link.from_device.id,
+                                                                      controller.scope.new_link.to_device.id));
         controller.scope.new_link = null;
         controller.changeState(Connected);
     } else {

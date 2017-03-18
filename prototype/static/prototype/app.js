@@ -1,5 +1,5 @@
 
-//console.log = function () { };
+console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -54,7 +54,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
-  $scope.device_id_seq = util.natural_numbers();
+  $scope.device_id_seq = util.natural_numbers(1);
   $scope.devices = [
     new models.Device($scope.device_id_seq(), "R1", 15*4, 20*4, "router"),
     new models.Device($scope.device_id_seq(), "Rack1", 50*4, 60*4, "rack"),
@@ -132,7 +132,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.selected_links = [];
         for (i = 0; i < devices.length; i++) {
             if (devices[i].selected) {
-                $scope.control_socket.send(messages.serialize(new messages.DeviceUnSelected($scope.client_id, devices[i].id)));
+                $scope.send_control_message(new messages.DeviceUnSelected($scope.client_id, devices[i].id));
             }
             devices[i].selected = false;
         }
@@ -156,10 +156,10 @@ app.controller('MainCtrl', function($scope, $document, $location) {
             $scope.clear_selections();
         }
 
-        for (i = 0; i < devices.length; i++) {
+        for (i = devices.length - 1; i >= 0; i--) {
             if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 devices[i].selected = true;
-                $scope.control_socket.send(messages.serialize(new messages.DeviceSelected($scope.client_id, devices[i].id)));
+                $scope.send_control_message(new messages.DeviceSelected($scope.client_id, devices[i].id));
                 last_selected_device = devices[i];
                 if ($scope.selected_devices.indexOf(devices[i]) === -1) {
                     $scope.selected_devices.push(devices[i]);
@@ -285,6 +285,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
                                        data.x,
                                        data.y,
                                        data.type);
+        $scope.device_id_seq = util.natural_numbers(data.id);
         $scope.devices.push(device);
         $scope.$apply();
     };
@@ -458,6 +459,10 @@ app.controller('MainCtrl', function($scope, $document, $location) {
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();
 	}
+
+    $scope.send_control_message = function (message) {
+        $scope.control_socket.send(messages.serialize(message));
+    };
 
 
     // End web socket
