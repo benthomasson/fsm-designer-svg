@@ -10,7 +10,7 @@ var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
 
-app.controller('MainCtrl', function($scope, $document, $location) {
+app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
   $scope.topology_id = $location.search().topology_id || 0;
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
@@ -558,6 +558,18 @@ app.controller('MainCtrl', function($scope, $document, $location) {
 
 
     // End web socket
+    //
+
+	angular.element($window).bind('resize', function(){
+
+		$scope.graph.width = $window.innerWidth;
+	  	$scope.graph.right_column = $window.innerWidth - 300;
+	  	$scope.graph.height = $window.innerHeight;
+
+		// manuall $digest required as resize event
+		// is outside of angular
+	 	$scope.$digest();
+    });
 });
 
 exports.app = app;
