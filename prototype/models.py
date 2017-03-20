@@ -15,6 +15,8 @@ class Device(models.Model):
 
     id = models.IntegerField()
 
+    type = models.CharField(max_length=200, )
+
     def __unicode__(self):
         return self.name
 

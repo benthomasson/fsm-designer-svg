@@ -19,6 +19,9 @@ models:
     type: IntegerField
   - name: id
     type: IntegerField
+  - len: 200
+    name: type
+    type: CharField
   name: Device
   x: 348
   y: 124
@@ -29,13 +32,13 @@ models:
   - name: from_device
     ref: Device
     ref_field: device_id
-    type: ForeignKey
     related_name: +
+    type: ForeignKey
   - name: to_device
     ref: Device
     ref_field: device_id
-    type: ForeignKey
     related_name: +
+    type: ForeignKey
   name: Link
   x: 591
   y: 128

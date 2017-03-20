@@ -8,7 +8,7 @@ from prototype.models import Topology
 
 
 class DeviceAdmin(admin.ModelAdmin):
-    fields = ('topology', 'name', 'x', 'y', 'id',)
+    fields = ('topology', 'name', 'x', 'y', 'id', 'type',)
     raw_id_fields = ('topology',)
 
 
