@@ -57,27 +57,21 @@ app.controller('MainCtrl', function($scope, $document, $location) {
                   'height': window.innerHeight};
   $scope.device_id_seq = util.natural_numbers(1);
   $scope.devices = [
-    new models.Device($scope.device_id_seq(), "R1", 15*4, 20*4, "router"),
-    new models.Device($scope.device_id_seq(), "Rack1", 50*4, 60*4, "rack"),
-    new models.Device($scope.device_id_seq(), "S1", 80*4, 10*4, "switch")
   ];
 
   $scope.stencils = [
-    {"name": "router", "size":50, 'x':10, 'y':100},
-    {"name": "switch", "size":50, 'x':10, 'y':160},
-    {"name": "rack", "size":50, 'x':10, 'y':220},
+    //{"name": "router", "size":50, 'x':10, 'y':100},
+    //{"name": "switch", "size":50, 'x':10, 'y':160},
+    //{"name": "rack", "size":50, 'x':10, 'y':220},
   ];
 
   $scope.layers = [
-    {"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
-    {"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
-    {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
+    //{"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
+    //{"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
+    //{"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
   ];
 
   $scope.links = [
-    new models.Link($scope.devices[0], $scope.devices[1]),
-    new models.Link($scope.devices[1], $scope.devices[2]),
-    new models.Link($scope.devices[0], $scope.devices[2]),
   ];
 
 
