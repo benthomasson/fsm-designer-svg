@@ -20,9 +20,6 @@ import json
 def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
-    # Work out room name from path (ignore slashes)
-    room = message.content['path'].strip("/")
-    # Save room in session and add us to the group
     data = urlparse.parse_qs(message.content['query_string'])
     topology_id = data.get('topology_id', ['null'])
     try:
@@ -34,14 +31,14 @@ def ws_connect(message):
     topology, created = Topology.objects.get_or_create(topology_id=topology_id, defaults=dict(name="topology", scale=1.0, panX=0, panY=0))
     topology_id = topology.topology_id
     message.channel_session['topology_id'] = topology_id
-    message.channel_session['room'] = room
-    Group("topology-%s" % room).add(message.reply_channel)
+    Group("topology-%s" % topology_id).add(message.reply_channel)
     message.reply_channel.send({"text": json.dumps(["id", next(next_id)])})
     message.reply_channel.send({"text": json.dumps(["topology_id", topology_id])})
     topology_data = topology.__dict__.copy()
     del topology_data['_state']
     message.reply_channel.send({"text": json.dumps(["topology", topology_data])})
-    snapshot = dict(devices=list(Device.objects.filter(topology_id=topology_id).values()),
+    snapshot = dict(sender=0,
+                    devices=list(Device.objects.filter(topology_id=topology_id).values()),
                     links=[dict(from_device=x['from_device__id'],
                                 to_device=x['to_device__id']) for x in list(Link.objects
                                    .filter(Q(from_device__topology_id=topology_id)|Q(to_device__topology_id=topology_id))
@@ -55,7 +52,7 @@ def ws_message(message):
     # Send to debug printer
     Channel('console_printer').send({"text": message['text']})
     # Send to all clients editing the topology
-    Group("topology-%s" % message.channel_session['room']).send({
+    Group("topology-%s" % message.channel_session['topology_id']).send({
         "text": message['text'],
     })
     # Send to persistence worker
@@ -64,7 +61,7 @@ def ws_message(message):
 # Connected to websocket.disconnect
 @channel_session
 def ws_disconnect(message):
-    Group("topology-%s" % message.channel_session['room']).discard(message.reply_channel)
+    Group("topology-%s" % message.channel_session['topology_id']).discard(message.reply_channel)
 
 def console_printer(message):
     print message['text']
@@ -74,7 +71,10 @@ def persistence(message):
     if topology_id is None:
         return
     data = json.loads(message['text'])
-    if data[0] == "Snapshot":
+    if data[0] in ["DeviceSelected", "DeviceUnSelected"]:
+        # Ignore these messages in persistence
+        pass
+    elif data[0] == "Snapshot":
         device_map = dict()
         for device in data[1]['devices']:
             del device['size']
@@ -90,7 +90,28 @@ def persistence(message):
             Link.objects.get_or_create(from_device=device_map[link['from_device']],
                                        to_device=device_map[link['to_device']])
 
-
-    if data[0] == "DeviceMove":
+    elif data[0] == "DeviceCreate":
+        device = data[1]
+        del device['sender']
+        d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
+        d.x = device['x']
+        d.y = device['y']
+        d.type = device['type']
+        d.save()
+    elif data[0] == "DeviceDestroy":
+        device = data[1]
+        Device.objects.filter(topology_id=topology_id, id=device['id']).delete()
+    elif data[0] == "DeviceMove":
         device = data[1]
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(x=device['x'], y=device['y'])
+    elif data[0] == "DeviceLabelEdit":
+        device = data[1]
+        Device.objects.filter(topology_id=topology_id, id=device['id']).update(name=device['name'])
+    elif data[0] == "LinkCreate":
+        link = data[1]
+        del link['sender']
+        print link
+        device_map = dict(Device.objects.filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']]).values_list('id', 'pk'))
+        Link.objects.get_or_create(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']])
+    else:
+        print "Unsupported!", data[0]
