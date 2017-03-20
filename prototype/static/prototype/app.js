@@ -1,5 +1,5 @@
 
-console.log = function () { };
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -16,6 +16,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
+  $scope.history = [];
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
@@ -74,9 +75,9 @@ app.controller('MainCtrl', function($scope, $document, $location) {
   ];
 
   $scope.links = [
-    new models.Link($scope.devices[0], $scope.devices[1], false),
-    new models.Link($scope.devices[1], $scope.devices[2], false),
-    new models.Link($scope.devices[0], $scope.devices[2], false),
+    new models.Link($scope.devices[0], $scope.devices[1]),
+    new models.Link($scope.devices[1], $scope.devices[2]),
+    new models.Link($scope.devices[0], $scope.devices[2]),
   ];
 
 
@@ -239,13 +240,14 @@ app.controller('MainCtrl', function($scope, $document, $location) {
 
     // Button Event Handlers
 
-    $scope.onSaveButton = function (button) {
-        console.log(button.name);
-        $scope.control_socket.send(JSON.stringify(['save', {"devices": $scope.devices,
-                                                            "links": $scope.links,
-                                                            "scale": $scope.scale,
-                                                            "panX": $scope.panX,
-                                                            "panY": $scope.panY}]));
+    $scope.send_snapshot = function () {
+        var data = JSON.stringify(['Snapshot', {"sender": $scope.client_id,
+                                                "devices": $scope.devices,
+                                                "links": $scope.links,
+                                                "scale": $scope.scale,
+                                                "panX": $scope.panX,
+                                                "panY": $scope.panY}]);
+        $scope.control_socket.send(data);
     };
 
     $scope.onLoadButton = function (button) {
@@ -259,22 +261,12 @@ app.controller('MainCtrl', function($scope, $document, $location) {
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Save", 10, 10, 50, 50, $scope.onSaveButton),
-      new models.Button("Load", 70, 10, 50, 50, $scope.onLoadButton),
-      new models.Button("Deploy", 130, 10, 60, 50, $scope.onDeployButton)
+      new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
     ];
 
 
     // Create a web socket to connect to the backend server
     //
-
-    $scope.onSave = function(data) {
-        console.log(data);
-        $location.search({topology_id: data.id});
-        //$location.replace();
-        console.log($location.search());
-        $scope.$apply();
-    };
 
     $scope.onDeviceCreate = function(data) {
         if (data.sender === $scope.client_id) {
@@ -309,7 +301,7 @@ app.controller('MainCtrl', function($scope, $document, $location) {
             return;
         }
         var i = 0;
-        var new_link = new models.Link(null, null, false);
+        var new_link = new models.Link(null, null);
         for (i = 0; i < $scope.devices.length; i++){
             if ($scope.devices[i].id === data.from_id) {
                 new_link.from_device = $scope.devices[i];
@@ -414,35 +406,76 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.$apply();
     };
 
-    $scope.control_socket.onmessage = function(e) {
-        console.log(e.data);
-        var type_data = JSON.parse(e.data);
+    $scope.onSnapshot = function (data) {
+        if (data.sender === $scope.client_id) {
+            return;
+        }
+
+        $scope.devices = [];
+        $scope.links = [];
+
+        var device_map = {};
+        var i = 0;
+        var device = null;
+        var new_device = null;
+        for (i = 0; i < data.devices.length; i++) {
+            device = data.devices[i];
+            new_device = new models.Device(device.id,
+                                           device.name,
+                                           device.x,
+                                           device.y,
+                                           device.type);
+            $scope.devices.push(new_device);
+            device_map[device.id] = new_device;
+        }
+
+        var link = null;
+        for (i = 0; i < data.links.length; i++) {
+            link = data.links[i];
+            $scope.links.push(new models.Link(device_map[link.from_device],
+                                              device_map[link.to_device]));
+        }
+
+        $scope.$apply();
+    };
+
+    $scope.control_socket.onmessage = function(message) {
+        console.log(message.data);
+        var type_data = JSON.parse(message.data);
         var type = type_data[0];
         var data = type_data[1];
 
-        if (type === 'save') {
-            $scope.onSave(data);
-        }
         if (type === 'DeviceCreate') {
+            $scope.history.push(message.data);
             $scope.onDeviceCreate(data);
         }
         if (type === 'LinkCreate') {
+            $scope.history.push(message.data);
             $scope.onLinkCreate(data);
         }
         if (type === 'DeviceMove') {
+            $scope.history.push(message.data);
             $scope.onDeviceMove(data);
         }
         if (type === 'DeviceDestroy') {
+            $scope.history.push(message.data);
             $scope.onDeviceDestroy(data);
         }
         if (type === 'DeviceLabelEdit') {
+            $scope.history.push(message.data);
             $scope.onDeviceLabelEdit(data);
         }
         if (type === 'DeviceSelected') {
+            $scope.history.push(message.data);
             $scope.onDeviceSelected(data);
         }
         if (type === 'DeviceUnSelected') {
+            $scope.history.push(message.data);
             $scope.onDeviceUnSelected(data);
+        }
+        if (type === 'Snapshot') {
+            $scope.history.push(message.data);
+            $scope.onSnapshot(data);
         }
         if (type === 'id') {
             $scope.onClientId(data);
@@ -461,7 +494,11 @@ app.controller('MainCtrl', function($scope, $document, $location) {
 	}
 
     $scope.send_control_message = function (message) {
-        $scope.control_socket.send(messages.serialize(message));
+        if ($scope.history.length === 0) {
+            $scope.send_snapshot();
+        }
+        var data = messages.serialize(message);
+        $scope.control_socket.send(data);
     };
 
 

@@ -23,12 +23,28 @@ Device.prototype.is_selected = function (x, y) {
 
 };
 
-function Link(from_device, to_device, selected) {
+
+Device.prototype.toJSON = function () {
+    return {id: this.id,
+            name: this.name,
+            x: this.x,
+            y: this.y,
+            size: this.size,
+            type: this.type};
+
+};
+
+function Link(from_device, to_device) {
     this.from_device = from_device;
     this.to_device = to_device;
-    this.selected = selected;
+    this.selected = false;
 }
 exports.Link = Link;
+
+Link.prototype.toJSON = function () {
+    return {to_device: this.to_device.id,
+            from_device: this.from_device.id};
+};
 
 function Button(name, x, y, width, height, callback) {
     this.name = name;
