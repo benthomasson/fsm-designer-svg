@@ -7,11 +7,11 @@ clean:
 	rm -f css/style.css
 
 main:
-	browserify main.js  --standalone main -o js/bundle.js
+	browserify src/main.js  --standalone main -o js/bundle.js
 	cp vendor/*.js js/
 
 lint:
-	jshint --verbose main.js app.js view.js fsm.js models.js move.js link.js button.js buttons.js util.js messages.js
+	jshint --verbose src/*js
 
 lessc:
-	lessc style.less css/style.css
+	lessc src/style.less css/style.css
