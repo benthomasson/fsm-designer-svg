@@ -124,6 +124,11 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         $scope.scaledY = ($scope.mouseY - $scope.panY) / $scope.current_scale;
     };
 
+    $scope.updatePanAndScale = function() {
+        var g = document.getElementById('frame_g');
+        g.setAttribute('transform','translate(' + $scope.panX + ',' + $scope.panY + ') scale(' + $scope.current_scale + ')');
+    };
+
     $scope.clear_selections = function () {
 
         var i = 0;
@@ -418,8 +423,28 @@ app.controller('MainCtrl', function($scope, $document, $location) {
         var i = 0;
         var device = null;
         var new_device = null;
+        var max_device_id = null;
+        var min_x = null;
+        var min_y = null;
+        var max_x = null;
+        var max_y = null;
         for (i = 0; i < data.devices.length; i++) {
             device = data.devices[i];
+            if (max_device_id === null || device.id > max_device_id) {
+                max_device_id = device.id;
+            }
+            if (min_x === null || device.x < min_x) {
+                min_x = device.x;
+            }
+            if (min_y === null || device.y < min_y) {
+                min_y = device.y;
+            }
+            if (max_x === null || device.x > max_x) {
+                max_x = device.x;
+            }
+            if (max_y === null || device.y > max_y) {
+                max_y = device.y;
+            }
             new_device = new models.Device(device.id,
                                            device.name,
                                            device.x,
@@ -436,6 +461,42 @@ app.controller('MainCtrl', function($scope, $document, $location) {
                                               device_map[link.to_device]));
         }
 
+        var diff_x;
+        var diff_y;
+
+        if (min_x !== null && min_y !== null && max_x !== null && max_y !== null) {
+            console.log(['min_x', min_x]);
+            console.log(['min_y', min_y]);
+            console.log(['max_x', max_x]);
+            console.log(['max_y', max_y]);
+
+            diff_x = max_x - min_x;
+            diff_y = max_y - min_y;
+            console.log(['diff_x', diff_x]);
+            console.log(['diff_y', diff_y]);
+
+            console.log(['ratio_x', window.innerWidth/diff_x]);
+            console.log(['ratio_y', window.innerHeight/diff_y]);
+
+            $scope.current_scale = Math.min(2, Math.max(0.10, Math.min((window.innerWidth-200)/diff_x, (window.innerHeight-300)/diff_y)));
+            $scope.updateScaledXY();
+            $scope.updatePanAndScale();
+        }
+        if (min_x !== null && min_y !== null) {
+            console.log(['min_x', min_x]);
+            console.log(['min_y', min_y]);
+            diff_x = max_x - min_x;
+            diff_y = max_y - min_y;
+            $scope.panX = $scope.current_scale * (-min_x - diff_x/2) + window.innerWidth/2;
+            $scope.panY = $scope.current_scale * (-min_y - diff_y/2) + window.innerHeight/2;
+            $scope.updateScaledXY();
+            $scope.updatePanAndScale();
+        }
+
+        if (max_device_id !== null) {
+            console.log(['max_device_id', max_device_id]);
+            $scope.device_id_seq = util.natural_numbers(max_device_id);
+        }
         $scope.$apply();
     };
 

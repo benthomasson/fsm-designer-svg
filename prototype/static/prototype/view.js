@@ -107,7 +107,6 @@ _Scale.prototype.timeout = function (controller) {
 
 
 _Scale.prototype.onMouseWheel = function (controller, event, delta) {
-      var g = document.getElementById('frame_g');
       var new_scale = Math.max(0.1, Math.min(10, (controller.scope.current_scale + delta / 100)));
       var new_panX = controller.scope.mouseX - new_scale * ((controller.scope.mouseX - controller.scope.panX) / controller.scope.current_scale);
       var new_panY = controller.scope.mouseY - new_scale * ((controller.scope.mouseY - controller.scope.panY) / controller.scope.current_scale);
@@ -115,7 +114,7 @@ _Scale.prototype.onMouseWheel = function (controller, event, delta) {
       controller.scope.current_scale = new_scale;
       controller.scope.panX = new_panX;
       controller.scope.panY = new_panY;
-      g.setAttribute('transform','translate(' + controller.scope.panX + ',' + controller.scope.panY + ') scale(' + controller.scope.current_scale + ')');
+      controller.scope.updatePanAndScale();
       controller.changeState(Ready);
 };
 
@@ -135,11 +134,10 @@ _Pressed.prototype.onMouseMove = function (controller) {
 
 _Pan.prototype.onMouseMove = function (controller) {
 
-    var g = document.getElementById('frame_g');
     controller.scope.panX = (controller.scope.mouseX - controller.scope.pressedX) + controller.scope.lastPanX;
     controller.scope.panY = (controller.scope.mouseY - controller.scope.pressedY) + controller.scope.lastPanY;
     controller.scope.updateScaledXY();
-    g.setAttribute('transform','translate(' + controller.scope.panX + ',' + controller.scope.panY + ') scale(' + controller.scope.current_scale + ')');
+    controller.scope.updatePanAndScale();
 };
 
 

@@ -272,6 +272,18 @@
                 <line x1="-5" y1="0" x2="5" y2="0"/>
                 <line x1="0" y1="-5" x2="0" y2="5"/>
             </g>
+            <g>
+                 <line ng-attr-x1="-1000"
+                       ng-attr-y1="0"
+                       ng-attr-x2="1000"
+                       ng-attr-y2="0"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+                 <line ng-attr-x1="0"
+                       ng-attr-y1="-1000"
+                       ng-attr-x2="0"
+                       ng-attr-y2="1000"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+            </g>
         </g>
         <g ng-show="!hide_buttons">
             <g> <!-- buttons -->
