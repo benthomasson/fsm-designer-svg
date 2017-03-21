@@ -1,5 +1,5 @@
 
-console.log = function () { };
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -14,6 +14,7 @@ var messages = require('./messages.js');
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
   $scope.topology_id = $location.search().topology_id || 0;
+  // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
@@ -59,6 +60,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                   'height': window.innerHeight};
   $scope.device_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
+  $scope.time_pointer = -1;
+
+
   $scope.devices = [
   ];
 
@@ -175,6 +179,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         return last_selected_device;
     };
 
+    $scope.forget_time = function () {
+        $scope.history.splice($scope.time_pointer);
+    };
+
 
     // Event Handlers
 
@@ -268,8 +276,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     ];
 
 
-    // Create a web socket to connect to the backend server
-    //
 
     $scope.onDeviceCreate = function(data) {
         if (data.sender === $scope.client_id) {
@@ -282,7 +288,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                        data.type);
         $scope.device_id_seq = util.natural_numbers(data.id);
         $scope.devices.push(device);
-        $scope.$apply();
     };
 
     $scope.onDeviceLabelEdit = function(data) {
@@ -296,7 +301,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 break;
             }
         }
-        $scope.$apply();
     };
 
     $scope.onLinkCreate = function(data) {
@@ -317,7 +321,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
         if (new_link.from_device !== null && new_link.to_device !== null) {
             $scope.links.push(new_link);
-            $scope.$apply();
         }
     };
 
@@ -330,7 +333,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             if ($scope.devices[i].id === data.id) {
                 $scope.devices[i].x = data.x;
                 $scope.devices[i].y = data.y;
-                $scope.$apply();
                 break;
             }
         }
@@ -366,7 +368,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 }
             }
         }
-        $scope.$apply();
     };
 
     $scope.onClientId = function(data) {
@@ -379,7 +380,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.panY = data.panX;
         $scope.current_scale = data.scale;
         $location.search({topology_id: data.topology_id});
-        $scope.$apply();
     };
 
     $scope.onDeviceSelected = function(data) {
@@ -393,7 +393,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 console.log($scope.devices[i].remote_selected);
             }
         }
-        $scope.$apply();
     };
 
     $scope.onDeviceUnSelected = function(data) {
@@ -407,7 +406,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 console.log($scope.devices[i].remote_selected);
             }
         }
-        $scope.$apply();
     };
 
     $scope.onSnapshot = function (data) {
@@ -503,57 +501,18 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             console.log(['max_device_id', max_device_id]);
             $scope.device_id_seq = util.natural_numbers(max_device_id);
         }
+    };
+
+
+    $scope.control_socket.onmessage = function(message) {
+        $scope.first_controller.state.onMessage($scope.first_controller, message);
         $scope.$apply();
     };
 
-    $scope.control_socket.onmessage = function(message) {
-        console.log(message.data);
-        var type_data = JSON.parse(message.data);
-        var type = type_data[0];
-        var data = type_data[1];
-
-        if (type === 'DeviceCreate') {
-            $scope.history.push(message.data);
-            $scope.onDeviceCreate(data);
-        }
-        if (type === 'LinkCreate') {
-            $scope.history.push(message.data);
-            $scope.onLinkCreate(data);
-        }
-        if (type === 'DeviceMove') {
-            $scope.history.push(message.data);
-            $scope.onDeviceMove(data);
-        }
-        if (type === 'DeviceDestroy') {
-            $scope.history.push(message.data);
-            $scope.onDeviceDestroy(data);
-        }
-        if (type === 'DeviceLabelEdit') {
-            $scope.history.push(message.data);
-            $scope.onDeviceLabelEdit(data);
-        }
-        if (type === 'DeviceSelected') {
-            $scope.history.push(message.data);
-            $scope.onDeviceSelected(data);
-        }
-        if (type === 'DeviceUnSelected') {
-            $scope.history.push(message.data);
-            $scope.onDeviceUnSelected(data);
-        }
-        if (type === 'Snapshot') {
-            $scope.history.push(message.data);
-            $scope.onSnapshot(data);
-        }
-        if (type === 'id') {
-            $scope.onClientId(data);
-        }
-        if (type === 'topology') {
-            $scope.onTopology(data);
-        }
-	};
 	$scope.control_socket.onopen = function() {
         //Ignore
 	};
+
 	// Call onopen directly if $scope.control_socket is already open
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();

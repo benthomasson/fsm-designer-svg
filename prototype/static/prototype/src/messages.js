@@ -68,3 +68,17 @@ function LinkDestroy(sender, from_id, to_id) {
     this.to_id = to_id;
 }
 exports.LinkDestroy = LinkDestroy;
+
+function Undo(sender, client_id, message_id) {
+    this.sender = sender;
+    this.client_id = client_id;
+    this.message_id = message_id;
+}
+exports.Undo = Undo;
+
+function Redo(sender, client_id, message_id) {
+    this.sender = sender;
+    this.client_id = client_id;
+    this.message_id = message_id;
+}
+exports.Redo = Redo;
