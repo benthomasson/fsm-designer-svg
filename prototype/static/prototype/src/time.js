@@ -88,33 +88,49 @@ _Present.prototype.onMessage = function(controller, message) {
 
     if (type === 'DeviceCreate') {
         controller.scope.history.push(message.data);
-        controller.scope.onDeviceCreate(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceCreate(data);
+        }
     }
     if (type === 'LinkCreate') {
         controller.scope.history.push(message.data);
-        controller.scope.onLinkCreate(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onLinkCreate(data);
+        }
     }
     if (type === 'DeviceMove') {
         controller.scope.history.push(message.data);
-        controller.scope.onDeviceMove(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceMove(data);
+        }
     }
     if (type === 'DeviceDestroy') {
         controller.scope.history.push(message.data);
-        controller.scope.onDeviceDestroy(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceDestroy(data);
+        }
     }
     if (type === 'DeviceLabelEdit') {
         controller.scope.history.push(message.data);
-        controller.scope.onDeviceLabelEdit(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceLabelEdit(data);
+        }
     }
     if (type === 'DeviceSelected') {
-        controller.scope.onDeviceSelected(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceSelected(data);
+        }
     }
     if (type === 'DeviceUnSelected') {
-        controller.scope.onDeviceUnSelected(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceUnSelected(data);
+        }
     }
     if (type === 'Snapshot') {
         controller.scope.history.push(message.data);
-        controller.scope.onSnapshot(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onSnapshot(data);
+        }
     }
     if (type === 'id') {
         controller.scope.onClientId(data);

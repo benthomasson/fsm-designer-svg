@@ -261,10 +261,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.control_socket.send(data);
     };
 
-    $scope.onLoadButton = function (button) {
-        console.log(button.name);
-    };
-
     $scope.onDeployButton = function (button) {
         console.log(button.name);
     };
@@ -278,9 +274,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
     $scope.onDeviceCreate = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var device = new models.Device(data.id,
                                        data.name,
                                        data.x,
@@ -291,9 +284,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceLabelEdit = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -304,9 +294,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onLinkCreate = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var i = 0;
         var new_link = new models.Link(null, null);
         for (i = 0; i < $scope.devices.length; i++){
@@ -325,9 +312,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceMove = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -339,9 +323,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceDestroy = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
 
         // Delete the device and any links connecting to the device.
         var i = 0;
@@ -383,9 +364,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceSelected = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -396,9 +374,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceUnSelected = function(data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -409,9 +384,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onSnapshot = function (data) {
-        if (data.sender === $scope.client_id) {
-            return;
-        }
 
         //Erase the existing state
         $scope.devices = [];
