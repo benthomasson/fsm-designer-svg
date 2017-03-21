@@ -89,7 +89,8 @@ models:
   name: TopologyHistory
   x: -205
   y: 282
-- fields:
+- display: name
+  fields:
   - name: message_type_id
     pk: true
     type: AutoField

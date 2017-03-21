@@ -53,3 +53,6 @@ class MessageType(models.Model):
 
     message_type_id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=200, )
+
+    def __unicode__(self):
+        return self.name
