@@ -6,6 +6,7 @@ var view = require('./view.js');
 var move = require('./move.js');
 var link = require('./link.js');
 var buttons = require('./buttons.js');
+var time = require('./time.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
@@ -44,7 +45,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
   $scope.link_controller = new fsm.FSMController($scope, link.Start, $scope.move_controller);
   $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.link_controller);
-  $scope.first_controller = $scope.buttons_controller;
+  $scope.time_controller = new fsm.FSMController($scope, time.Start, $scope.buttons_controller);
+  $scope.first_controller = $scope.time_controller;
   $scope.last_key = "";
   $scope.last_key_code = null;
   $scope.last_event = null;
@@ -339,6 +341,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             return;
         }
 
+        // Delete the device and any links connecting to the device.
         var i = 0;
         var j = 0;
         var dindex = -1;
@@ -412,6 +415,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             return;
         }
 
+        //Erase the existing state
         $scope.devices = [];
         $scope.links = [];
 
@@ -424,6 +428,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var min_y = null;
         var max_x = null;
         var max_y = null;
+
+        //Build the devices
         for (i = 0; i < data.devices.length; i++) {
             device = data.devices[i];
             if (max_device_id === null || device.id > max_device_id) {
@@ -450,6 +456,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             device_map[device.id] = new_device;
         }
 
+        //Build the links
         var link = null;
         for (i = 0; i < data.links.length; i++) {
             link = data.links[i];
@@ -460,6 +467,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var diff_x;
         var diff_y;
 
+        // Calculate the new scale to show the entire diagram
         if (min_x !== null && min_y !== null && max_x !== null && max_y !== null) {
             console.log(['min_x', min_x]);
             console.log(['min_y', min_y]);
@@ -478,6 +486,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.updateScaledXY();
             $scope.updatePanAndScale();
         }
+        // Calculate the new panX and panY to show the entire diagram
         if (min_x !== null && min_y !== null) {
             console.log(['min_x', min_x]);
             console.log(['min_y', min_y]);
@@ -489,6 +498,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.updatePanAndScale();
         }
 
+        //Update the device_id_seq to be greater than all device ids to prevent duplicate ids.
         if (max_device_id !== null) {
             console.log(['max_device_id', max_device_id]);
             $scope.device_id_seq = util.natural_numbers(max_device_id);
@@ -540,7 +550,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         if (type === 'topology') {
             $scope.onTopology(data);
         }
-
 	};
 	$scope.control_socket.onopen = function() {
         //Ignore
