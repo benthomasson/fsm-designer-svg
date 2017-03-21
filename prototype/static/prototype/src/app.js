@@ -55,7 +55,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
-  $scope.device_id_seq = util.natural_numbers(1);
+  $scope.device_id_seq = util.natural_numbers(0);
+  $scope.message_id_seq = util.natural_numbers(0);
   $scope.devices = [
   ];
 
@@ -245,7 +246,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                                 "links": $scope.links,
                                                 "scale": $scope.scale,
                                                 "panX": $scope.panX,
-                                                "panY": $scope.panY}]);
+                                                "panY": $scope.panY,
+                                                "message_id": $scope.message_id_seq()}]);
         $scope.control_socket.send(data);
     };
 
@@ -552,6 +554,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         if ($scope.history.length === 0) {
             $scope.send_snapshot();
         }
+        message.message_id = $scope.message_id_seq();
         var data = messages.serialize(message);
         $scope.control_socket.send(data);
     };
