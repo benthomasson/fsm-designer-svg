@@ -1,4 +1,4 @@
-app: models
+app: prototype
 external_models: []
 models:
 - display: name
@@ -59,8 +59,48 @@ models:
   name: Topology
   x: 111
   y: 127
+- fields:
+  - name: client_id
+    pk: true
+    type: AutoField
+  name: Client
+  x: -455
+  y: 109
+- fields:
+  - name: topology_history_id
+    pk: true
+    type: AutoField
+  - name: topology
+    ref: Topology
+    ref_field: topology_id
+    type: ForeignKey
+  - name: client
+    ref: Client
+    ref_field: client_id
+    type: ForeignKey
+  - name: message_type
+    ref: MessageType
+    ref_field: message_type_id
+    type: ForeignKey
+  - name: message_id
+    type: IntegerField
+  - name: message_data
+    type: TextField
+  name: TopologyHistory
+  x: -205
+  y: 282
+- fields:
+  - name: message_type_id
+    pk: true
+    type: AutoField
+  - len: 200
+    name: name
+    type: CharField
+  name: MessageType
+  x: -509
+  y: 383
 modules: []
 view:
-  panX: 25
-  panY: 28
-  scaleXY: 1
+  panX: 642.7150627655888
+  panY: 193.7947851815995
+  scaleXY: 0.6900000000000002
