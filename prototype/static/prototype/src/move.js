@@ -171,7 +171,11 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
             if (index !== -1) {
                 controller.scope.devices.splice(index, 1);
                 controller.scope.send_control_message(new messages.DeviceDestroy(controller.scope.client_id,
-                                                                                 devices[i].id));
+                                                                                 devices[i].id,
+                                                                                 devices[i].x,
+                                                                                 devices[i].y,
+                                                                                 devices[i].name,
+                                                                                 devices[i].type));
             }
             for (j = 0; j < all_links.length; j++) {
                 if (all_links[j].to_device === devices[i] ||
@@ -213,13 +217,18 @@ _Move.prototype.onMouseMove = function (controller) {
     var diffX = controller.scope.scaledX - controller.scope.pressedScaledX;
     var diffY = controller.scope.scaledY - controller.scope.pressedScaledY;
     var i = 0;
+    var previous_x, previous_y;
     for (i = 0; i < devices.length; i++) {
+        previous_x = devices[i].x;
+        previous_y = devices[i].y;
         devices[i].x = devices[i].x + diffX;
         devices[i].y = devices[i].y + diffY;
         controller.scope.send_control_message(new messages.DeviceMove(controller.scope.client_id,
                                                                       devices[i].id,
                                                                       devices[i].x,
-                                                                      devices[i].y));
+                                                                      devices[i].y,
+                                                                      previous_x,
+                                                                      previous_y));
     }
     controller.scope.pressedScaledX = controller.scope.scaledX;
     controller.scope.pressedScaledY = controller.scope.scaledY;
@@ -266,6 +275,7 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var device = controller.scope.selected_devices[0];
+    var previous_name = device.name;
 	if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
 		device.name = device.name.slice(0, -1);
 	} else if ($event.keyCode >= 48 && $event.keyCode <=90) { //Alphanumeric
@@ -277,6 +287,7 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
     }
     controller.scope.send_control_message(new messages.DeviceLabelEdit(controller.scope.client_id,
                                                                        device.id,
-                                                                       device.name));
+                                                                       device.name,
+                                                                       previous_name));
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];

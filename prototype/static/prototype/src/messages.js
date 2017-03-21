@@ -5,11 +5,13 @@ function serialize(message) {
 }
 exports.serialize = serialize;
 
-function DeviceMove(sender, id, x, y) {
+function DeviceMove(sender, id, x, y, previous_x, previous_y) {
     this.sender = sender;
     this.id = id;
     this.x = x;
     this.y = y;
+    this.previous_x = previous_x;
+    this.previous_y = previous_y;
 }
 exports.DeviceMove = DeviceMove;
 
@@ -23,16 +25,21 @@ function DeviceCreate(sender, id, x, y, name, type) {
 }
 exports.DeviceCreate = DeviceCreate;
 
-function DeviceDestroy(sender, id) {
+function DeviceDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
     this.sender = sender;
     this.id = id;
+    this.previous_x = previous_x;
+    this.previous_y = previous_y;
+    this.previous_name = previous_name;
+    this.previous_type = previous_type;
 }
 exports.DeviceDestroy = DeviceDestroy;
 
-function DeviceLabelEdit(sender, id, name) {
+function DeviceLabelEdit(sender, id, name, previous_name) {
     this.sender = sender;
     this.id = id;
     this.name = name;
+    this.previous_name = previous_name;
 }
 exports.DeviceLabelEdit = DeviceLabelEdit;
 

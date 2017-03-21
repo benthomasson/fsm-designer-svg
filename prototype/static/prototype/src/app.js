@@ -1,5 +1,5 @@
 
-//console.log = function () { };
+console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -262,7 +262,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
+      //new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
     ];
 
 
