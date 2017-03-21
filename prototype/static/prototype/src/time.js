@@ -143,10 +143,28 @@ _Present.prototype.onMessage = function(controller, message) {
 _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
     if ($event.originalEvent.metaKey) {
-        if (delta < 0) {
-            controller.changeState(Past);
-        }
         console.log(delta);
+        if (delta < 0) {
+            //controller.changeState(Past);
+            controller.scope.time_pointer = controller.scope.history.length - 1;
+            if (controller.scope.time_pointer >= 0) {
+                var change = controller.scope.history[controller.scope.time_pointer];
+                var type_data = JSON.parse(change);
+                var type = type_data[0];
+                var data = type_data[1];
+                var inverted_data = angular.copy(data);
+
+                console.log(type);
+
+                if (type === "DeviceMove") {
+                    inverted_data.x = data.previous_x;
+                    inverted_data.y = data.previous_y;
+                    controller.scope.move_devices(inverted_data);
+                }
+
+                controller.scope.history.splice(-1);
+            }
+        }
     } else {
         controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
     }

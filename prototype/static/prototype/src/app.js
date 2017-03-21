@@ -312,6 +312,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceMove = function(data) {
+        $scope.move_devices(data);
+    };
+
+    $scope.move_devices = function(data) {
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
