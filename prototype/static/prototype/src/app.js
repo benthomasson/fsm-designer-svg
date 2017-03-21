@@ -543,7 +543,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 	};
 	$scope.control_socket.onopen = function() {
-		$scope.control_socket.send(JSON.stringify(["message", "hello world"]));
+        //Ignore
 	};
 	// Call onopen directly if $scope.control_socket is already open
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
@@ -554,6 +554,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         if ($scope.history.length === 0) {
             $scope.send_snapshot();
         }
+        message.sender = $scope.client_id;
         message.message_id = $scope.message_id_seq();
         var data = messages.serialize(message);
         $scope.control_socket.send(data);
