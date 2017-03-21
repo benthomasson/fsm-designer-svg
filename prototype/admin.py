@@ -46,7 +46,7 @@ admin.site.register(Client, ClientAdmin)
 
 
 class TopologyHistoryAdmin(admin.ModelAdmin):
-    fields = ('topology', 'client', 'message_type', 'message_id', 'message_data',)
+    fields = ('topology', 'client', 'message_type', 'message_id', 'message_data', 'undone',)
     raw_id_fields = ('topology', 'client', 'message_type',)
 
 

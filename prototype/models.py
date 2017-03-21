@@ -47,6 +47,7 @@ class TopologyHistory(models.Model):
     message_type = models.ForeignKey('MessageType',)
     message_id = models.IntegerField()
     message_data = models.TextField()
+    undone = models.BooleanField(default=False)
 
 
 class MessageType(models.Model):
