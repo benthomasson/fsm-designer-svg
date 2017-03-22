@@ -43,6 +43,8 @@ def ws_connect(message):
                                                                             .values('from_device__id', 'to_device__id'))])
     pprint(snapshot)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
+    history = list(TopologyHistory.objects.filter(topology_id=topology_id).order_by('pk').values_list('message_data', flat=True)[:1000])
+    message.reply_channel.send({"text": json.dumps(["History", history])})
 
 # Connected to websocket.receive
 
