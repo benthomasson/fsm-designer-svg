@@ -66,10 +66,66 @@ _Past.prototype.onMessage = function(controller, message) {
     var data = type_data[1];
 
     if (type === 'DeviceSelected') {
-        controller.scope.onDeviceSelected(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceSelected(data);
+        }
     }
     if (type === 'DeviceUnSelected') {
-        controller.scope.onDeviceUnSelected(data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onDeviceUnSelected(data);
+        }
+    }
+
+    if (type === 'Undo') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
+            controller.scope.undo(data.original_message);
+        }
+    }
+};
+
+_Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
+
+    if ($event.originalEvent.metaKey) {
+        console.log(delta);
+        if (delta < 0) {
+            this.undo(controller);
+        }
+    } else {
+        controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
+    }
+
+};
+_Past.prototype.onMouseWheel.transitions = ['Past'];
+
+_Past.prototype.onKeyDown = function(controller, $event) {
+
+    console.log($event);
+
+    if ($event.key === 'z' && $event.metaKey && ! $event.shiftKey) {
+        this.undo(controller);
+        return;
+    } else if ($event.key === 'z' && $event.ctrlKey && ! $event.shiftKey) {
+        this.undo(controller);
+        return;
+    } else {
+        controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+    }
+};
+_Past.prototype.onKeyDown.transitions = ['Past'];
+
+
+_Past.prototype.undo = function(controller) {
+    //controller.changeState(Past);
+    controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
+    if (controller.scope.time_pointer >= 0) {
+        var change = controller.scope.history[controller.scope.time_pointer];
+        var type_data = JSON.parse(change);
+        controller.scope.send_control_message(new messages.Undo(controller.scope.client_id,
+                                                                type_data));
+
+
+        controller.scope.undo(type_data);
     }
 };
 
@@ -129,8 +185,9 @@ _Present.prototype.onMessage = function(controller, message) {
     }
     if (type === 'Undo') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.history.splice(-1);
+            controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
             controller.scope.undo(data.original_message);
+            controller.changeState(Past);
         }
     }
     if (type === 'Snapshot') {
@@ -149,6 +206,7 @@ _Present.prototype.onMessage = function(controller, message) {
         controller.scope.onHistory(data);
     }
 };
+_Present.prototype.onMessage.transitions = ['Past'];
 
 _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
@@ -186,16 +244,11 @@ _Present.prototype.undo = function(controller) {
     controller.scope.time_pointer = controller.scope.history.length - 1;
     if (controller.scope.time_pointer >= 0) {
         var change = controller.scope.history[controller.scope.time_pointer];
-        controller.scope.history.splice(-1);
-
         var type_data = JSON.parse(change);
         controller.scope.send_control_message(new messages.Undo(controller.scope.client_id,
                                                                 type_data));
 
-
         controller.scope.undo(type_data);
-
-
-
+        controller.changeState(Past);
     }
 };
