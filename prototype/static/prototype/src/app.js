@@ -388,6 +388,35 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
+    $scope.redo = function(type_data) {
+        var type = type_data[0];
+        var data = type_data[1];
+
+        if (type === "DeviceMove") {
+            $scope.move_devices(data);
+        }
+
+        if (type === "DeviceCreate") {
+            $scope.create_device(data);
+        }
+
+        if (type === "DeviceDestroy") {
+            $scope.destroy_device(data);
+        }
+
+        if (type === "DeviceLabelEdit") {
+            $scope.edit_device_label(data);
+        }
+
+        if (type === "LinkCreate") {
+            $scope.create_link(data);
+        }
+
+        if (type === "LinkDestroy") {
+            $scope.destroy_link(data);
+        }
+    };
+
 
     $scope.undo = function(type_data) {
         var type = type_data[0];
@@ -418,7 +447,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         if (type === "DeviceLabelEdit") {
             inverted_data = angular.copy(data);
             inverted_data.name = data.previous_name;
-            $scope.edit_device_label(data);
+            $scope.edit_device_label(inverted_data);
         }
 
         if (type === "LinkCreate") {

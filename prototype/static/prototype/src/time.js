@@ -78,8 +78,17 @@ _Past.prototype.onMessage = function(controller, message) {
 
     if (type === 'Undo') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
+            controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
             controller.scope.undo(data.original_message);
+        }
+    }
+    if (type === 'Redo') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.time_pointer = Math.min(controller.scope.history.length, controller.scope.time_pointer + 1);
+            controller.scope.redo(data.original_message);
+            if (controller.scope.time_pointer === controller.scope.history.length) {
+                controller.changeState(Present);
+            }
         }
     }
 };
@@ -90,6 +99,8 @@ _Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, delt
         console.log(delta);
         if (delta < 0) {
             this.undo(controller);
+        } else if (delta > 0) {
+            this.redo(controller);
         }
     } else {
         controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
@@ -108,6 +119,12 @@ _Past.prototype.onKeyDown = function(controller, $event) {
     } else if ($event.key === 'z' && $event.ctrlKey && ! $event.shiftKey) {
         this.undo(controller);
         return;
+    } else if ($event.key === 'Z' && $event.metaKey && $event.shiftKey) {
+        this.redo(controller);
+        return;
+    } else if ($event.key === 'Z' && $event.ctrlKey && $event.shiftKey) {
+        this.redo(controller);
+        return;
     } else {
         controller.next_controller.state.onKeyDown(controller.next_controller, $event);
     }
@@ -117,7 +134,7 @@ _Past.prototype.onKeyDown.transitions = ['Past'];
 
 _Past.prototype.undo = function(controller) {
     //controller.changeState(Past);
-    controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
+    controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
     if (controller.scope.time_pointer >= 0) {
         var change = controller.scope.history[controller.scope.time_pointer];
         var type_data = JSON.parse(change);
@@ -126,6 +143,24 @@ _Past.prototype.undo = function(controller) {
 
 
         controller.scope.undo(type_data);
+    }
+};
+
+_Past.prototype.redo = function(controller) {
+
+
+    if (controller.scope.time_pointer < controller.scope.history.length) {
+        var change = controller.scope.history[controller.scope.time_pointer];
+        var type_data = JSON.parse(change);
+        controller.scope.send_control_message(new messages.Redo(controller.scope.client_id,
+                                                                type_data));
+        controller.scope.redo(type_data);
+        controller.scope.time_pointer = Math.min(controller.scope.history.length, controller.scope.time_pointer + 1);
+        if (controller.scope.time_pointer === controller.scope.history.length) {
+            controller.changeState(Present);
+        }
+    } else {
+        controller.changeState(Present);
     }
 };
 
@@ -185,7 +220,7 @@ _Present.prototype.onMessage = function(controller, message) {
     }
     if (type === 'Undo') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.time_pointer = Math.max(-1, controller.scope.time_pointer - 1);
+            controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
             controller.scope.undo(data.original_message);
             controller.changeState(Past);
         }
