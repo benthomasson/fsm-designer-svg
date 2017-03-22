@@ -388,6 +388,48 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
+
+    $scope.undo = function(type_data) {
+        var type = type_data[0];
+        var data = type_data[1];
+        var inverted_data;
+
+        if (type === "DeviceMove") {
+            inverted_data = angular.copy(data);
+            inverted_data.x = data.previous_x;
+            inverted_data.y = data.previous_y;
+            $scope.move_devices(inverted_data);
+        }
+
+        if (type === "DeviceCreate") {
+            $scope.destroy_device(data);
+        }
+
+        if (type === "DeviceDestroy") {
+            inverted_data = new messages.DeviceCreate(data.sender,
+                                                      data.id,
+                                                      data.previous_x,
+                                                      data.previous_y,
+                                                      data.previous_name,
+                                                      data.previous_type);
+            $scope.create_device(inverted_data);
+        }
+
+        if (type === "DeviceLabelEdit") {
+            inverted_data = angular.copy(data);
+            inverted_data.name = data.previous_name;
+            $scope.edit_device_label(data);
+        }
+
+        if (type === "LinkCreate") {
+            $scope.destroy_link(data);
+        }
+
+        if (type === "LinkDestroy") {
+            $scope.create_link(data);
+        }
+    };
+
     $scope.onClientId = function(data) {
         $scope.client_id = data;
     };

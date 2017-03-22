@@ -127,6 +127,12 @@ _Present.prototype.onMessage = function(controller, message) {
             controller.scope.onDeviceUnSelected(data);
         }
     }
+    if (type === 'Undo') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.history.splice(-1);
+            controller.scope.undo(data.original_message);
+        }
+    }
     if (type === 'Snapshot') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
@@ -180,51 +186,16 @@ _Present.prototype.undo = function(controller) {
     controller.scope.time_pointer = controller.scope.history.length - 1;
     if (controller.scope.time_pointer >= 0) {
         var change = controller.scope.history[controller.scope.time_pointer];
+        controller.scope.history.splice(-1);
+
         var type_data = JSON.parse(change);
-        var type = type_data[0];
-        var data = type_data[1];
-        var inverted_data;
-
-        console.log(type);
-
-        if (type === "DeviceMove") {
-            inverted_data = angular.copy(data);
-            inverted_data.x = data.previous_x;
-            inverted_data.y = data.previous_y;
-            controller.scope.move_devices(inverted_data);
-        }
-
-        if (type === "DeviceCreate") {
-            controller.scope.destroy_device(data);
-        }
-
-        if (type === "DeviceDestroy") {
-            inverted_data = new messages.DeviceCreate(data.sender,
-                                                      data.id,
-                                                      data.previous_x,
-                                                      data.previous_y,
-                                                      data.previous_name,
-                                                      data.previous_type);
-            controller.scope.create_device(inverted_data);
-        }
-
-        if (type === "DeviceLabelEdit") {
-            inverted_data = angular.copy(data);
-            inverted_data.name = data.previous_name;
-            controller.scope.edit_device_label(data);
-        }
-
-        if (type === "LinkCreate") {
-            controller.scope.destroy_link(data);
-        }
-
-        if (type === "LinkDestroy") {
-            controller.scope.create_link(data);
-        }
-
         controller.scope.send_control_message(new messages.Undo(controller.scope.client_id,
                                                                 type_data));
 
-        controller.scope.history.splice(-1);
+
+        controller.scope.undo(type_data);
+
+
+
     }
 };
