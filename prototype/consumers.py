@@ -150,7 +150,7 @@ class _Persistence(object):
                                 .values_list('id', 'pk'))
         Link.objects.get_or_create(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']])
 
-    def onLinkDestroy(self, message_value, topology_id, client_id):
+    def onLinkDestroy(self, link, topology_id, client_id):
         device_map = dict(Device.objects
                                 .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
                                 .values_list('id', 'pk'))
