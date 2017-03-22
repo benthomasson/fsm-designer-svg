@@ -135,7 +135,7 @@ _Present.prototype.onMessage = function(controller, message) {
     if (type === 'id') {
         controller.scope.onClientId(data);
     }
-    if (type === 'topology') {
+    if (type === 'Topology') {
         controller.scope.onTopology(data);
     }
 };
