@@ -34,7 +34,7 @@ def ws_connect(message):
     message.reply_channel.send({"text": json.dumps(["topology_id", topology_id])})
     topology_data = topology.__dict__.copy()
     del topology_data['_state']
-    message.reply_channel.send({"text": json.dumps(["topology", topology_data])})
+    message.reply_channel.send({"text": json.dumps(["Topology", topology_data])})
     snapshot = dict(sender=0,
                     devices=list(Device.objects.filter(topology_id=topology_id).values()),
                     links=[dict(from_device=x['from_device__id'],
