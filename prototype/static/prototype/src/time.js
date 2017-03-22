@@ -65,6 +65,21 @@ _Past.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
+    if (['DeviceCreate',
+         'DeviceDestroy',
+         'DeviceMove',
+         'DeviceLabelEdit',
+         'LinkCreate',
+         'LinkDestroy'].indexOf(type) !== -1) {
+        controller.changeState(Present);
+        controller.scope.history.splice(controller.scope.time_pointer);
+        if (data.sender !== controller.scope.client_id) {
+            controller.state.onMessage(controller, message);
+        } else {
+            controller.scope.history.push(message.data);
+        }
+    }
+
     if (type === 'DeviceSelected') {
         if (data.sender !== controller.scope.client_id) {
             controller.scope.onDeviceSelected(data);
