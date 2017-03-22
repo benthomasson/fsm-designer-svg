@@ -187,6 +187,14 @@ _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, d
                     controller.scope.edit_device_label(data);
                 }
 
+                if (type === "LinkCreate") {
+                    controller.scope.destroy_link(data);
+                }
+
+                if (type === "LinkDestroy") {
+                    controller.scope.create_link(data);
+                }
+
                 controller.scope.history.splice(-1);
             }
         }

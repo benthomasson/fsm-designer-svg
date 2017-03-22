@@ -302,6 +302,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onLinkCreate = function(data) {
+        $scope.create_link(data);
+    };
+
+    $scope.create_link = function(data) {
         var i = 0;
         var new_link = new models.Link(null, null);
         for (i = 0; i < $scope.devices.length; i++){
@@ -316,6 +320,23 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
         if (new_link.from_device !== null && new_link.to_device !== null) {
             $scope.links.push(new_link);
+        }
+    };
+
+    $scope.onLinkDestroy = function(data) {
+        $scope.destroy_link(data);
+    };
+
+    $scope.destroy_link = function(data) {
+        var i = 0;
+        var link = null;
+        var index = -1;
+        for (i = 0; i < $scope.links.length; i++) {
+            link = $scope.links[i];
+            if (link.from_device.id === data.from_id && link.to_device.id === data.to_id) {
+                index = $scope.links.indexOf(link);
+                $scope.links.splice(index, 1);
+            }
         }
     };
 
