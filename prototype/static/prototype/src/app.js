@@ -422,6 +422,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onHistory = function (data) {
 
+        $scope.history = [];
         var i = 0;
         for (i = 0; i < data.length; i++) {
             console.log(data[i]);
