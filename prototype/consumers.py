@@ -49,6 +49,7 @@ def ws_connect(message):
     history = list(TopologyHistory.objects
                                   .filter(topology_id=topology_id)
                                   .exclude(message_type__name__in=history_message_ignore_types)
+                                  .exclude(undone=True)
                                   .order_by('pk')
                                   .values_list('message_data', flat=True)[:1000])
     message.reply_channel.send({"text": json.dumps(["History", history])})
@@ -150,7 +151,10 @@ class _Persistence(object):
         Link.objects.get_or_create(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']])
 
     def onLinkDestroy(self, message_value, topology_id, client_id):
-        pass
+        device_map = dict(Device.objects
+                                .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
+                                .values_list('id', 'pk'))
+        Link.objects.filter(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']]).delete()
 
     def onDeviceSelected(self, message_value, topology_id, client_id):
         'Ignore DeviceSelected messages'
@@ -160,5 +164,68 @@ class _Persistence(object):
         'Ignore DeviceSelected messages'
         pass
 
+    def onUndo(self, message_value, topology_id, client_id):
+        undo_persistence.handle(message_value['original_message'], topology_id, client_id)
+
 
 persistence = _Persistence()
+
+
+class _UndoPersistence(object):
+
+    def handle(self, message, topology_id, client_id):
+        message_type = message[0]
+        message_value = message[1]
+        TopologyHistory.objects.filter(topology_id=topology_id,
+                                       client_id=message_value['sender'],
+                                       message_id=message_value['message_id']).update(undone=True)
+        handler = getattr(self, "on{0}".format(message_type), None)
+        if handler is not None:
+            handler(message_value, topology_id, client_id)
+        else:
+            print "Unsupported undo message ", message_type
+
+    def onSnapshot(self, snapshot, topology_id, client_id):
+        pass
+
+    def onDeviceCreate(self, device, topology_id, client_id):
+        persistence.onDeviceDestroy(device, topology_id, client_id)
+
+    def onDeviceDestroy(self, device, topology_id, client_id):
+        inverted = device.copy()
+        inverted['type'] = device['previous_type']
+        inverted['name'] = device['previous_name']
+        inverted['x'] = device['previous_x']
+        inverted['y'] = device['previous_y']
+        persistence.onDeviceCreate(inverted, topology_id, client_id)
+
+    def onDeviceMove(self, device, topology_id, client_id):
+        inverted = device.copy()
+        inverted['x'] = device['previous_x']
+        inverted['y'] = device['previous_y']
+        persistence.onDeviceMove(inverted, topology_id, client_id)
+
+    def onDeviceEditLabel(self, device, topology_id, client_id):
+        inverted = device.copy()
+        inverted['name'] = device['previous_name']
+        persistence.onDeviceEditLabel(inverted, topology_id, client_id)
+
+    def onLinkCreate(self, link, topology_id, client_id):
+        persistence.onLinkDestroy(link, topology_id, client_id)
+
+    def onLinkDestroy(self, link, topology_id, client_id):
+        persistence.onLinkCreate(link, topology_id, client_id)
+
+    def onDeviceSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+    def onDeviceUnSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+    def onUndo(self, message_value, topology_id, client_id):
+        pass
+
+
+undo_persistence = _UndoPersistence()
