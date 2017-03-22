@@ -2,9 +2,8 @@
 from channels import Group, Channel
 from channels.sessions import channel_session
 from prototype.models import Topology, Device, Link, Client, TopologyHistory, MessageType
-from pprint import pprint
 import urlparse
-from django.db.models import Q, F
+from django.db.models import Q
 
 import json
 # Connected to websocket.connect
@@ -35,18 +34,24 @@ def ws_connect(message):
     topology_data = topology.__dict__.copy()
     del topology_data['_state']
     message.reply_channel.send({"text": json.dumps(["Topology", topology_data])})
+    devices = list(Device.objects
+                         .filter(topology_id=topology_id).values())
+    links = [dict(from_device=x['from_device__id'],
+                  to_device=x['to_device__id']) for x in list(Link.objects
+                                                                  .filter(Q(from_device__topology_id=topology_id) |
+                                                                          Q(to_device__topology_id=topology_id))
+                                                                  .values('from_device__id', 'to_device__id'))]
     snapshot = dict(sender=0,
-                    devices=list(Device.objects.filter(topology_id=topology_id).values()),
-                    links=[dict(from_device=x['from_device__id'],
-                                to_device=x['to_device__id']) for x in list(Link.objects
-                                                                            .filter(Q(from_device__topology_id=topology_id) | Q(to_device__topology_id=topology_id))
-                                                                            .values('from_device__id', 'to_device__id'))])
-    pprint(snapshot)
+                    devices=devices,
+                    links=links)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
-    history = list(TopologyHistory.objects.filter(topology_id=topology_id).order_by('pk').values_list('message_data', flat=True)[:1000])
+    history_message_ignore_types = ['DeviceSelected', 'DeviceUnSelected', 'Undo', 'Redo']
+    history = list(TopologyHistory.objects
+                                  .filter(topology_id=topology_id)
+                                  .exclude(message_type__name__in=history_message_ignore_types)
+                                  .order_by('pk')
+                                  .values_list('message_data', flat=True)[:1000])
     message.reply_channel.send({"text": json.dumps(["History", history])})
-
-# Connected to websocket.receive
 
 
 @channel_session
@@ -59,9 +64,9 @@ def ws_message(message):
     })
     # Send to persistence worker
     Channel('persistence').send(
-        {"text": message['text'], "topology": message.channel_session['topology_id'], "client": message.channel_session['client_id']})
-
-# Connected to websocket.disconnect
+        {"text": message['text'],
+         "topology": message.channel_session['topology_id'],
+         "client": message.channel_session['client_id']})
 
 
 @channel_session
@@ -73,32 +78,38 @@ def console_printer(message):
     print message['text']
 
 
-def persistence(message):
-    topology_id = message.get('topology')
-    if topology_id is None:
-        print "No topology_id"
-        return
-    client_id = message.get('client')
-    if client_id is None:
-        print "No client_id"
-        return
-    data = json.loads(message['text'])
-    if client_id != data[1].get('sender'):
-        print "client_id mismatch expected:", client_id, "actual:", data[1].get('sender')
-        return
-    message_type = data[0]
-    message_type_id = MessageType.objects.get_or_create(name=message_type)[0].pk
-    TopologyHistory(topology_id=topology_id,
-                    client_id=client_id,
-                    message_type_id=message_type_id,
-                    message_id=data[1].get('message_id', 0),
-                    message_data=message['text']).save()
-    if message_type in ["DeviceSelected", "DeviceUnSelected"]:
-        # Ignore these messages in persistence
-        pass
-    elif message_type == "Snapshot":
+class _Persistence(object):
+
+    def handle(self, message):
+        topology_id = message.get('topology')
+        if topology_id is None:
+            print "No topology_id"
+            return
+        client_id = message.get('client')
+        if client_id is None:
+            print "No client_id"
+            return
+        data = json.loads(message['text'])
+        if client_id != data[1].get('sender'):
+            print "client_id mismatch expected:", client_id, "actual:", data[1].get('sender')
+            return
+        message_type = data[0]
+        message_value = data[1]
+        message_type_id = MessageType.objects.get_or_create(name=message_type)[0].pk
+        TopologyHistory(topology_id=topology_id,
+                        client_id=client_id,
+                        message_type_id=message_type_id,
+                        message_id=data[1].get('message_id', 0),
+                        message_data=message['text']).save()
+        handler = getattr(self, "on{0}".format(message_type), None)
+        if handler is not None:
+            handler(message_value, topology_id, client_id)
+        else:
+            print "Unsupported message ", message_type
+
+    def onSnapshot(self, snapshot, topology_id, client_id):
         device_map = dict()
-        for device in data[1]['devices']:
+        for device in snapshot['devices']:
             del device['size']
             d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
             d.name = device['name']
@@ -108,12 +119,11 @@ def persistence(message):
             d.save()
             device_map[device['id']] = d
 
-        for link in data[1]['links']:
+        for link in snapshot['links']:
             Link.objects.get_or_create(from_device=device_map[link['from_device']],
                                        to_device=device_map[link['to_device']])
 
-    elif message_type == "DeviceCreate":
-        device = data[1]
+    def onDeviceCreate(self, device, topology_id, client_id):
         del device['sender']
         del device['message_id']
         d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
@@ -121,21 +131,34 @@ def persistence(message):
         d.y = device['y']
         d.type = device['type']
         d.save()
-    elif message_type == "DeviceDestroy":
-        device = data[1]
+
+    def onDeviceDestroy(self, device, topology_id, client_id):
         Device.objects.filter(topology_id=topology_id, id=device['id']).delete()
-    elif message_type == "DeviceMove":
-        device = data[1]
+
+    def onDeviceMove(self, device, topology_id, client_id):
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(x=device['x'], y=device['y'])
-    elif message_type == "DeviceLabelEdit":
-        device = data[1]
+
+    def onDeviceEditLabel(self, device, topology_id, client_id):
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(name=device['name'])
-    elif message_type == "LinkCreate":
-        link = data[1]
+
+    def onLinkCreate(self, link, topology_id, client_id):
         del link['sender']
         del link['message_id']
-        print link
-        device_map = dict(Device.objects.filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']]).values_list('id', 'pk'))
+        device_map = dict(Device.objects
+                                .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
+                                .values_list('id', 'pk'))
         Link.objects.get_or_create(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']])
-    else:
-        print "Unsupported!", message_type
+
+    def onLinkDestroy(self, message_value, topology_id, client_id):
+        pass
+
+    def onDeviceSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+    def onDeviceUnSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+
+persistence = _Persistence()

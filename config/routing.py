@@ -6,5 +6,5 @@ channel_routing = [
         route("websocket.receive", ws_message),
         route("websocket.disconnect", ws_disconnect),
         route("console_printer", console_printer),
-        route("persistence", persistence),
+        route("persistence", persistence.handle),
 ]
