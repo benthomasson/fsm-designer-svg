@@ -149,54 +149,7 @@ _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, d
     if ($event.originalEvent.metaKey) {
         console.log(delta);
         if (delta < 0) {
-            //controller.changeState(Past);
-            controller.scope.time_pointer = controller.scope.history.length - 1;
-            if (controller.scope.time_pointer >= 0) {
-                var change = controller.scope.history[controller.scope.time_pointer];
-                var type_data = JSON.parse(change);
-                var type = type_data[0];
-                var data = type_data[1];
-                var inverted_data;
-
-                console.log(type);
-
-                if (type === "DeviceMove") {
-                    inverted_data = angular.copy(data);
-                    inverted_data.x = data.previous_x;
-                    inverted_data.y = data.previous_y;
-                    controller.scope.move_devices(inverted_data);
-                }
-
-                if (type === "DeviceCreate") {
-                    controller.scope.destroy_device(data);
-                }
-
-                if (type === "DeviceDestroy") {
-                    inverted_data = new messages.DeviceCreate(data.sender,
-                                                              data.id,
-                                                              data.previous_x,
-                                                              data.previous_y,
-                                                              data.previous_name,
-                                                              data.previous_type);
-                    controller.scope.create_device(inverted_data);
-                }
-
-                if (type === "DeviceLabelEdit") {
-                    inverted_data = angular.copy(data);
-                    inverted_data.name = data.previous_name;
-                    controller.scope.edit_device_label(data);
-                }
-
-                if (type === "LinkCreate") {
-                    controller.scope.destroy_link(data);
-                }
-
-                if (type === "LinkDestroy") {
-                    controller.scope.create_link(data);
-                }
-
-                controller.scope.history.splice(-1);
-            }
+            this.undo(controller);
         }
     } else {
         controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
@@ -205,3 +158,73 @@ _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, d
 };
 _Present.prototype.onMouseWheel.transitions = ['Past'];
 
+_Present.prototype.onKeyDown = function(controller, $event) {
+
+    console.log($event);
+
+    if ($event.key === 'z' && $event.metaKey && ! $event.shiftKey) {
+        this.undo(controller);
+        return;
+    } else if ($event.key === 'z' && $event.ctrlKey && ! $event.shiftKey) {
+        this.undo(controller);
+        return;
+    } else {
+        controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+    }
+};
+_Present.prototype.onKeyDown.transitions = ['Past'];
+
+
+_Present.prototype.undo = function(controller) {
+    //controller.changeState(Past);
+    controller.scope.time_pointer = controller.scope.history.length - 1;
+    if (controller.scope.time_pointer >= 0) {
+        var change = controller.scope.history[controller.scope.time_pointer];
+        var type_data = JSON.parse(change);
+        var type = type_data[0];
+        var data = type_data[1];
+        var inverted_data;
+
+        console.log(type);
+
+        if (type === "DeviceMove") {
+            inverted_data = angular.copy(data);
+            inverted_data.x = data.previous_x;
+            inverted_data.y = data.previous_y;
+            controller.scope.move_devices(inverted_data);
+        }
+
+        if (type === "DeviceCreate") {
+            controller.scope.destroy_device(data);
+        }
+
+        if (type === "DeviceDestroy") {
+            inverted_data = new messages.DeviceCreate(data.sender,
+                                                      data.id,
+                                                      data.previous_x,
+                                                      data.previous_y,
+                                                      data.previous_name,
+                                                      data.previous_type);
+            controller.scope.create_device(inverted_data);
+        }
+
+        if (type === "DeviceLabelEdit") {
+            inverted_data = angular.copy(data);
+            inverted_data.name = data.previous_name;
+            controller.scope.edit_device_label(data);
+        }
+
+        if (type === "LinkCreate") {
+            controller.scope.destroy_link(data);
+        }
+
+        if (type === "LinkDestroy") {
+            controller.scope.create_link(data);
+        }
+
+        controller.scope.send_control_message(new messages.Undo(controller.scope.client_id,
+                                                                type_data));
+
+        controller.scope.history.splice(-1);
+    }
+};
