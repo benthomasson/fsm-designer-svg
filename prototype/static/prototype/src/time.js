@@ -138,6 +138,9 @@ _Present.prototype.onMessage = function(controller, message) {
     if (type === 'Topology') {
         controller.scope.onTopology(data);
     }
+    if (type === 'History') {
+        controller.scope.onHistory(data);
+    }
 };
 
 _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {

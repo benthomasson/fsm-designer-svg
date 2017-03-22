@@ -387,6 +387,15 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
+    $scope.onHistory = function (data) {
+
+        var i = 0;
+        for (i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            $scope.history.push(data[i]);
+        }
+    };
+
     $scope.onSnapshot = function (data) {
 
         //Erase the existing state
