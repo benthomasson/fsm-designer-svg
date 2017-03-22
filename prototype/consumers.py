@@ -167,6 +167,9 @@ class _Persistence(object):
     def onUndo(self, message_value, topology_id, client_id):
         undo_persistence.handle(message_value['original_message'], topology_id, client_id)
 
+    def onRedo(self, message_value, topology_id, client_id):
+        redo_persistence.handle(message_value['original_message'], topology_id, client_id)
+
 
 persistence = _Persistence()
 
@@ -229,3 +232,37 @@ class _UndoPersistence(object):
 
 
 undo_persistence = _UndoPersistence()
+
+class _RedoPersistence(object):
+
+    def handle(self, message, topology_id, client_id):
+        message_type = message[0]
+        message_value = message[1]
+        TopologyHistory.objects.filter(topology_id=topology_id,
+                                       client_id=message_value['sender'],
+                                       message_id=message_value['message_id']).update(undone=False)
+        handler_name = "on{0}".format(message_type)
+        handler = getattr(self, handler_name, getattr(persistence, handler_name, None))
+        if handler is not None:
+            handler(message_value, topology_id, client_id)
+        else:
+            print "Unsupported redo message ", message_type
+
+    def onDeviceSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+    def onDeviceUnSelected(self, message_value, topology_id, client_id):
+        'Ignore DeviceSelected messages'
+        pass
+
+    def onUndo(self, message_value, topology_id, client_id):
+        'Ignore Undo messages'
+        pass
+
+    def onRedo(self, message_value, topology_id, client_id):
+        'Ignore Redo messages'
+        pass
+
+
+redo_persistence = _RedoPersistence()
