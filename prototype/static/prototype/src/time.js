@@ -1,5 +1,6 @@
 var inherits = require('inherits');
 var fsm = require('./fsm.js');
+var messages = require('./messages.js');
 
 function _State () {
 }
@@ -155,14 +156,35 @@ _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, d
                 var type_data = JSON.parse(change);
                 var type = type_data[0];
                 var data = type_data[1];
-                var inverted_data = angular.copy(data);
+                var inverted_data;
 
                 console.log(type);
 
                 if (type === "DeviceMove") {
+                    inverted_data = angular.copy(data);
                     inverted_data.x = data.previous_x;
                     inverted_data.y = data.previous_y;
                     controller.scope.move_devices(inverted_data);
+                }
+
+                if (type === "DeviceCreate") {
+                    controller.scope.destroy_device(data);
+                }
+
+                if (type === "DeviceDestroy") {
+                    inverted_data = new messages.DeviceCreate(data.sender,
+                                                              data.id,
+                                                              data.previous_x,
+                                                              data.previous_y,
+                                                              data.previous_name,
+                                                              data.previous_type);
+                    controller.scope.create_device(inverted_data);
+                }
+
+                if (type === "DeviceLabelEdit") {
+                    inverted_data = angular.copy(data);
+                    inverted_data.name = data.previous_name;
+                    controller.scope.edit_device_label(data);
                 }
 
                 controller.scope.history.splice(-1);

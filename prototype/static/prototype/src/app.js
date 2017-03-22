@@ -274,6 +274,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
     $scope.onDeviceCreate = function(data) {
+        $scope.create_device(data);
+    };
+
+    $scope.create_device = function(data) {
         var device = new models.Device(data.id,
                                        data.name,
                                        data.x,
@@ -284,6 +288,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceLabelEdit = function(data) {
+        $scope.edit_device_label(data);
+    };
+
+    $scope.edit_device_label = function(data) {
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -327,6 +335,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDeviceDestroy = function(data) {
+        $scope.destroy_device(data);
+    };
+
+    $scope.destroy_device = function(data) {
 
         // Delete the device and any links connecting to the device.
         var i = 0;
