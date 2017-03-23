@@ -211,3 +211,42 @@ svg line.debug {
 .button-hover text {
     fill: @button-text;
 }
+
+.host rect {
+    fill: @widget-body;
+    stroke: @dark-widget-detail;
+    stroke-width: 2;
+}
+
+.host rect.background {
+    fill: @light-background;
+    stroke: @light-background;
+    stroke-width: 2;
+}
+
+.host rect.selected {
+    fill: @selected-blue;
+    stroke: @selected-blue;
+    stroke-width: 10;
+}
+
+.host rect.remote-selected {
+    fill: @selected-mango;
+    stroke: @selected-mango;
+    stroke-width: 10;
+}
+
+.host rect.selected-conflict {
+    fill: @selected-red;
+    stroke: @selected-red;
+    stroke-width: 10;
+}
+
+.host line {
+    stroke: @light-widget-detail;
+    stroke-width: 20;
+}
+
+.host circle {
+    fill: @light-widget-detail;
+}

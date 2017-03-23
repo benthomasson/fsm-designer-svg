@@ -114,6 +114,13 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
                                    scope.scaledY,
                                    "rack");
 	}
+    else if ($event.key === 'h') {
+		device = new models.Device(controller.scope.device_id_seq(),
+                                   "Host",
+                                   scope.scaledX,
+                                   scope.scaledY,
+                                   "host");
+	}
 
     if (device !== null) {
         scope.devices.push(device);

@@ -6,7 +6,8 @@ function Device(id, name, x, y, type) {
     this.name = name;
     this.x = x;
     this.y = y;
-    this.size = 50;
+    this.height = type === "host" ? 30 : 50;
+    this.width = 50;
     this.type = type;
     this.selected = false;
     this.remote_selected = false;
@@ -16,10 +17,10 @@ exports.Device = Device;
 
 Device.prototype.is_selected = function (x, y) {
 
-    return (x > this.x - this.size &&
-            x < this.x + this.size &&
-            y > this.y - this.size &&
-            y < this.y + this.size);
+    return (x > this.x - this.width &&
+            x < this.x + this.width &&
+            y > this.y - this.height &&
+            y < this.y + this.height);
 
 };
 
