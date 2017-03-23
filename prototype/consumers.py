@@ -32,7 +32,8 @@ def ws_connect(message):
     message.reply_channel.send({"text": json.dumps(["id", client.pk])})
     message.reply_channel.send({"text": json.dumps(["topology_id", topology_id])})
     topology_data = topology.__dict__.copy()
-    del topology_data['_state']
+    if '_state' in topology_data:
+        del topology_data['_state']
     message.reply_channel.send({"text": json.dumps(["Topology", topology_data])})
     devices = list(Device.objects
                          .filter(topology_id=topology_id).values())
@@ -111,7 +112,12 @@ class _Persistence(object):
     def onSnapshot(self, snapshot, topology_id, client_id):
         device_map = dict()
         for device in snapshot['devices']:
-            del device['size']
+            if 'size' in device:
+                del device['size']
+            if 'height' in device:
+                del device['height']
+            if 'width' in device:
+                del device['width']
             d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
             d.name = device['name']
             d.x = device['x']
@@ -125,8 +131,10 @@ class _Persistence(object):
                                        to_device=device_map[link['to_device']])
 
     def onDeviceCreate(self, device, topology_id, client_id):
-        del device['sender']
-        del device['message_id']
+        if 'sender' in device:
+            del device['sender']
+        if 'message_id' in device:
+            del device['message_id']
         d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
         d.x = device['x']
         d.y = device['y']
@@ -143,8 +151,10 @@ class _Persistence(object):
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(name=device['name'])
 
     def onLinkCreate(self, link, topology_id, client_id):
-        del link['sender']
-        del link['message_id']
+        if 'sender' in device:
+            del device['sender']
+        if 'message_id' in device:
+            del device['message_id']
         device_map = dict(Device.objects
                                 .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
                                 .values_list('id', 'pk'))
