@@ -634,4 +634,20 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     });
 });
 
+app.directive('cursor', function() {
+  return {
+      restrict: 'AE',
+      transclude: true,
+      templateUrl: 'cursor.html'
+  };
+});
+
+app.directive('debug', function() {
+  return {
+      restrict: 'AE',
+      transclude: true,
+      templateUrl: 'debug.html'
+  };
+});
+
 exports.app = app;
