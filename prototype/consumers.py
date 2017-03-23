@@ -139,7 +139,7 @@ class _Persistence(object):
     def onDeviceMove(self, device, topology_id, client_id):
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(x=device['x'], y=device['y'])
 
-    def onDeviceEditLabel(self, device, topology_id, client_id):
+    def onDeviceLabelEdit(self, device, topology_id, client_id):
         Device.objects.filter(topology_id=topology_id, id=device['id']).update(name=device['name'])
 
     def onLinkCreate(self, link, topology_id, client_id):
@@ -208,10 +208,10 @@ class _UndoPersistence(object):
         inverted['y'] = device['previous_y']
         persistence.onDeviceMove(inverted, topology_id, client_id)
 
-    def onDeviceEditLabel(self, device, topology_id, client_id):
+    def onDeviceLabelEdit(self, device, topology_id, client_id):
         inverted = device.copy()
         inverted['name'] = device['previous_name']
-        persistence.onDeviceEditLabel(inverted, topology_id, client_id)
+        persistence.onDeviceLabelEdit(inverted, topology_id, client_id)
 
     def onLinkCreate(self, link, topology_id, client_id):
         persistence.onLinkDestroy(link, topology_id, client_id)
