@@ -60,7 +60,7 @@ _Past.prototype.onMouseWheel.transitions = ['Present'];
 
 _Past.prototype.onMessage = function(controller, message) {
 
-    console.log(message.data);
+    //console.log(message.data);
     var type_data = JSON.parse(message.data);
     var type = type_data[0];
     var data = type_data[1];
@@ -111,7 +111,7 @@ _Past.prototype.onMessage = function(controller, message) {
 _Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
     if ($event.originalEvent.metaKey) {
-        console.log(delta);
+        //console.log(delta);
         if (delta < 0) {
             this.undo(controller);
         } else if (delta > 0) {
@@ -126,7 +126,7 @@ _Past.prototype.onMouseWheel.transitions = ['Past'];
 
 _Past.prototype.onKeyDown = function(controller, $event) {
 
-    console.log($event);
+    //console.log($event);
 
     if ($event.key === 'z' && $event.metaKey && ! $event.shiftKey) {
         this.undo(controller);
@@ -188,7 +188,7 @@ _Start.prototype.start.transitions = ['Present'];
 
 _Present.prototype.onMessage = function(controller, message) {
 
-    console.log(message.data);
+    //console.log(message.data);
     var type_data = JSON.parse(message.data);
     var type = type_data[0];
     var data = type_data[1];
@@ -261,7 +261,7 @@ _Present.prototype.onMessage.transitions = ['Past'];
 _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
     if ($event.originalEvent.metaKey) {
-        console.log(delta);
+        //console.log(delta);
         if (delta < 0) {
             this.undo(controller);
         }
@@ -274,7 +274,7 @@ _Present.prototype.onMouseWheel.transitions = ['Past'];
 
 _Present.prototype.onKeyDown = function(controller, $event) {
 
-    console.log($event);
+    //console.log($event);
 
     if ($event.key === 'z' && $event.metaKey && ! $event.shiftKey) {
         this.undo(controller);

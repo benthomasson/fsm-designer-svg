@@ -496,7 +496,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.history = [];
         var i = 0;
         for (i = 0; i < data.length; i++) {
-            console.log(data[i]);
+            //console.log(data[i]);
             $scope.history.push(data[i]);
         }
     };
@@ -647,6 +647,30 @@ app.directive('debug', function() {
       restrict: 'AE',
       transclude: true,
       templateUrl: 'debug.html'
+  };
+});
+
+app.directive('router', function() {
+  return {
+      restrict: 'AE',
+      transclude: true,
+      templateUrl: 'router.html'
+  };
+});
+
+app.directive('switch', function() {
+  return {
+      restrict: 'AE',
+      transclude: true,
+      templateUrl: 'switch.html'
+  };
+});
+
+app.directive('host', function() {
+  return {
+      restrict: 'AE',
+      transclude: true,
+      templateUrl: 'host.html'
   };
 });
 
