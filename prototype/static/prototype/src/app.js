@@ -682,5 +682,9 @@ app.directive('button', function() {
   return { restrict: 'A', templateUrl: 'widgets/button.html' };
 });
 
+app.directive('statusLight', function() {
+  return { restrict: 'A', templateUrl: 'widgets/status_light.html' };
+});
+
 
 exports.app = app;

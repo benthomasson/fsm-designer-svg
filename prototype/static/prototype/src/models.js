@@ -6,12 +6,13 @@ function Device(id, name, x, y, type) {
     this.name = name;
     this.x = x;
     this.y = y;
-    this.height = type === "host" ? 30 : 50;
+    this.height = type === "host" ? 15 : 50;
     this.width = 50;
     this.type = type;
     this.selected = false;
     this.remote_selected = false;
     this.edit_label = false;
+    this.status = null;
 }
 exports.Device = Device;
 
@@ -39,6 +40,7 @@ function Link(from_device, to_device) {
     this.from_device = from_device;
     this.to_device = to_device;
     this.selected = false;
+    this.status = null;
 }
 exports.Link = Link;
 

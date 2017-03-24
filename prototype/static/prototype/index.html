@@ -33,7 +33,7 @@
                ng-attr-transform="translate({{device.x}},{{device.y}})"
                ng-attr-class="{{device.type}}"
                ng-switch on="device.type">
-            <g ng-switch-when="router"><!-- begin router -->
+               <g ng-switch-when="router"><!-- begin router -->
                    <g router></g>
                </g> <!-- end router -->
 
@@ -54,6 +54,7 @@
                     <g default></g>
 
                </g> <!-- end default -->
+               <g status-light></g>
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>
