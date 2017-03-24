@@ -67,15 +67,15 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   ];
 
   $scope.stencils = [
-    //{"name": "router", "size":50, 'x':10, 'y':100},
-    //{"name": "switch", "size":50, 'x':10, 'y':160},
-    //{"name": "rack", "size":50, 'x':10, 'y':220},
+    {"name": "router", "size":50, 'x':10, 'y':100},
+    {"name": "switch", "size":50, 'x':10, 'y':160},
+    {"name": "rack", "size":50, 'x':10, 'y':220},
   ];
 
   $scope.layers = [
-    //{"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
-    //{"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
-    //{"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
+    {"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
+    {"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
+    {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
   ];
 
   $scope.links = [
@@ -268,7 +268,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     // Buttons
 
     $scope.buttons = [
-      //new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
+      new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
     ];
 
 
@@ -636,42 +636,54 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 app.directive('cursor', function() {
   return {
-      restrict: 'AE',
-      transclude: true,
+      restrict: 'A',
       templateUrl: 'cursor.html'
   };
 });
 
 app.directive('debug', function() {
-  return {
-      restrict: 'AE',
-      transclude: true,
-      templateUrl: 'debug.html'
-  };
+  return { restrict: 'A', templateUrl: 'debug.html' };
 });
 
 app.directive('router', function() {
-  return {
-      restrict: 'AE',
-      transclude: true,
-      templateUrl: 'router.html'
-  };
+  return { restrict: 'A', templateUrl: 'router.html' };
 });
 
 app.directive('switch', function() {
-  return {
-      restrict: 'AE',
-      transclude: true,
-      templateUrl: 'switch.html'
-  };
+  return { restrict: 'A', templateUrl: 'switch.html' };
 });
 
 app.directive('host', function() {
-  return {
-      restrict: 'AE',
-      transclude: true,
-      templateUrl: 'host.html'
-  };
+  return { restrict: 'A', templateUrl: 'host.html' };
 });
+
+app.directive('link', function() {
+  return { restrict: 'A', templateUrl: 'link.html' };
+});
+
+app.directive('rack', function() {
+  return { restrict: 'A', templateUrl: 'rack.html' };
+});
+
+app.directive('default', function() {
+  return { restrict: 'A', templateUrl: 'default.html' };
+});
+
+app.directive('quadrants', function() {
+  return { restrict: 'A', templateUrl: 'quadrants.html' };
+});
+
+app.directive('stencil', function() {
+  return { restrict: 'A', templateUrl: 'stencil.html' };
+});
+
+app.directive('layer', function() {
+  return { restrict: 'A', templateUrl: 'layer.html' };
+});
+
+app.directive('button', function() {
+  return { restrict: 'A', templateUrl: 'button.html' };
+});
+
 
 exports.app = app;
