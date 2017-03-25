@@ -61,6 +61,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.device_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
+  $scope.frame = 0;
 
 
   $scope.devices = [
@@ -632,6 +633,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 		// is outside of angular
 	 	$scope.$digest();
     });
+
+    window.scope = $scope;
 });
 
 app.directive('cursor', function() {

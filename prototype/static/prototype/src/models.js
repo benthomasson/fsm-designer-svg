@@ -1,5 +1,6 @@
 var fsm = require('./fsm.js');
 var button = require('./button.js');
+var util = require('./util.js');
 
 function Device(id, name, x, y, type) {
     this.id = id;
@@ -13,8 +14,15 @@ function Device(id, name, x, y, type) {
     this.remote_selected = false;
     this.edit_label = false;
     this.status = null;
+    this.frame = 10;
 }
 exports.Device = Device;
+
+Device.prototype.incr_frame = function ( ) {
+    this.frame = this.frame + 1;
+};
+
+Device.prototype.describeArc = util.describeArc;
 
 Device.prototype.is_selected = function (x, y) {
 
