@@ -140,7 +140,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.selected_links = [];
         for (i = 0; i < devices.length; i++) {
             if (devices[i].selected) {
-                $scope.send_control_message(new messages.DeviceUnSelected($scope.client_id, devices[i].id));
+                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, devices[i].id));
             }
             devices[i].selected = false;
         }
@@ -167,7 +167,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         for (i = devices.length - 1; i >= 0; i--) {
             if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 devices[i].selected = true;
-                $scope.send_control_message(new messages.DeviceSelected($scope.client_id, devices[i].id));
+                $scope.send_control_message(new messages.StateSelected($scope.client_id, devices[i].id));
                 last_selected_device = devices[i];
                 if ($scope.selected_devices.indexOf(devices[i]) === -1) {
                     $scope.selected_devices.push(devices[i]);
@@ -274,12 +274,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
 
-    $scope.onDeviceCreate = function(data) {
+    $scope.onStateCreate = function(data) {
         $scope.create_device(data);
     };
 
     $scope.create_device = function(data) {
-        var device = new models.Device(data.id,
+        var device = new models.State(data.id,
                                        data.name,
                                        data.x,
                                        data.y,
@@ -288,7 +288,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.devices.push(device);
     };
 
-    $scope.onDeviceLabelEdit = function(data) {
+    $scope.onStateLabelEdit = function(data) {
         $scope.edit_device_label(data);
     };
 
@@ -341,7 +341,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.onDeviceMove = function(data) {
+    $scope.onStateMove = function(data) {
         $scope.move_devices(data);
     };
 
@@ -356,7 +356,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.onDeviceDestroy = function(data) {
+    $scope.onStateDestroy = function(data) {
         $scope.destroy_device(data);
     };
 
@@ -393,19 +393,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var type = type_data[0];
         var data = type_data[1];
 
-        if (type === "DeviceMove") {
+        if (type === "StateMove") {
             $scope.move_devices(data);
         }
 
-        if (type === "DeviceCreate") {
+        if (type === "StateCreate") {
             $scope.create_device(data);
         }
 
-        if (type === "DeviceDestroy") {
+        if (type === "StateDestroy") {
             $scope.destroy_device(data);
         }
 
-        if (type === "DeviceLabelEdit") {
+        if (type === "StateLabelEdit") {
             $scope.edit_device_label(data);
         }
 
@@ -424,19 +424,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var data = type_data[1];
         var inverted_data;
 
-        if (type === "DeviceMove") {
+        if (type === "StateMove") {
             inverted_data = angular.copy(data);
             inverted_data.x = data.previous_x;
             inverted_data.y = data.previous_y;
             $scope.move_devices(inverted_data);
         }
 
-        if (type === "DeviceCreate") {
+        if (type === "StateCreate") {
             $scope.destroy_device(data);
         }
 
-        if (type === "DeviceDestroy") {
-            inverted_data = new messages.DeviceCreate(data.sender,
+        if (type === "StateDestroy") {
+            inverted_data = new messages.StateCreate(data.sender,
                                                       data.id,
                                                       data.previous_x,
                                                       data.previous_y,
@@ -445,7 +445,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.create_device(inverted_data);
         }
 
-        if (type === "DeviceLabelEdit") {
+        if (type === "StateLabelEdit") {
             inverted_data = angular.copy(data);
             inverted_data.name = data.previous_name;
             $scope.edit_device_label(inverted_data);
@@ -472,7 +472,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $location.search({topology_id: data.topology_id});
     };
 
-    $scope.onDeviceSelected = function(data) {
+    $scope.onStateSelected = function(data) {
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -482,7 +482,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.onDeviceUnSelected = function(data) {
+    $scope.onStateUnSelected = function(data) {
         var i = 0;
         for (i = 0; i < $scope.devices.length; i++) {
             if ($scope.devices[i].id === data.id) {
@@ -536,7 +536,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             if (max_y === null || device.y > max_y) {
                 max_y = device.y;
             }
-            new_device = new models.Device(device.id,
+            new_device = new models.State(device.id,
                                            device.name,
                                            device.x,
                                            device.y,

@@ -5,7 +5,7 @@ function serialize(message) {
 }
 exports.serialize = serialize;
 
-function DeviceMove(sender, id, x, y, previous_x, previous_y) {
+function StateMove(sender, id, x, y, previous_x, previous_y) {
     this.sender = sender;
     this.id = id;
     this.x = x;
@@ -13,9 +13,9 @@ function DeviceMove(sender, id, x, y, previous_x, previous_y) {
     this.previous_x = previous_x;
     this.previous_y = previous_y;
 }
-exports.DeviceMove = DeviceMove;
+exports.StateMove = StateMove;
 
-function DeviceCreate(sender, id, x, y, name, type) {
+function StateCreate(sender, id, x, y, name, type) {
     this.sender = sender;
     this.id = id;
     this.x = x;
@@ -23,9 +23,9 @@ function DeviceCreate(sender, id, x, y, name, type) {
     this.name = name;
     this.type = type;
 }
-exports.DeviceCreate = DeviceCreate;
+exports.StateCreate = StateCreate;
 
-function DeviceDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
+function StateDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
     this.sender = sender;
     this.id = id;
     this.previous_x = previous_x;
@@ -33,27 +33,27 @@ function DeviceDestroy(sender, id, previous_x, previous_y, previous_name, previo
     this.previous_name = previous_name;
     this.previous_type = previous_type;
 }
-exports.DeviceDestroy = DeviceDestroy;
+exports.StateDestroy = StateDestroy;
 
-function DeviceLabelEdit(sender, id, name, previous_name) {
+function StateLabelEdit(sender, id, name, previous_name) {
     this.sender = sender;
     this.id = id;
     this.name = name;
     this.previous_name = previous_name;
 }
-exports.DeviceLabelEdit = DeviceLabelEdit;
+exports.StateLabelEdit = StateLabelEdit;
 
-function DeviceSelected(sender, id) {
+function StateSelected(sender, id) {
     this.sender = sender;
     this.id = id;
 }
-exports.DeviceSelected = DeviceSelected;
+exports.StateSelected = StateSelected;
 
-function DeviceUnSelected(sender, id) {
+function StateUnSelected(sender, id) {
     this.sender = sender;
     this.id = id;
 }
-exports.DeviceUnSelected = DeviceUnSelected;
+exports.StateUnSelected = StateUnSelected;
 
 function LinkCreate(sender, from_id, to_id) {
     this.sender = sender;

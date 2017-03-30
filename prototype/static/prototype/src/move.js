@@ -94,28 +94,28 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
     var device = null;
 
 	if ($event.key === 'r') {
-		device = new models.Device(controller.scope.device_id_seq(),
+		device = new models.State(controller.scope.device_id_seq(),
                                    "Router",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "router");
 	}
     else if ($event.key === 's') {
-		device = new models.Device(controller.scope.device_id_seq(),
+		device = new models.State(controller.scope.device_id_seq(),
                                    "Switch",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "switch");
 	}
     else if ($event.key === 'a') {
-		device = new models.Device(controller.scope.device_id_seq(),
+		device = new models.State(controller.scope.device_id_seq(),
                                    "Rack",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "rack");
 	}
     else if ($event.key === 'h') {
-		device = new models.Device(controller.scope.device_id_seq(),
+		device = new models.State(controller.scope.device_id_seq(),
                                    "Host",
                                    scope.scaledX,
                                    scope.scaledY,
@@ -124,7 +124,7 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
 
     if (device !== null) {
         scope.devices.push(device);
-        scope.send_control_message(new messages.DeviceCreate(scope.client_id,
+        scope.send_control_message(new messages.StateCreate(scope.client_id,
                                                              device.id,
                                                              device.x,
                                                              device.y,
@@ -177,7 +177,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
             index = controller.scope.devices.indexOf(devices[i]);
             if (index !== -1) {
                 controller.scope.devices.splice(index, 1);
-                controller.scope.send_control_message(new messages.DeviceDestroy(controller.scope.client_id,
+                controller.scope.send_control_message(new messages.StateDestroy(controller.scope.client_id,
                                                                                  devices[i].id,
                                                                                  devices[i].x,
                                                                                  devices[i].y,
@@ -230,7 +230,7 @@ _Move.prototype.onMouseMove = function (controller) {
         previous_y = devices[i].y;
         devices[i].x = devices[i].x + diffX;
         devices[i].y = devices[i].y + diffY;
-        controller.scope.send_control_message(new messages.DeviceMove(controller.scope.client_id,
+        controller.scope.send_control_message(new messages.StateMove(controller.scope.client_id,
                                                                       devices[i].id,
                                                                       devices[i].x,
                                                                       devices[i].y,
@@ -292,7 +292,7 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
 	} else if ($event.keyCode === 13) { //Enter
         controller.changeState(Selected2);
     }
-    controller.scope.send_control_message(new messages.DeviceLabelEdit(controller.scope.client_id,
+    controller.scope.send_control_message(new messages.StateLabelEdit(controller.scope.client_id,
                                                                        device.id,
                                                                        device.name,
                                                                        previous_name));

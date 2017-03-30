@@ -65,10 +65,10 @@ _Past.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
-    if (['DeviceCreate',
-         'DeviceDestroy',
-         'DeviceMove',
-         'DeviceLabelEdit',
+    if (['StateCreate',
+         'StateDestroy',
+         'StateMove',
+         'StateLabelEdit',
          'LinkCreate',
          'LinkDestroy'].indexOf(type) !== -1) {
         controller.changeState(Present);
@@ -80,14 +80,14 @@ _Past.prototype.onMessage = function(controller, message) {
         }
     }
 
-    if (type === 'DeviceSelected') {
+    if (type === 'StateSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceSelected(data);
+            controller.scope.onStateSelected(data);
         }
     }
-    if (type === 'DeviceUnSelected') {
+    if (type === 'StateUnSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceUnSelected(data);
+            controller.scope.onStateUnSelected(data);
         }
     }
 
@@ -193,10 +193,10 @@ _Present.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
-    if (type === 'DeviceCreate') {
+    if (type === 'StateCreate') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceCreate(data);
+            controller.scope.onStateCreate(data);
         }
     }
     if (type === 'LinkCreate') {
@@ -205,32 +205,32 @@ _Present.prototype.onMessage = function(controller, message) {
             controller.scope.onLinkCreate(data);
         }
     }
-    if (type === 'DeviceMove') {
+    if (type === 'StateMove') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceMove(data);
+            controller.scope.onStateMove(data);
         }
     }
-    if (type === 'DeviceDestroy') {
+    if (type === 'StateDestroy') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceDestroy(data);
+            controller.scope.onStateDestroy(data);
         }
     }
-    if (type === 'DeviceLabelEdit') {
+    if (type === 'StateLabelEdit') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceLabelEdit(data);
+            controller.scope.onStateLabelEdit(data);
         }
     }
-    if (type === 'DeviceSelected') {
+    if (type === 'StateSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceSelected(data);
+            controller.scope.onStateSelected(data);
         }
     }
-    if (type === 'DeviceUnSelected') {
+    if (type === 'StateUnSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceUnSelected(data);
+            controller.scope.onStateUnSelected(data);
         }
     }
     if (type === 'Undo') {

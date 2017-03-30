@@ -2,7 +2,7 @@ var fsm = require('./fsm.js');
 var button = require('./button.js');
 var util = require('./util.js');
 
-function Device(id, name, x, y, type) {
+function State(id, name, x, y, type) {
     this.id = id;
     this.name = name;
     this.x = x;
@@ -16,15 +16,15 @@ function Device(id, name, x, y, type) {
     this.status = null;
     this.frame = 10;
 }
-exports.Device = Device;
+exports.State = State;
 
-Device.prototype.incr_frame = function ( ) {
+State.prototype.incr_frame = function ( ) {
     this.frame = this.frame + 1;
 };
 
-Device.prototype.describeArc = util.describeArc;
+State.prototype.describeArc = util.describeArc;
 
-Device.prototype.is_selected = function (x, y) {
+State.prototype.is_selected = function (x, y) {
 
     return (x > this.x - this.width &&
             x < this.x + this.width &&
@@ -34,7 +34,7 @@ Device.prototype.is_selected = function (x, y) {
 };
 
 
-Device.prototype.toJSON = function () {
+State.prototype.toJSON = function () {
     return {id: this.id,
             name: this.name,
             x: this.x,
