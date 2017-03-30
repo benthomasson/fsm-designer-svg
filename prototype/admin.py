@@ -1,40 +1,16 @@
 from django.contrib import admin
 
-from prototype.models import Device
-
-from prototype.models import Link
-
-from prototype.models import Topology
-
 from prototype.models import Client
 
-from prototype.models import TopologyHistory
+from prototype.models import History
 
 from prototype.models import MessageType
 
+from prototype.models import FiniteStateMachine
 
-class DeviceAdmin(admin.ModelAdmin):
-    fields = ('topology', 'name', 'x', 'y', 'id', 'type',)
-    raw_id_fields = ('topology',)
+from prototype.models import State
 
-
-admin.site.register(Device, DeviceAdmin)
-
-
-class LinkAdmin(admin.ModelAdmin):
-    fields = ('from_device', 'to_device',)
-    raw_id_fields = ('from_device', 'to_device',)
-
-
-admin.site.register(Link, LinkAdmin)
-
-
-class TopologyAdmin(admin.ModelAdmin):
-    fields = ('name', 'scale', 'panX', 'panY',)
-    raw_id_fields = ()
-
-
-admin.site.register(Topology, TopologyAdmin)
+from prototype.models import Transition
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -45,12 +21,12 @@ class ClientAdmin(admin.ModelAdmin):
 admin.site.register(Client, ClientAdmin)
 
 
-class TopologyHistoryAdmin(admin.ModelAdmin):
-    fields = ('topology', 'client', 'message_type', 'message_id', 'message_data', 'undone',)
-    raw_id_fields = ('topology', 'client', 'message_type',)
+class HistoryAdmin(admin.ModelAdmin):
+    fields = ('client', 'message_type', 'message_id', 'message_data', 'undone', 'finite_state_machine',)
+    raw_id_fields = ('client', 'message_type', 'finite_state_machine',)
 
 
-admin.site.register(TopologyHistory, TopologyHistoryAdmin)
+admin.site.register(History, HistoryAdmin)
 
 
 class MessageTypeAdmin(admin.ModelAdmin):
@@ -59,3 +35,27 @@ class MessageTypeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(MessageType, MessageTypeAdmin)
+
+
+class FiniteStateMachineAdmin(admin.ModelAdmin):
+    fields = ('name',)
+    raw_id_fields = ()
+
+
+admin.site.register(FiniteStateMachine, FiniteStateMachineAdmin)
+
+
+class StateAdmin(admin.ModelAdmin):
+    fields = ('finite_state_machine', 'name',)
+    raw_id_fields = ('finite_state_machine',)
+
+
+admin.site.register(State, StateAdmin)
+
+
+class TransitionAdmin(admin.ModelAdmin):
+    fields = ('from_state', 'to_state', 'label',)
+    raw_id_fields = ('from_state', 'to_state',)
+
+
+admin.site.register(Transition, TransitionAdmin)
