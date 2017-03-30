@@ -4,7 +4,7 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
-var link = require('./link.js');
+var transition = require('./transition.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
 var util = require('./util.js');
@@ -40,12 +40,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
   $scope.selected_states = [];
-  $scope.selected_links = [];
-  $scope.new_link = null;
+  $scope.selected_transitions = [];
+  $scope.new_transition = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
-  $scope.link_controller = new fsm.FSMController($scope, link.Start, $scope.move_controller);
-  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.link_controller);
+  $scope.transition_controller = new fsm.FSMController($scope, transition.Start, $scope.move_controller);
+  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.transition_controller);
   $scope.time_controller = new fsm.FSMController($scope, time.Start, $scope.buttons_controller);
   $scope.first_controller = $scope.time_controller;
   $scope.last_key = "";
@@ -79,7 +79,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
   ];
 
-  $scope.links = [
+  $scope.transitions = [
   ];
 
 
@@ -135,17 +135,17 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
         var i = 0;
         var states = $scope.states;
-        var links = $scope.links;
+        var transitions = $scope.transitions;
         $scope.selected_states = [];
-        $scope.selected_links = [];
+        $scope.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
             if (states[i].selected) {
                 $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
             }
             states[i].selected = false;
         }
-        for (i = 0; i < links.length; i++) {
-            links[i].selected = false;
+        for (i = 0; i < transitions.length; i++) {
+            transitions[i].selected = false;
         }
     };
 
@@ -254,7 +254,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.send_snapshot = function () {
         var data = JSON.stringify(['Snapshot', {"sender": $scope.client_id,
                                                 "states": $scope.states,
-                                                "links": $scope.links,
+                                                "transitions": $scope.transitions,
                                                 "scale": $scope.scale,
                                                 "panX": $scope.panX,
                                                 "panY": $scope.panY,
@@ -303,40 +303,40 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onTransitionCreate = function(data) {
-        $scope.create_link(data);
+        $scope.create_transition(data);
     };
 
-    $scope.create_link = function(data) {
+    $scope.create_transition = function(data) {
         var i = 0;
-        var new_link = new models.Transition(null, null);
+        var new_transition = new models.Transition(null, null);
         for (i = 0; i < $scope.states.length; i++){
             if ($scope.states[i].id === data.from_id) {
-                new_link.from_state = $scope.states[i];
+                new_transition.from_state = $scope.states[i];
             }
         }
         for (i = 0; i < $scope.states.length; i++){
             if ($scope.states[i].id === data.to_id) {
-                new_link.to_state = $scope.states[i];
+                new_transition.to_state = $scope.states[i];
             }
         }
-        if (new_link.from_state !== null && new_link.to_state !== null) {
-            $scope.links.push(new_link);
+        if (new_transition.from_state !== null && new_transition.to_state !== null) {
+            $scope.transitions.push(new_transition);
         }
     };
 
     $scope.onTransitionDestroy = function(data) {
-        $scope.destroy_link(data);
+        $scope.destroy_transition(data);
     };
 
-    $scope.destroy_link = function(data) {
+    $scope.destroy_transition = function(data) {
         var i = 0;
-        var link = null;
+        var transition = null;
         var index = -1;
-        for (i = 0; i < $scope.links.length; i++) {
-            link = $scope.links[i];
-            if (link.from_state.id === data.from_id && link.to_state.id === data.to_id) {
-                index = $scope.links.indexOf(link);
-                $scope.links.splice(index, 1);
+        for (i = 0; i < $scope.transitions.length; i++) {
+            transition = $scope.transitions[i];
+            if (transition.from_state.id === data.from_id && transition.to_state.id === data.to_id) {
+                index = $scope.transitions.indexOf(transition);
+                $scope.transitions.splice(index, 1);
             }
         }
     };
@@ -362,13 +362,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.destroy_state = function(data) {
 
-        // Delete the state and any links connecting to the state.
+        // Delete the state and any transitions connecting to the state.
         var i = 0;
         var j = 0;
         var dindex = -1;
         var lindex = -1;
         var states = $scope.states.slice();
-        var all_links = $scope.links.slice();
+        var all_transitions = $scope.transitions.slice();
         for (i = 0; i < states.length; i++) {
             if (states[i].id === data.id) {
                 dindex = $scope.states.indexOf(states[i]);
@@ -376,12 +376,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                     $scope.states.splice(dindex, 1);
                 }
                 lindex = -1;
-                for (j = 0; j < all_links.length; j++) {
-                    if (all_links[j].to_state === states[i] ||
-                        all_links[j].from_state === states[i]) {
-                        lindex = $scope.links.indexOf(all_links[j]);
+                for (j = 0; j < all_transitions.length; j++) {
+                    if (all_transitions[j].to_state === states[i] ||
+                        all_transitions[j].from_state === states[i]) {
+                        lindex = $scope.transitions.indexOf(all_transitions[j]);
                         if (lindex !== -1) {
-                            $scope.links.splice(lindex, 1);
+                            $scope.transitions.splice(lindex, 1);
                         }
                     }
                 }
@@ -410,11 +410,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
 
         if (type === "TransitionCreate") {
-            $scope.create_link(data);
+            $scope.create_transition(data);
         }
 
         if (type === "TransitionDestroy") {
-            $scope.destroy_link(data);
+            $scope.destroy_transition(data);
         }
     };
 
@@ -452,11 +452,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
 
         if (type === "TransitionCreate") {
-            $scope.destroy_link(data);
+            $scope.destroy_transition(data);
         }
 
         if (type === "TransitionDestroy") {
-            $scope.create_link(data);
+            $scope.create_transition(data);
         }
     };
 
@@ -506,7 +506,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
         //Erase the existing state
         $scope.states = [];
-        $scope.links = [];
+        $scope.transitions = [];
 
         var state_map = {};
         var i = 0;
@@ -545,12 +545,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             state_map[state.id] = new_state;
         }
 
-        //Build the links
-        var link = null;
-        for (i = 0; i < data.links.length; i++) {
-            link = data.links[i];
-            $scope.links.push(new models.Transition(state_map[link.from_state],
-                                              state_map[link.to_state]));
+        //Build the transitions
+        var transition = null;
+        for (i = 0; i < data.transitions.length; i++) {
+            transition = data.transitions[i];
+            $scope.transitions.push(new models.Transition(state_map[transition.from_state],
+                                              state_map[transition.to_state]));
         }
 
         var diff_x;
@@ -657,8 +657,8 @@ app.directive('host', function() {
   return { restrict: 'A', templateUrl: 'widgets/host.html' };
 });
 
-app.directive('link', function() {
-  return { restrict: 'A', templateUrl: 'widgets/link.html' };
+app.directive('transition', function() {
+  return { restrict: 'A', templateUrl: 'widgets/transition.html' };
 });
 
 app.directive('rack', function() {

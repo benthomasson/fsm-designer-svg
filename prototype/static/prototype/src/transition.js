@@ -102,18 +102,18 @@ _Connecting.prototype.onMouseUp = function (controller) {
 
     var selected_state = controller.scope.select_states(false);
     if (selected_state !== null) {
-        controller.scope.new_link.to_state = selected_state;
+        controller.scope.new_transition.to_state = selected_state;
         controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.client_id,
-                                                                      controller.scope.new_link.from_state.id,
-                                                                      controller.scope.new_link.to_state.id));
-        controller.scope.new_link = null;
+                                                                      controller.scope.new_transition.from_state.id,
+                                                                      controller.scope.new_transition.to_state.id));
+        controller.scope.new_transition = null;
         controller.changeState(Connected);
     } else {
-        var index = controller.scope.links.indexOf(controller.scope.new_link);
+        var index = controller.scope.transitions.indexOf(controller.scope.new_transition);
         if (index !== -1) {
-            controller.scope.links.splice(index, 1);
+            controller.scope.transitions.splice(index, 1);
         }
-        controller.scope.new_link = null;
+        controller.scope.new_transition = null;
         controller.changeState(Ready);
     }
 };
@@ -126,8 +126,8 @@ _Selecting.prototype.onMouseUp = function (controller) {
 
     var selected_state = controller.scope.select_states(false);
     if (selected_state !== null) {
-        controller.scope.new_link = new models.Transition(selected_state, null, true);
-        controller.scope.links.push(controller.scope.new_link);
+        controller.scope.new_transition = new models.Transition(selected_state, null, true);
+        controller.scope.transitions.push(controller.scope.new_transition);
         controller.changeState(Connecting);
     }
 };

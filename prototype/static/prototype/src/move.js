@@ -170,9 +170,9 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         var j = 0;
         var index = -1;
         var states = controller.scope.selected_states;
-        var all_links = controller.scope.links.slice();
+        var all_transitions = controller.scope.transitions.slice();
         controller.scope.selected_states = [];
-        controller.scope.selected_links = [];
+        controller.scope.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
             index = controller.scope.states.indexOf(states[i]);
             if (index !== -1) {
@@ -184,12 +184,12 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
                                                                                  states[i].name,
                                                                                  states[i].type));
             }
-            for (j = 0; j < all_links.length; j++) {
-                if (all_links[j].to_state === states[i] ||
-                    all_links[j].from_state === states[i]) {
-                    index = controller.scope.links.indexOf(all_links[j]);
+            for (j = 0; j < all_transitions.length; j++) {
+                if (all_transitions[j].to_state === states[i] ||
+                    all_transitions[j].from_state === states[i]) {
+                    index = controller.scope.transitions.indexOf(all_transitions[j]);
                     if (index !== -1) {
-                        controller.scope.links.splice(index, 1);
+                        controller.scope.transitions.splice(index, 1);
                     }
                 }
             }
