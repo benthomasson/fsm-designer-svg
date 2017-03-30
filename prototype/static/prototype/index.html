@@ -26,35 +26,13 @@
 		</filter>
 		</defs>
          <g transform="scale(1.0)" id="frame_g">
-            <g ng-repeat="link in links">
-            <g link></g>
+            <g ng-repeat="transition in transitions">
+            <g transition></g>
             </g>
-            <g ng-repeat="device in devices"
-               ng-attr-transform="translate({{device.x}},{{device.y}})"
-               ng-attr-class="{{device.type}}"
-               ng-switch on="device.type">
-               <g ng-switch-when="router"><!-- begin router -->
-                   <g router></g>
-               </g> <!-- end router -->
-
-               <g ng-switch-when="switch"> <!-- begin switch -->
-                   <g switch> </g>
-               </g> <!-- end switch -->
-
-               <g ng-switch-when="host"> <!-- begin host -->
-                    <g host> </g>
-
-               </g> <!-- end host -->
-
-               <g ng-switch-when="rack"> <!-- begin rack -->
-                    <g rack> </g>
-               </g> <!-- end rack -->
-
-               <g ng-switch-default> <!-- begin default -->
-                    <g default></g>
-
-               </g> <!-- end default -->
-               <g status-light></g>
+            <g ng-repeat="state in states"
+               ng-attr-transform="translate({{state.x}},{{state.y}})"
+               ng-attr-class="{{state.type}}">
+               <g state></g>
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>
@@ -62,31 +40,6 @@
             </g>
             <g quadrants>
             </g>
-        </g>
-        <g ng-show="!hide_buttons">
-            <g> <!-- buttons -->
-                <g ng-repeat="button in buttons"
-                   ng-attr-transform="translate({{button.x}},{{button.y}})"
-                   ng-attr-class="{{button.is_pressed ? 'button-pressed' : button.mouse_over ? 'button-hover' : 'button'}}">
-                    <g button></g>
-                </g>
-            </g> <!-- end buttons -->
-
-            <g> <!-- stencils -->
-                <g ng-repeat="stencil in stencils"
-                   ng-attr-transform="translate({{stencil.x}},{{stencil.y}})"
-                   class="button">
-                    <g stencil></g>
-                </g>
-            </g> <!-- end stencils -->
-
-            <g> <!-- layers -->
-                <g ng-repeat="layer in layers"
-                   ng-attr-transform="translate({{layer.x}},{{layer.y}})"
-                   class="button">
-                    <g layer> </g>
-                </g>
-            </g> <!-- end layers -->
         </g>
         <g debug></g>
         <g cursor></g>

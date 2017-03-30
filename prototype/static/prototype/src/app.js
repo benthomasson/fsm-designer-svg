@@ -639,48 +639,16 @@ app.directive('debug', function() {
   return { restrict: 'A', templateUrl: 'widgets/debug.html' };
 });
 
-app.directive('router', function() {
-  return { restrict: 'A', templateUrl: 'widgets/router.html' };
-});
-
-app.directive('switch', function() {
-  return { restrict: 'A', templateUrl: 'widgets/switch.html' };
-});
-
-app.directive('host', function() {
-  return { restrict: 'A', templateUrl: 'widgets/host.html' };
+app.directive('state', function() {
+  return { restrict: 'A', templateUrl: 'widgets/state.html' };
 });
 
 app.directive('transition', function() {
   return { restrict: 'A', templateUrl: 'widgets/transition.html' };
 });
 
-app.directive('rack', function() {
-  return { restrict: 'A', templateUrl: 'widgets/rack.html' };
-});
-
-app.directive('default', function() {
-  return { restrict: 'A', templateUrl: 'widgets/default.html' };
-});
-
 app.directive('quadrants', function() {
   return { restrict: 'A', templateUrl: 'widgets/quadrants.html' };
-});
-
-app.directive('stencil', function() {
-  return { restrict: 'A', templateUrl: 'widgets/stencil.html' };
-});
-
-app.directive('layer', function() {
-  return { restrict: 'A', templateUrl: 'widgets/layer.html' };
-});
-
-app.directive('button', function() {
-  return { restrict: 'A', templateUrl: 'widgets/button.html' };
-});
-
-app.directive('statusLight', function() {
-  return { restrict: 'A', templateUrl: 'widgets/status_light.html' };
 });
 
 
