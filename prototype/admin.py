@@ -38,7 +38,7 @@ admin.site.register(MessageType, MessageTypeAdmin)
 
 
 class FiniteStateMachineAdmin(admin.ModelAdmin):
-    fields = ('name',)
+    fields = ('name', 'id',)
     raw_id_fields = ()
 
 
@@ -46,7 +46,7 @@ admin.site.register(FiniteStateMachine, FiniteStateMachineAdmin)
 
 
 class StateAdmin(admin.ModelAdmin):
-    fields = ('finite_state_machine', 'name',)
+    fields = ('finite_state_machine', 'name', 'id',)
     raw_id_fields = ('finite_state_machine',)
 
 
@@ -54,7 +54,7 @@ admin.site.register(State, StateAdmin)
 
 
 class TransitionAdmin(admin.ModelAdmin):
-    fields = ('from_state', 'to_state', 'label',)
+    fields = ('from_state', 'to_state', 'label', 'id',)
     raw_id_fields = ('from_state', 'to_state',)
 
 

@@ -22,7 +22,7 @@ def ws_connect(message):
     if not finite_state_machine_id:
         finite_state_machine_id = None
     fsm, created = FiniteStateMachine.objects.get_or_create(
-        finite_state_machine_id=finite_state_machine_id, defaults=dict(name="fsm", scale=1.0, panX=0, panY=0))
+        finite_state_machine_id=finite_state_machine_id, defaults=dict(name="fsm"))
     finite_state_machine_id = fsm.finite_state_machine_id
     message.channel_session['finite_state_machine_id'] = finite_state_machine_id
     Group("fsm-%s" % finite_state_machine_id).add(message.reply_channel)

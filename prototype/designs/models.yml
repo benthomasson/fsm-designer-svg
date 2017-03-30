@@ -53,6 +53,8 @@ models:
   - len: 200
     name: name
     type: CharField
+  - name: id
+    type: IntegerField
   name: FiniteStateMachine
   x: 225
   y: 152
@@ -68,6 +70,8 @@ models:
   - len: 200
     name: name
     type: CharField
+  - name: id
+    type: IntegerField
   name: State
   x: 516
   y: 154
@@ -79,14 +83,18 @@ models:
   - name: from_state
     ref: State
     ref_field: state_id
+    related_name: from_transition
     type: ForeignKey
   - name: to_state
     ref: State
     ref_field: state_id
+    related_name: to_transition
     type: ForeignKey
   - len: 200
     name: label
     type: CharField
+  - name: id
+    type: IntegerField
   name: Transition
   x: 812
   y: 158
