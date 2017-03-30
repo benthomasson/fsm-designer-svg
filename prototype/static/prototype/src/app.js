@@ -464,7 +464,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.client_id = data;
     };
 
-    $scope.onTopology = function(data) {
+    $scope.onFiniteStateMachine = function(data) {
         $scope.topology_id = data.topology_id;
         $scope.panX = data.panX;
         $scope.panY = data.panX;
