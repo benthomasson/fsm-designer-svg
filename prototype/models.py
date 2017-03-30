@@ -30,7 +30,6 @@ class FiniteStateMachine(models.Model):
 
     finite_state_machine_id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=200, )
-    id = models.IntegerField()
 
     def __unicode__(self):
         return self.name
