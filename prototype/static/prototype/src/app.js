@@ -68,15 +68,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   ];
 
   $scope.stencils = [
-    {"name": "router", "size":50, 'x':10, 'y':100},
-    {"name": "switch", "size":50, 'x':10, 'y':160},
-    {"name": "rack", "size":50, 'x':10, 'y':220},
   ];
 
   $scope.layers = [
-    {"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
-    {"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
-    {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
   ];
 
   $scope.transitions = [

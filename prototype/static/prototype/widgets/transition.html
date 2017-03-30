@@ -1,0 +1,10 @@
+                <line ng-attr-x1="{{transition.from_device.x}}"
+                      ng-attr-y1="{{transition.from_device.y}}"
+                      ng-attr-x2="{{transition.to_device !== null ? transition.to_device.x : scaledX}}"
+                      ng-attr-y2="{{transition.to_device !== null ? transition.to_device.y : scaledY}}"
+                      ng-attr-class="{{transition.selected && 'selected' || 'hidden'}}"/>
+                <line ng-attr-x1="{{transition.from_device.x}}"
+                      ng-attr-y1="{{transition.from_device.y}}"
+                      ng-attr-x2="{{transition.to_device !== null ? transition.to_device.x : scaledX}}"
+                      ng-attr-y2="{{transition.to_device !== null ? transition.to_device.y : scaledY}}"
+                      class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
