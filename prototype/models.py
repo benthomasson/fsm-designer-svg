@@ -48,8 +48,8 @@ class State(models.Model):
 class Transition(models.Model):
 
     transition_id = models.AutoField(primary_key=True,)
-    from_state = models.ForeignKey('State',)
-    to_state = models.ForeignKey('State',)
+    from_state = models.ForeignKey('State', related_name="from_transition")
+    to_state = models.ForeignKey('State', related_name="to_transition")
     label = models.CharField(max_length=200, )
 
     def __unicode__(self):

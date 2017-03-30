@@ -1,7 +1,7 @@
 # In consumers.py
 from channels import Group, Channel
 from channels.sessions import channel_session
-from prototype.models import Topology, Device, Link, Client, TopologyHistory, MessageType
+from prototype.models import FiniteStateMachine, State, Transition, Client, History, MessageType
 import urlparse
 from django.db.models import Q
 
@@ -14,45 +14,46 @@ def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
     data = urlparse.parse_qs(message.content['query_string'])
-    topology_id = data.get('topology_id', ['null'])
+    finite_state_machine_id = data.get('finite_state_machine_id', ['null'])
     try:
-        topology_id = int(topology_id[0])
+        finite_state_machine_id = int(finite_state_machine_id[0])
     except ValueError:
-        topology_id = None
-    if not topology_id:
-        topology_id = None
-    topology, created = Topology.objects.get_or_create(
-        topology_id=topology_id, defaults=dict(name="topology", scale=1.0, panX=0, panY=0))
-    topology_id = topology.topology_id
-    message.channel_session['topology_id'] = topology_id
-    Group("topology-%s" % topology_id).add(message.reply_channel)
+        finite_state_machine_id = None
+    if not finite_state_machine_id:
+        finite_state_machine_id = None
+    fsm, created = FiniteStateMachine.objects.get_or_create(
+        finite_state_machine_id=finite_state_machine_id, defaults=dict(name="fsm", scale=1.0, panX=0, panY=0))
+    finite_state_machine_id = fsm.finite_state_machine_id
+    message.channel_session['finite_state_machine_id'] = finite_state_machine_id
+    Group("fsm-%s" % finite_state_machine_id).add(message.reply_channel)
     client = Client()
     client.save()
     message.channel_session['client_id'] = client.pk
     message.reply_channel.send({"text": json.dumps(["id", client.pk])})
-    message.reply_channel.send({"text": json.dumps(["topology_id", topology_id])})
-    topology_data = topology.__dict__.copy()
-    if '_state' in topology_data:
-        del topology_data['_state']
-    message.reply_channel.send({"text": json.dumps(["Topology", topology_data])})
-    devices = list(Device.objects
-                         .filter(topology_id=topology_id).values())
-    links = [dict(from_device=x['from_device__id'],
-                  to_device=x['to_device__id']) for x in list(Link.objects
-                                                                  .filter(Q(from_device__topology_id=topology_id) |
-                                                                          Q(to_device__topology_id=topology_id))
-                                                                  .values('from_device__id', 'to_device__id'))]
+    message.reply_channel.send({"text": json.dumps(["finite_state_machine_id", finite_state_machine_id])})
+    fsm_data = fsm.__dict__.copy()
+    if '_state' in fsm_data:
+        del fsm_data['_state']
+    message.reply_channel.send({"text": json.dumps(["FiniteStateMachine", fsm_data])})
+    states = list(State.objects
+                  .filter(finite_state_machine_id=finite_state_machine_id).values())
+    transitions = [dict(from_state=x['from_state__id'],
+                        to_state=x['to_state__id'])
+                   for x in list(Transition.objects
+                                 .filter(Q(from_state__finite_state_machine_id=finite_state_machine_id) |
+                                         Q(to_state__finite_state_machine_id=finite_state_machine_id))
+                                 .values('from_state__id', 'to_state__id'))]
     snapshot = dict(sender=0,
-                    devices=devices,
-                    links=links)
+                    states=states,
+                    transitions=transitions)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
-    history_message_ignore_types = ['DeviceSelected', 'DeviceUnSelected', 'Undo', 'Redo']
-    history = list(TopologyHistory.objects
-                                  .filter(topology_id=topology_id)
-                                  .exclude(message_type__name__in=history_message_ignore_types)
-                                  .exclude(undone=True)
-                                  .order_by('pk')
-                                  .values_list('message_data', flat=True)[:1000])
+    history_message_ignore_types = ['StateSelected', 'StateUnSelected', 'Undo', 'Redo']
+    history = list(History.objects
+                          .filter(finite_state_machine_id=finite_state_machine_id)
+                          .exclude(message_type__name__in=history_message_ignore_types)
+                          .exclude(undone=True)
+                          .order_by('pk')
+                          .values_list('message_data', flat=True)[:1000])
     message.reply_channel.send({"text": json.dumps(["History", history])})
 
 
@@ -60,20 +61,20 @@ def ws_connect(message):
 def ws_message(message):
     # Send to debug printer
     Channel('console_printer').send({"text": message['text']})
-    # Send to all clients editing the topology
-    Group("topology-%s" % message.channel_session['topology_id']).send({
+    # Send to all clients editing the fsm
+    Group("fsm-%s" % message.channel_session['finite_state_machine_id']).send({
         "text": message['text'],
     })
     # Send to persistence worker
     Channel('persistence').send(
         {"text": message['text'],
-         "topology": message.channel_session['topology_id'],
+         "fsm": message.channel_session['finite_state_machine_id'],
          "client": message.channel_session['client_id']})
 
 
 @channel_session
 def ws_disconnect(message):
-    Group("topology-%s" % message.channel_session['topology_id']).discard(message.reply_channel)
+    Group("fsm-%s" % message.channel_session['finite_state_machine_id']).discard(message.reply_channel)
 
 
 def console_printer(message):
@@ -83,9 +84,9 @@ def console_printer(message):
 class _Persistence(object):
 
     def handle(self, message):
-        topology_id = message.get('topology')
-        if topology_id is None:
-            print "No topology_id"
+        finite_state_machine_id = message.get('fsm')
+        if finite_state_machine_id is None:
+            print "No finite_state_machine_id"
             return
         client_id = message.get('client')
         if client_id is None:
@@ -98,87 +99,97 @@ class _Persistence(object):
         message_type = data[0]
         message_value = data[1]
         message_type_id = MessageType.objects.get_or_create(name=message_type)[0].pk
-        TopologyHistory(topology_id=topology_id,
-                        client_id=client_id,
-                        message_type_id=message_type_id,
-                        message_id=data[1].get('message_id', 0),
-                        message_data=message['text']).save()
+        History(finite_state_machine_id=finite_state_machine_id,
+                client_id=client_id,
+                message_type_id=message_type_id,
+                message_id=data[1].get('message_id', 0),
+                message_data=message['text']).save()
         handler = getattr(self, "on{0}".format(message_type), None)
         if handler is not None:
-            handler(message_value, topology_id, client_id)
+            handler(message_value, finite_state_machine_id, client_id)
         else:
             print "Unsupported message ", message_type
 
-    def onSnapshot(self, snapshot, topology_id, client_id):
-        device_map = dict()
-        for device in snapshot['devices']:
-            if 'size' in device:
-                del device['size']
-            if 'height' in device:
-                del device['height']
-            if 'width' in device:
-                del device['width']
-            d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
-            d.name = device['name']
-            d.x = device['x']
-            d.y = device['y']
-            d.type = device['type']
+    def onSnapshot(self, snapshot, finite_state_machine_id, client_id):
+        state_map = dict()
+        for state in snapshot['states']:
+            if 'size' in state:
+                del state['size']
+            if 'height' in state:
+                del state['height']
+            if 'width' in state:
+                del state['width']
+            d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
+                                               id=state['id'],
+                                               defaults=state)
+            d.name = state['name']
+            d.x = state['x']
+            d.y = state['y']
+            d.type = state['type']
             d.save()
-            device_map[device['id']] = d
+            state_map[state['id']] = d
 
-        for link in snapshot['links']:
-            Link.objects.get_or_create(from_device=device_map[link['from_device']],
-                                       to_device=device_map[link['to_device']])
+        for transition in snapshot['transitions']:
+            Transition.objects.get_or_create(from_state=state_map[transition['from_state']],
+                                             to_state=state_map[transition['to_state']])
 
-    def onDeviceCreate(self, device, topology_id, client_id):
-        if 'sender' in device:
-            del device['sender']
-        if 'message_id' in device:
-            del device['message_id']
-        d, _ = Device.objects.get_or_create(topology_id=topology_id, id=device['id'], defaults=device)
-        d.x = device['x']
-        d.y = device['y']
-        d.type = device['type']
+    def onStateCreate(self, state, finite_state_machine_id, client_id):
+        if 'sender' in state:
+            del state['sender']
+        if 'message_id' in state:
+            del state['message_id']
+        d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
+                                           id=state['id'],
+                                           defaults=state)
+        d.x = state['x']
+        d.y = state['y']
+        d.type = state['type']
         d.save()
 
-    def onDeviceDestroy(self, device, topology_id, client_id):
-        Device.objects.filter(topology_id=topology_id, id=device['id']).delete()
+    def onStateDestroy(self, state, finite_state_machine_id, client_id):
+        State.objects.filter(finite_state_machine_id=finite_state_machine_id, id=state['id']).delete()
 
-    def onDeviceMove(self, device, topology_id, client_id):
-        Device.objects.filter(topology_id=topology_id, id=device['id']).update(x=device['x'], y=device['y'])
+    def onStateMove(self, state, finite_state_machine_id, client_id):
+        State.objects.filter(finite_state_machine_id=finite_state_machine_id,
+                             id=state['id']).update(x=state['x'], y=state['y'])
 
-    def onDeviceLabelEdit(self, device, topology_id, client_id):
-        Device.objects.filter(topology_id=topology_id, id=device['id']).update(name=device['name'])
+    def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
+        State.objects.filter(finite_state_machine_id=finite_state_machine_id,
+                             id=state['id']).update(name=state['name'])
 
-    def onLinkCreate(self, link, topology_id, client_id):
-        if 'sender' in link:
-            del link['sender']
-        if 'message_id' in link:
-            del link['message_id']
-        device_map = dict(Device.objects
-                                .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
-                                .values_list('id', 'pk'))
-        Link.objects.get_or_create(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']])
+    def onTransitionCreate(self, transition, finite_state_machine_id, client_id):
+        if 'sender' in transition:
+            del transition['sender']
+        if 'message_id' in transition:
+            del transition['message_id']
+        state_map = dict(State.objects
+                         .filter(finite_state_machine_id=finite_state_machine_id,
+                                 id__in=[transition['from_id'], transition['to_id']])
+                         .values_list('id', 'pk'))
+        Transition.objects.get_or_create(from_state_id=state_map[transition['from_id']],
+                                         to_state_id=state_map[transition['to_id']])
 
-    def onLinkDestroy(self, link, topology_id, client_id):
-        device_map = dict(Device.objects
-                                .filter(topology_id=topology_id, id__in=[link['from_id'], link['to_id']])
-                                .values_list('id', 'pk'))
-        Link.objects.filter(from_device_id=device_map[link['from_id']], to_device_id=device_map[link['to_id']]).delete()
+    def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
+        state_map = dict(State.objects
+                         .filter(finite_state_machine_id=finite_state_machine_id,
+                                 id__in=[transition['from_id'], transition['to_id']])
+                         .values_list('id', 'pk'))
+        Transition.objects.filter(from_state_id=state_map[transition['from_id']],
+                                  to_state_id=state_map[transition['to_id']]).delete()
 
-    def onDeviceSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onDeviceUnSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onUndo(self, message_value, topology_id, client_id):
-        undo_persistence.handle(message_value['original_message'], topology_id, client_id)
+    def onUndo(self, message_value, finite_state_machine_id, client_id):
+        undo_persistence.handle(message_value['original_message'], finite_state_machine_id, client_id)
 
-    def onRedo(self, message_value, topology_id, client_id):
-        redo_persistence.handle(message_value['original_message'], topology_id, client_id)
+    def onRedo(self, message_value, finite_state_machine_id, client_id):
+        redo_persistence.handle(message_value['original_message'], finite_state_machine_id, client_id)
 
 
 persistence = _Persistence()
@@ -186,58 +197,58 @@ persistence = _Persistence()
 
 class _UndoPersistence(object):
 
-    def handle(self, message, topology_id, client_id):
+    def handle(self, message, finite_state_machine_id, client_id):
         message_type = message[0]
         message_value = message[1]
-        TopologyHistory.objects.filter(topology_id=topology_id,
-                                       client_id=message_value['sender'],
-                                       message_id=message_value['message_id']).update(undone=True)
+        History.objects.filter(finite_state_machine_id=finite_state_machine_id,
+                               client_id=message_value['sender'],
+                               message_id=message_value['message_id']).update(undone=True)
         handler = getattr(self, "on{0}".format(message_type), None)
         if handler is not None:
-            handler(message_value, topology_id, client_id)
+            handler(message_value, finite_state_machine_id, client_id)
         else:
             print "Unsupported undo message ", message_type
 
-    def onSnapshot(self, snapshot, topology_id, client_id):
+    def onSnapshot(self, snapshot, finite_state_machine_id, client_id):
         pass
 
-    def onDeviceCreate(self, device, topology_id, client_id):
-        persistence.onDeviceDestroy(device, topology_id, client_id)
+    def onStateCreate(self, state, finite_state_machine_id, client_id):
+        persistence.onStateDestroy(state, finite_state_machine_id, client_id)
 
-    def onDeviceDestroy(self, device, topology_id, client_id):
-        inverted = device.copy()
-        inverted['type'] = device['previous_type']
-        inverted['name'] = device['previous_name']
-        inverted['x'] = device['previous_x']
-        inverted['y'] = device['previous_y']
-        persistence.onDeviceCreate(inverted, topology_id, client_id)
+    def onStateDestroy(self, state, finite_state_machine_id, client_id):
+        inverted = state.copy()
+        inverted['type'] = state['previous_type']
+        inverted['name'] = state['previous_name']
+        inverted['x'] = state['previous_x']
+        inverted['y'] = state['previous_y']
+        persistence.onStateCreate(inverted, finite_state_machine_id, client_id)
 
-    def onDeviceMove(self, device, topology_id, client_id):
-        inverted = device.copy()
-        inverted['x'] = device['previous_x']
-        inverted['y'] = device['previous_y']
-        persistence.onDeviceMove(inverted, topology_id, client_id)
+    def onStateMove(self, state, finite_state_machine_id, client_id):
+        inverted = state.copy()
+        inverted['x'] = state['previous_x']
+        inverted['y'] = state['previous_y']
+        persistence.onStateMove(inverted, finite_state_machine_id, client_id)
 
-    def onDeviceLabelEdit(self, device, topology_id, client_id):
-        inverted = device.copy()
-        inverted['name'] = device['previous_name']
-        persistence.onDeviceLabelEdit(inverted, topology_id, client_id)
+    def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
+        inverted = state.copy()
+        inverted['name'] = state['previous_name']
+        persistence.onStateLabelEdit(inverted, finite_state_machine_id, client_id)
 
-    def onLinkCreate(self, link, topology_id, client_id):
-        persistence.onLinkDestroy(link, topology_id, client_id)
+    def onTransitionCreate(self, transition, finite_state_machine_id, client_id):
+        persistence.onTransitionDestroy(transition, finite_state_machine_id, client_id)
 
-    def onLinkDestroy(self, link, topology_id, client_id):
-        persistence.onLinkCreate(link, topology_id, client_id)
+    def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
+        persistence.onTransitionCreate(transition, finite_state_machine_id, client_id)
 
-    def onDeviceSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onDeviceUnSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onUndo(self, message_value, topology_id, client_id):
+    def onUndo(self, message_value, finite_state_machine_id, client_id):
         pass
 
 
@@ -246,32 +257,32 @@ undo_persistence = _UndoPersistence()
 
 class _RedoPersistence(object):
 
-    def handle(self, message, topology_id, client_id):
+    def handle(self, message, finite_state_machine_id, client_id):
         message_type = message[0]
         message_value = message[1]
-        TopologyHistory.objects.filter(topology_id=topology_id,
-                                       client_id=message_value['sender'],
-                                       message_id=message_value['message_id']).update(undone=False)
+        History.objects.filter(finite_state_machine_id=finite_state_machine_id,
+                               client_id=message_value['sender'],
+                               message_id=message_value['message_id']).update(undone=False)
         handler_name = "on{0}".format(message_type)
         handler = getattr(self, handler_name, getattr(persistence, handler_name, None))
         if handler is not None:
-            handler(message_value, topology_id, client_id)
+            handler(message_value, finite_state_machine_id, client_id)
         else:
             print "Unsupported redo message ", message_type
 
-    def onDeviceSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onDeviceUnSelected(self, message_value, topology_id, client_id):
-        'Ignore DeviceSelected messages'
+    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore StateSelected messages'
         pass
 
-    def onUndo(self, message_value, topology_id, client_id):
+    def onUndo(self, message_value, finite_state_machine_id, client_id):
         'Ignore Undo messages'
         pass
 
-    def onRedo(self, message_value, topology_id, client_id):
+    def onRedo(self, message_value, finite_state_machine_id, client_id):
         'Ignore Redo messages'
         pass
 
