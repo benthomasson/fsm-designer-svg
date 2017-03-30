@@ -39,7 +39,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.pressedScaledY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
-  $scope.selected_devices = [];
+  $scope.selected_states = [];
   $scope.selected_links = [];
   $scope.new_link = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
@@ -58,13 +58,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
-  $scope.device_id_seq = util.natural_numbers(0);
+  $scope.state_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
 
 
-  $scope.devices = [
+  $scope.states = [
   ];
 
   $scope.stencils = [
@@ -134,26 +134,26 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.clear_selections = function () {
 
         var i = 0;
-        var devices = $scope.devices;
+        var states = $scope.states;
         var links = $scope.links;
-        $scope.selected_devices = [];
+        $scope.selected_states = [];
         $scope.selected_links = [];
-        for (i = 0; i < devices.length; i++) {
-            if (devices[i].selected) {
-                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, devices[i].id));
+        for (i = 0; i < states.length; i++) {
+            if (states[i].selected) {
+                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
             }
-            devices[i].selected = false;
+            states[i].selected = false;
         }
         for (i = 0; i < links.length; i++) {
             links[i].selected = false;
         }
     };
 
-    $scope.select_devices = function (multiple_selection) {
+    $scope.select_states = function (multiple_selection) {
 
         var i = 0;
-        var devices = $scope.devices;
-        var last_selected_device = null;
+        var states = $scope.states;
+        var last_selected_state = null;
 
         $scope.pressedX = $scope.mouseX;
         $scope.pressedY = $scope.mouseY;
@@ -164,20 +164,20 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.clear_selections();
         }
 
-        for (i = devices.length - 1; i >= 0; i--) {
-            if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
-                devices[i].selected = true;
-                $scope.send_control_message(new messages.StateSelected($scope.client_id, devices[i].id));
-                last_selected_device = devices[i];
-                if ($scope.selected_devices.indexOf(devices[i]) === -1) {
-                    $scope.selected_devices.push(devices[i]);
+        for (i = states.length - 1; i >= 0; i--) {
+            if (states[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                states[i].selected = true;
+                $scope.send_control_message(new messages.StateSelected($scope.client_id, states[i].id));
+                last_selected_state = states[i];
+                if ($scope.selected_states.indexOf(states[i]) === -1) {
+                    $scope.selected_states.push(states[i]);
                 }
                 if (!multiple_selection) {
                     break;
                 }
             }
         }
-        return last_selected_device;
+        return last_selected_state;
     };
 
     $scope.forget_time = function () {
@@ -253,7 +253,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.send_snapshot = function () {
         var data = JSON.stringify(['Snapshot', {"sender": $scope.client_id,
-                                                "devices": $scope.devices,
+                                                "states": $scope.states,
                                                 "links": $scope.links,
                                                 "scale": $scope.scale,
                                                 "panX": $scope.panX,
@@ -275,28 +275,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
     $scope.onStateCreate = function(data) {
-        $scope.create_device(data);
+        $scope.create_state(data);
     };
 
-    $scope.create_device = function(data) {
-        var device = new models.State(data.id,
+    $scope.create_state = function(data) {
+        var state = new models.State(data.id,
                                        data.name,
                                        data.x,
                                        data.y,
                                        data.type);
-        $scope.device_id_seq = util.natural_numbers(data.id);
-        $scope.devices.push(device);
+        $scope.state_id_seq = util.natural_numbers(data.id);
+        $scope.states.push(state);
     };
 
     $scope.onStateLabelEdit = function(data) {
-        $scope.edit_device_label(data);
+        $scope.edit_state_label(data);
     };
 
-    $scope.edit_device_label = function(data) {
+    $scope.edit_state_label = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].name = data.name;
+        for (i = 0; i < $scope.states.length; i++) {
+            if ($scope.states[i].id === data.id) {
+                $scope.states[i].name = data.name;
                 break;
             }
         }
@@ -309,17 +309,17 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.create_link = function(data) {
         var i = 0;
         var new_link = new models.Link(null, null);
-        for (i = 0; i < $scope.devices.length; i++){
-            if ($scope.devices[i].id === data.from_id) {
-                new_link.from_device = $scope.devices[i];
+        for (i = 0; i < $scope.states.length; i++){
+            if ($scope.states[i].id === data.from_id) {
+                new_link.from_state = $scope.states[i];
             }
         }
-        for (i = 0; i < $scope.devices.length; i++){
-            if ($scope.devices[i].id === data.to_id) {
-                new_link.to_device = $scope.devices[i];
+        for (i = 0; i < $scope.states.length; i++){
+            if ($scope.states[i].id === data.to_id) {
+                new_link.to_state = $scope.states[i];
             }
         }
-        if (new_link.from_device !== null && new_link.to_device !== null) {
+        if (new_link.from_state !== null && new_link.to_state !== null) {
             $scope.links.push(new_link);
         }
     };
@@ -334,7 +334,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var index = -1;
         for (i = 0; i < $scope.links.length; i++) {
             link = $scope.links[i];
-            if (link.from_device.id === data.from_id && link.to_device.id === data.to_id) {
+            if (link.from_state.id === data.from_id && link.to_state.id === data.to_id) {
                 index = $scope.links.indexOf(link);
                 $scope.links.splice(index, 1);
             }
@@ -342,43 +342,43 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onStateMove = function(data) {
-        $scope.move_devices(data);
+        $scope.move_states(data);
     };
 
-    $scope.move_devices = function(data) {
+    $scope.move_states = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].x = data.x;
-                $scope.devices[i].y = data.y;
+        for (i = 0; i < $scope.states.length; i++) {
+            if ($scope.states[i].id === data.id) {
+                $scope.states[i].x = data.x;
+                $scope.states[i].y = data.y;
                 break;
             }
         }
     };
 
     $scope.onStateDestroy = function(data) {
-        $scope.destroy_device(data);
+        $scope.destroy_state(data);
     };
 
-    $scope.destroy_device = function(data) {
+    $scope.destroy_state = function(data) {
 
-        // Delete the device and any links connecting to the device.
+        // Delete the state and any links connecting to the state.
         var i = 0;
         var j = 0;
         var dindex = -1;
         var lindex = -1;
-        var devices = $scope.devices.slice();
+        var states = $scope.states.slice();
         var all_links = $scope.links.slice();
-        for (i = 0; i < devices.length; i++) {
-            if (devices[i].id === data.id) {
-                dindex = $scope.devices.indexOf(devices[i]);
+        for (i = 0; i < states.length; i++) {
+            if (states[i].id === data.id) {
+                dindex = $scope.states.indexOf(states[i]);
                 if (dindex !== -1) {
-                    $scope.devices.splice(dindex, 1);
+                    $scope.states.splice(dindex, 1);
                 }
                 lindex = -1;
                 for (j = 0; j < all_links.length; j++) {
-                    if (all_links[j].to_device === devices[i] ||
-                        all_links[j].from_device === devices[i]) {
+                    if (all_links[j].to_state === states[i] ||
+                        all_links[j].from_state === states[i]) {
                         lindex = $scope.links.indexOf(all_links[j]);
                         if (lindex !== -1) {
                             $scope.links.splice(lindex, 1);
@@ -394,19 +394,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var data = type_data[1];
 
         if (type === "StateMove") {
-            $scope.move_devices(data);
+            $scope.move_states(data);
         }
 
         if (type === "StateCreate") {
-            $scope.create_device(data);
+            $scope.create_state(data);
         }
 
         if (type === "StateDestroy") {
-            $scope.destroy_device(data);
+            $scope.destroy_state(data);
         }
 
         if (type === "StateLabelEdit") {
-            $scope.edit_device_label(data);
+            $scope.edit_state_label(data);
         }
 
         if (type === "LinkCreate") {
@@ -428,11 +428,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             inverted_data = angular.copy(data);
             inverted_data.x = data.previous_x;
             inverted_data.y = data.previous_y;
-            $scope.move_devices(inverted_data);
+            $scope.move_states(inverted_data);
         }
 
         if (type === "StateCreate") {
-            $scope.destroy_device(data);
+            $scope.destroy_state(data);
         }
 
         if (type === "StateDestroy") {
@@ -442,13 +442,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                                       data.previous_y,
                                                       data.previous_name,
                                                       data.previous_type);
-            $scope.create_device(inverted_data);
+            $scope.create_state(inverted_data);
         }
 
         if (type === "StateLabelEdit") {
             inverted_data = angular.copy(data);
             inverted_data.name = data.previous_name;
-            $scope.edit_device_label(inverted_data);
+            $scope.edit_state_label(inverted_data);
         }
 
         if (type === "LinkCreate") {
@@ -474,20 +474,20 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onStateSelected = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].remote_selected = true;
-                console.log($scope.devices[i].remote_selected);
+        for (i = 0; i < $scope.states.length; i++) {
+            if ($scope.states[i].id === data.id) {
+                $scope.states[i].remote_selected = true;
+                console.log($scope.states[i].remote_selected);
             }
         }
     };
 
     $scope.onStateUnSelected = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].remote_selected = false;
-                console.log($scope.devices[i].remote_selected);
+        for (i = 0; i < $scope.states.length; i++) {
+            if ($scope.states[i].id === data.id) {
+                $scope.states[i].remote_selected = false;
+                console.log($scope.states[i].remote_selected);
             }
         }
     };
@@ -505,52 +505,52 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.onSnapshot = function (data) {
 
         //Erase the existing state
-        $scope.devices = [];
+        $scope.states = [];
         $scope.links = [];
 
-        var device_map = {};
+        var state_map = {};
         var i = 0;
-        var device = null;
-        var new_device = null;
-        var max_device_id = null;
+        var state = null;
+        var new_state = null;
+        var max_state_id = null;
         var min_x = null;
         var min_y = null;
         var max_x = null;
         var max_y = null;
 
-        //Build the devices
-        for (i = 0; i < data.devices.length; i++) {
-            device = data.devices[i];
-            if (max_device_id === null || device.id > max_device_id) {
-                max_device_id = device.id;
+        //Build the states
+        for (i = 0; i < data.states.length; i++) {
+            state = data.states[i];
+            if (max_state_id === null || state.id > max_state_id) {
+                max_state_id = state.id;
             }
-            if (min_x === null || device.x < min_x) {
-                min_x = device.x;
+            if (min_x === null || state.x < min_x) {
+                min_x = state.x;
             }
-            if (min_y === null || device.y < min_y) {
-                min_y = device.y;
+            if (min_y === null || state.y < min_y) {
+                min_y = state.y;
             }
-            if (max_x === null || device.x > max_x) {
-                max_x = device.x;
+            if (max_x === null || state.x > max_x) {
+                max_x = state.x;
             }
-            if (max_y === null || device.y > max_y) {
-                max_y = device.y;
+            if (max_y === null || state.y > max_y) {
+                max_y = state.y;
             }
-            new_device = new models.State(device.id,
-                                           device.name,
-                                           device.x,
-                                           device.y,
-                                           device.type);
-            $scope.devices.push(new_device);
-            device_map[device.id] = new_device;
+            new_state = new models.State(state.id,
+                                           state.name,
+                                           state.x,
+                                           state.y,
+                                           state.type);
+            $scope.states.push(new_state);
+            state_map[state.id] = new_state;
         }
 
         //Build the links
         var link = null;
         for (i = 0; i < data.links.length; i++) {
             link = data.links[i];
-            $scope.links.push(new models.Link(device_map[link.from_device],
-                                              device_map[link.to_device]));
+            $scope.links.push(new models.Link(state_map[link.from_state],
+                                              state_map[link.to_state]));
         }
 
         var diff_x;
@@ -587,10 +587,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.updatePanAndScale();
         }
 
-        //Update the device_id_seq to be greater than all device ids to prevent duplicate ids.
-        if (max_device_id !== null) {
-            console.log(['max_device_id', max_device_id]);
-            $scope.device_id_seq = util.natural_numbers(max_device_id);
+        //Update the state_id_seq to be greater than all state ids to prevent duplicate ids.
+        if (max_state_id !== null) {
+            console.log(['max_state_id', max_state_id]);
+            $scope.state_id_seq = util.natural_numbers(max_state_id);
         }
     };
 

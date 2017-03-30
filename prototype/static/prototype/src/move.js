@@ -77,9 +77,9 @@ exports.EditLabel = EditLabel;
 
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
-    var last_selected_device = controller.scope.select_devices($event.shiftKey);
+    var last_selected_state = controller.scope.select_states($event.shiftKey);
 
-    if (last_selected_device !== null) {
+    if (last_selected_state !== null) {
         controller.changeState(Selected1);
     } else {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
@@ -91,45 +91,45 @@ _Ready.prototype.onMouseDown.transitions = ['Selected1'];
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
 	var scope = controller.scope;
-    var device = null;
+    var state = null;
 
 	if ($event.key === 'r') {
-		device = new models.State(controller.scope.device_id_seq(),
+		state = new models.State(controller.scope.state_id_seq(),
                                    "Router",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "router");
 	}
     else if ($event.key === 's') {
-		device = new models.State(controller.scope.device_id_seq(),
+		state = new models.State(controller.scope.state_id_seq(),
                                    "Switch",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "switch");
 	}
     else if ($event.key === 'a') {
-		device = new models.State(controller.scope.device_id_seq(),
+		state = new models.State(controller.scope.state_id_seq(),
                                    "Rack",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "rack");
 	}
     else if ($event.key === 'h') {
-		device = new models.State(controller.scope.device_id_seq(),
+		state = new models.State(controller.scope.state_id_seq(),
                                    "Host",
                                    scope.scaledX,
                                    scope.scaledY,
                                    "host");
 	}
 
-    if (device !== null) {
-        scope.devices.push(device);
+    if (state !== null) {
+        scope.states.push(state);
         scope.send_control_message(new messages.StateCreate(scope.client_id,
-                                                             device.id,
-                                                             device.x,
-                                                             device.y,
-                                                             device.name,
-                                                             device.type));
+                                                             state.id,
+                                                             state.x,
+                                                             state.y,
+                                                             state.name,
+                                                             state.type));
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
@@ -146,10 +146,10 @@ _Start.prototype.start.transitions = ['Ready'];
 
 _Selected2.prototype.onMouseDown = function (controller, $event) {
 
-    if (controller.scope.selected_devices.length === 1) {
-        var current_selected_device = controller.scope.selected_devices[0];
-        var last_selected_device = controller.scope.select_devices($event.shiftKey);
-        if (current_selected_device === last_selected_device) {
+    if (controller.scope.selected_states.length === 1) {
+        var current_selected_state = controller.scope.selected_states[0];
+        var last_selected_state = controller.scope.select_states($event.shiftKey);
+        if (current_selected_state === last_selected_state) {
             controller.changeState(Selected3);
             return;
         }
@@ -169,24 +169,24 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         var i = 0;
         var j = 0;
         var index = -1;
-        var devices = controller.scope.selected_devices;
+        var states = controller.scope.selected_states;
         var all_links = controller.scope.links.slice();
-        controller.scope.selected_devices = [];
+        controller.scope.selected_states = [];
         controller.scope.selected_links = [];
-        for (i = 0; i < devices.length; i++) {
-            index = controller.scope.devices.indexOf(devices[i]);
+        for (i = 0; i < states.length; i++) {
+            index = controller.scope.states.indexOf(states[i]);
             if (index !== -1) {
-                controller.scope.devices.splice(index, 1);
+                controller.scope.states.splice(index, 1);
                 controller.scope.send_control_message(new messages.StateDestroy(controller.scope.client_id,
-                                                                                 devices[i].id,
-                                                                                 devices[i].x,
-                                                                                 devices[i].y,
-                                                                                 devices[i].name,
-                                                                                 devices[i].type));
+                                                                                 states[i].id,
+                                                                                 states[i].x,
+                                                                                 states[i].y,
+                                                                                 states[i].name,
+                                                                                 states[i].type));
             }
             for (j = 0; j < all_links.length; j++) {
-                if (all_links[j].to_device === devices[i] ||
-                    all_links[j].from_device === devices[i]) {
+                if (all_links[j].to_state === states[i] ||
+                    all_links[j].from_state === states[i]) {
                     index = controller.scope.links.indexOf(all_links[j]);
                     if (index !== -1) {
                         controller.scope.links.splice(index, 1);
@@ -219,21 +219,21 @@ _Selected1.prototype.onMouseDown = function () {
 
 _Move.prototype.onMouseMove = function (controller) {
 
-    var devices = controller.scope.selected_devices;
+    var states = controller.scope.selected_states;
 
     var diffX = controller.scope.scaledX - controller.scope.pressedScaledX;
     var diffY = controller.scope.scaledY - controller.scope.pressedScaledY;
     var i = 0;
     var previous_x, previous_y;
-    for (i = 0; i < devices.length; i++) {
-        previous_x = devices[i].x;
-        previous_y = devices[i].y;
-        devices[i].x = devices[i].x + diffX;
-        devices[i].y = devices[i].y + diffY;
+    for (i = 0; i < states.length; i++) {
+        previous_x = states[i].x;
+        previous_y = states[i].y;
+        states[i].x = states[i].x + diffX;
+        states[i].y = states[i].y + diffY;
         controller.scope.send_control_message(new messages.StateMove(controller.scope.client_id,
-                                                                      devices[i].id,
-                                                                      devices[i].x,
-                                                                      devices[i].y,
+                                                                      states[i].id,
+                                                                      states[i].x,
+                                                                      states[i].y,
                                                                       previous_x,
                                                                       previous_y));
     }
@@ -262,11 +262,11 @@ _Selected3.prototype.onMouseMove.transitions = ['Move'];
 
 
 _EditLabel.prototype.start = function (controller) {
-    controller.scope.selected_devices[0].edit_label = true;
+    controller.scope.selected_states[0].edit_label = true;
 };
 
 _EditLabel.prototype.end = function (controller) {
-    controller.scope.selected_devices[0].edit_label = false;
+    controller.scope.selected_states[0].edit_label = false;
 };
 
 _EditLabel.prototype.onMouseDown = function (controller, $event) {
@@ -281,20 +281,20 @@ _EditLabel.prototype.onMouseDown.transitions = ['Ready'];
 _EditLabel.prototype.onKeyDown = function (controller, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-	var device = controller.scope.selected_devices[0];
-    var previous_name = device.name;
+	var state = controller.scope.selected_states[0];
+    var previous_name = state.name;
 	if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
-		device.name = device.name.slice(0, -1);
+		state.name = state.name.slice(0, -1);
 	} else if ($event.keyCode >= 48 && $event.keyCode <=90) { //Alphanumeric
-        device.name += $event.key;
+        state.name += $event.key;
 	} else if ($event.keyCode >= 186 && $event.keyCode <=222) { //Punctuation
-        device.name += $event.key;
+        state.name += $event.key;
 	} else if ($event.keyCode === 13) { //Enter
         controller.changeState(Selected2);
     }
     controller.scope.send_control_message(new messages.StateLabelEdit(controller.scope.client_id,
-                                                                       device.id,
-                                                                       device.name,
+                                                                       state.id,
+                                                                       state.name,
                                                                        previous_name));
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];

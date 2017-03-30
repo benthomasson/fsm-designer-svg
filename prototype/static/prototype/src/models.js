@@ -44,17 +44,17 @@ State.prototype.toJSON = function () {
 
 };
 
-function Link(from_device, to_device) {
-    this.from_device = from_device;
-    this.to_device = to_device;
+function Link(from_state, to_state) {
+    this.from_state = from_state;
+    this.to_state = to_state;
     this.selected = false;
     this.status = null;
 }
 exports.Link = Link;
 
 Link.prototype.toJSON = function () {
-    return {to_device: this.to_device.id,
-            from_device: this.from_device.id};
+    return {to_state: this.to_state.id,
+            from_state: this.from_state.id};
 };
 
 function Button(name, x, y, width, height, callback) {
