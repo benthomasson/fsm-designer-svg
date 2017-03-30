@@ -13,9 +13,9 @@ var messages = require('./messages.js');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
-  $scope.topology_id = $location.search().topology_id || 0;
+  $scope.finite_state_machine_id = $location.search().finite_state_machine_id || 0;
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
+  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?finite_state_machine_id=" + $scope.finite_state_machine_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.history = [];
@@ -465,11 +465,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onFiniteStateMachine = function(data) {
-        $scope.topology_id = data.topology_id;
+        $scope.finite_state_machine_id = data.finite_state_machine_id;
         $scope.panX = data.panX;
         $scope.panY = data.panX;
         $scope.current_scale = data.scale;
-        $location.search({topology_id: data.topology_id});
+        $location.search({finite_state_machine_id: data.finite_state_machine_id});
     };
 
     $scope.onStateSelected = function(data) {
