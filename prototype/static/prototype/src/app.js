@@ -302,13 +302,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.onLinkCreate = function(data) {
+    $scope.onTransitionCreate = function(data) {
         $scope.create_link(data);
     };
 
     $scope.create_link = function(data) {
         var i = 0;
-        var new_link = new models.Link(null, null);
+        var new_link = new models.Transition(null, null);
         for (i = 0; i < $scope.states.length; i++){
             if ($scope.states[i].id === data.from_id) {
                 new_link.from_state = $scope.states[i];
@@ -324,7 +324,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.onLinkDestroy = function(data) {
+    $scope.onTransitionDestroy = function(data) {
         $scope.destroy_link(data);
     };
 
@@ -409,11 +409,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.edit_state_label(data);
         }
 
-        if (type === "LinkCreate") {
+        if (type === "TransitionCreate") {
             $scope.create_link(data);
         }
 
-        if (type === "LinkDestroy") {
+        if (type === "TransitionDestroy") {
             $scope.destroy_link(data);
         }
     };
@@ -451,11 +451,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.edit_state_label(inverted_data);
         }
 
-        if (type === "LinkCreate") {
+        if (type === "TransitionCreate") {
             $scope.destroy_link(data);
         }
 
-        if (type === "LinkDestroy") {
+        if (type === "TransitionDestroy") {
             $scope.create_link(data);
         }
     };
@@ -549,7 +549,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var link = null;
         for (i = 0; i < data.links.length; i++) {
             link = data.links[i];
-            $scope.links.push(new models.Link(state_map[link.from_state],
+            $scope.links.push(new models.Transition(state_map[link.from_state],
                                               state_map[link.to_state]));
         }
 

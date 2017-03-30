@@ -55,19 +55,19 @@ function StateUnSelected(sender, id) {
 }
 exports.StateUnSelected = StateUnSelected;
 
-function LinkCreate(sender, from_id, to_id) {
+function TransitionCreate(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;
     this.to_id = to_id;
 }
-exports.LinkCreate = LinkCreate;
+exports.TransitionCreate = TransitionCreate;
 
-function LinkDestroy(sender, from_id, to_id) {
+function TransitionDestroy(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;
     this.to_id = to_id;
 }
-exports.LinkDestroy = LinkDestroy;
+exports.TransitionDestroy = TransitionDestroy;
 
 function Undo(sender, original_message) {
     this.sender = sender;

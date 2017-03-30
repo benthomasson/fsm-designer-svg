@@ -69,8 +69,8 @@ _Past.prototype.onMessage = function(controller, message) {
          'StateDestroy',
          'StateMove',
          'StateLabelEdit',
-         'LinkCreate',
-         'LinkDestroy'].indexOf(type) !== -1) {
+         'TransitionCreate',
+         'TransitionDestroy'].indexOf(type) !== -1) {
         controller.changeState(Present);
         controller.scope.history.splice(controller.scope.time_pointer);
         if (data.sender !== controller.scope.client_id) {
@@ -199,10 +199,10 @@ _Present.prototype.onMessage = function(controller, message) {
             controller.scope.onStateCreate(data);
         }
     }
-    if (type === 'LinkCreate') {
+    if (type === 'TransitionCreate') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onLinkCreate(data);
+            controller.scope.onTransitionCreate(data);
         }
     }
     if (type === 'StateMove') {

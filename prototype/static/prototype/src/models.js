@@ -44,15 +44,15 @@ State.prototype.toJSON = function () {
 
 };
 
-function Link(from_state, to_state) {
+function Transition(from_state, to_state) {
     this.from_state = from_state;
     this.to_state = to_state;
     this.selected = false;
     this.status = null;
 }
-exports.Link = Link;
+exports.Transition = Transition;
 
-Link.prototype.toJSON = function () {
+Transition.prototype.toJSON = function () {
     return {to_state: this.to_state.id,
             from_state: this.from_state.id};
 };

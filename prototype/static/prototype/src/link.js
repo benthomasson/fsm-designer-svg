@@ -66,13 +66,13 @@ exports.Selecting = Selecting;
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
     if ($event.key === 'l') {
-        controller.state.onNewLink(controller, $event);
+        controller.state.onNewTransition(controller, $event);
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
 };
 
-_Ready.prototype.onNewLink = function (controller) {
+_Ready.prototype.onNewTransition = function (controller) {
 
     controller.scope.clear_selections();
     controller.changeState(Selecting);
@@ -103,7 +103,7 @@ _Connecting.prototype.onMouseUp = function (controller) {
     var selected_state = controller.scope.select_states(false);
     if (selected_state !== null) {
         controller.scope.new_link.to_state = selected_state;
-        controller.scope.send_control_message(new messages.LinkCreate(controller.scope.client_id,
+        controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.client_id,
                                                                       controller.scope.new_link.from_state.id,
                                                                       controller.scope.new_link.to_state.id));
         controller.scope.new_link = null;
@@ -126,7 +126,7 @@ _Selecting.prototype.onMouseUp = function (controller) {
 
     var selected_state = controller.scope.select_states(false);
     if (selected_state !== null) {
-        controller.scope.new_link = new models.Link(selected_state, null, true);
+        controller.scope.new_link = new models.Transition(selected_state, null, true);
         controller.scope.links.push(controller.scope.new_link);
         controller.changeState(Connecting);
     }
