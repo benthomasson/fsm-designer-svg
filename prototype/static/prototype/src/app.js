@@ -275,14 +275,15 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.control_socket.send(data);
     };
 
-    $scope.onDeployButton = function (button) {
+    $scope.onDownloadButton = function (button) {
         console.log(button.name);
+        window.open("/prototype/fsm?finite_state_machine_id=" + $scope.finite_state_machine_id);
     };
 
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
+      new models.Button("Download", 10, 10, 60, 50, $scope.onButtonButton)
     ];
 
 
