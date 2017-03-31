@@ -8,7 +8,7 @@
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
       ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
       class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
-<g ng-if="!debug.hidden">
+<g ng-if="!debug.hidden && current_scale > 0.5">
 <g ng-attr-transform="translate({{transition.to_state.x}},
                                 {{transition.to_state.y}})
                       rotate({{transition.slope()}})
@@ -36,4 +36,13 @@
         r=10
         class="debug" ></circle>
 </g>
+</g>
+<g ng-attr-transform="translate({{transition.to_state.x}},
+                                {{transition.to_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{transition.to_state.size}}, 0)
+                      rotate(180)
+                      translate(-19, -9)
+                      ">
+<path d="M0,0 L0,18 L18,9 z" class="transition"/>
 </g>
