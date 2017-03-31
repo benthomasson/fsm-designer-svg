@@ -125,7 +125,6 @@ class _Persistence(object):
             d.name = state['name']
             d.x = state['x']
             d.y = state['y']
-            d.type = state['type']
             d.save()
             state_map[state['id']] = d
 
@@ -143,7 +142,6 @@ class _Persistence(object):
                                            defaults=state)
         d.x = state['x']
         d.y = state['y']
-        d.type = state['type']
         d.save()
 
     def onStateDestroy(self, state, finite_state_machine_id, client_id):
@@ -217,7 +215,6 @@ class _UndoPersistence(object):
 
     def onStateDestroy(self, state, finite_state_machine_id, client_id):
         inverted = state.copy()
-        inverted['type'] = state['previous_type']
         inverted['name'] = state['previous_name']
         inverted['x'] = state['previous_x']
         inverted['y'] = state['previous_y']

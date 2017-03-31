@@ -70,6 +70,10 @@ models:
     type: CharField
   - name: id
     type: IntegerField
+  - name: x
+    type: IntegerField
+  - name: y
+    type: IntegerField
   name: State
   x: 516
   y: 154
@@ -91,13 +95,11 @@ models:
   - len: 200
     name: label
     type: CharField
-  - name: id
-    type: IntegerField
   name: Transition
   x: 812
   y: 158
 modules: []
 view:
-  panX: 793.6208598670376
-  panY: 472.7802924279762
-  scaleXY: 0.4800000000000002
+  panX: -202.21247346629514
+  panY: -165.01732661964252
+  scaleXY: 1.6800000000000002

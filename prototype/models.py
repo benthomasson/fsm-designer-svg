@@ -41,6 +41,8 @@ class State(models.Model):
     finite_state_machine = models.ForeignKey('FiniteStateMachine',)
     name = models.CharField(max_length=200, )
     id = models.IntegerField()
+    x = models.IntegerField()
+    y = models.IntegerField()
 
     def __unicode__(self):
         return self.name
@@ -52,7 +54,6 @@ class Transition(models.Model):
     from_state = models.ForeignKey('State',  related_name='from_transition', )
     to_state = models.ForeignKey('State',  related_name='to_transition', )
     label = models.CharField(max_length=200, )
-    id = models.IntegerField()
 
     def __unicode__(self):
         return self.name
