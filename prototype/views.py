@@ -36,7 +36,7 @@ transform_state = partial(transform_dict, state_map)
 transform_transition = partial(transform_dict, transition_map)
 
 
-def fsm(request):
+def download(request):
     data = dict(states=[], transitions=[])
     form = FSMForm(request.GET)
     if form.is_valid():
@@ -60,3 +60,7 @@ def fsm(request):
         return response
     else:
         return HttpResponse(form.errors)
+
+
+def upload(request):
+    return HttpResponse("")

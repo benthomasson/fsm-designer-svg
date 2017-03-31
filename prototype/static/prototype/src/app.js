@@ -277,13 +277,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onDownloadButton = function (button) {
         console.log(button.name);
-        window.open("/prototype/fsm?finite_state_machine_id=" + $scope.finite_state_machine_id);
+        window.open("/prototype/download?finite_state_machine_id=" + $scope.finite_state_machine_id);
+    };
+
+    $scope.onUploadButton = function (button) {
+        console.log(button.name);
+        window.open("/prototype/upload", "_top");
     };
 
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Download", 10, 10, 60, 50, $scope.onButtonButton)
+      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton),
+      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton)
     ];
 
 

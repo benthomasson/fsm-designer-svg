@@ -5,5 +5,6 @@ from . import views
 app_name = 'prototype'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^fsm$', views.fsm, name='fsm'),
+    url(r'^download$', views.download, name='download'),
+    url(r'^upload$', views.upload, name='upload'),
 ]
