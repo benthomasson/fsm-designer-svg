@@ -150,6 +150,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var i = 0;
         var states = $scope.states;
         var last_selected_state = null;
+        var last_selected_transition = null;
 
         $scope.pressedX = $scope.mouseX;
         $scope.pressedY = $scope.mouseY;
@@ -181,11 +182,15 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                     $scope.transitions[i].selected = true;
                     if ($scope.selected_transitions.indexOf($scope.transitions[i]) === -1) {
                         $scope.selected_transitions.push($scope.transitions[i]);
+                        if (!multiple_selection) {
+                            break;
+                        }
                     }
                 }
             }
         }
-        return last_selected_state;
+        return {last_selected_state: last_selected_state,
+                last_selected_transition: last_selected_transition};
     };
 
     $scope.forget_time = function () {

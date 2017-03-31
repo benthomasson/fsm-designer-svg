@@ -77,9 +77,9 @@ exports.EditLabel = EditLabel;
 
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
-    var last_selected_state = controller.scope.select_states($event.shiftKey);
+    var last_selected = controller.scope.select_states($event.shiftKey);
 
-    if (last_selected_state !== null) {
+    if (last_selected.last_selected_state !== null) {
         controller.changeState(Selected1);
     } else {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
@@ -126,8 +126,8 @@ _Selected2.prototype.onMouseDown = function (controller, $event) {
 
     if (controller.scope.selected_states.length === 1) {
         var current_selected_state = controller.scope.selected_states[0];
-        var last_selected_state = controller.scope.select_states($event.shiftKey);
-        if (current_selected_state === last_selected_state) {
+        var last_selected = controller.scope.select_states($event.shiftKey);
+        if (current_selected_state === last_selected.last_selected_state) {
             controller.changeState(Selected3);
             return;
         }

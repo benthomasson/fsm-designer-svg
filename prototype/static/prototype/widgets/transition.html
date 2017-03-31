@@ -56,9 +56,11 @@
                       rotate(180)
                       translate(-19, -9)
                       ">
+<path transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" class="transition {{transition.selected && 'selected' || 'hidden'}}"/>
 <path d="M0,0 L0,18 L18,9 z" class="transition"/>
 </g>
-<g ng-attr-transform="translate({{transition.from_state.x}},
+<g ng-if="current_scale > 0.5"
+   ng-attr-transform="translate({{transition.from_state.x}},
                                 {{transition.from_state.y}})
                       rotate({{transition.slope()}})
                       translate({{-transition.length()/2}}, 0)
