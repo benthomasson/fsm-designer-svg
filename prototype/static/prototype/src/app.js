@@ -667,5 +667,9 @@ app.directive('quadrants', function() {
   return { restrict: 'A', templateUrl: 'widgets/quadrants.html' };
 });
 
+app.directive('download', function() {
+  return { restrict: 'A', templateUrl: 'widgets/download.svg' };
+});
+
 
 exports.app = app;
