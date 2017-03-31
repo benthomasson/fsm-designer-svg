@@ -19,7 +19,7 @@
                         cx="0"
                         cy="0"
                         ng-attr-r="{{50 + 2}}"
-                        ng-attr-class="{{device.selected || device.remote_selected ? device.selected && device.remote_selected ? 'selected-conflict' : device.selected ? 'selected' : 'remote-selected' : 'hidden'}}">
+                        ng-attr-class="{{state.selected || state.remote_selected ? state.selected && state.remote_selected ? 'selected-conflict' : state.selected ? 'selected' : 'remote-selected' : 'hidden'}}">
                     </circle>
                     <circle
                         cx="0"
@@ -27,11 +27,11 @@
                         ng-attr-r="{{50}}">
                     </circle>
                     <g ng-show="current_scale > 0.5">
-                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+                    <text ng-attr-class="{{state.selected && ! state.edit_label ? 'selected' : 'hidden'}}"
 						  filter="url(#selected)"
                           text-anchor="middle"
 						  x="0"
-						  y="75"> {{device.name}}</text>
-                    <text text-anchor="middle" x="0" y="75">{{device.name}}{{device.edit_label?'_':''}}</text>
+						  y="75"> {{state.name}}</text>
+                    <text text-anchor="middle" x="0" y="75">{{state.name}}{{state.edit_label?'_':''}}</text>
                     </g>
                     
