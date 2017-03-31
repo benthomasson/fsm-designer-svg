@@ -10,8 +10,8 @@
       class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
 <g ng-if="!debug.hidden && current_scale > 0.5">
 <line ng-if="transition.to_state !== null"
-      ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x}}"
-      ng-attr-y1="{{transition.perpendicular(scaledX, scaledY).y}}"
+      ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x2}}"
+      ng-attr-y1="{{transition.perpendicular(scaledX, scaledY).y2}}"
       ng-attr-x2="{{scaledX}}"
       ng-attr-y2="{{scaledY}}"
       ng-attr-class="debug" />

@@ -173,6 +173,18 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 }
             }
         }
+
+        // Do not select links if a state was selected
+        if (last_selected_state === null) {
+            for (i = $scope.transitions.length - 1; i >= 0; i--) {
+                if($scope.transitions[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                    $scope.transitions[i].selected = true;
+                    if ($scope.selected_transitions.indexOf($scope.transitions[i]) === -1) {
+                        $scope.selected_transitions.push($scope.transitions[i]);
+                    }
+                }
+            }
+        }
         return last_selected_state;
     };
 

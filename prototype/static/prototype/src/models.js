@@ -86,7 +86,13 @@ Transition.prototype.perpendicular = function (x, y) {
 
     var xi = (pintercept - intercept) / (slope - pslope);
     var yi = pslope * xi + pintercept;
-    return {x: xi, y: yi};
+    return {x1:x, y1:y, x2: xi, y2: yi};
+};
+
+Transition.prototype.is_selected = function (x, y) {
+
+    var line = this.perpendicular(x, y);
+    return Math.sqrt(Math.pow(line.x1-line.x2, 2) + Math.pow(line.y1-line.y2, 2)) < 10;
 };
 
 Transition.prototype.length = function () {
