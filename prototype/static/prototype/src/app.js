@@ -278,8 +278,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var state = new models.State(data.id,
                                        data.name,
                                        data.x,
-                                       data.y,
-                                       data.type);
+                                       data.y);
         $scope.state_id_seq = util.natural_numbers(data.id);
         $scope.states.push(state);
     };
@@ -532,8 +531,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             new_state = new models.State(state.id,
                                            state.name,
                                            state.x,
-                                           state.y,
-                                           state.type);
+                                           state.y);
             $scope.states.push(new_state);
             state_map[state.id] = new_state;
         }

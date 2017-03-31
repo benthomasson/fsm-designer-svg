@@ -107,8 +107,7 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
                                                              state.id,
                                                              state.x,
                                                              state.y,
-                                                             state.name,
-                                                             state.type));
+                                                             state.name));
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
@@ -160,8 +159,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
                                                                                  states[i].id,
                                                                                  states[i].x,
                                                                                  states[i].y,
-                                                                                 states[i].name,
-                                                                                 states[i].type));
+                                                                                 states[i].name));
             }
             for (j = 0; j < all_transitions.length; j++) {
                 if (all_transitions[j].to_state === states[i] ||

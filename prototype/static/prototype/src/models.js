@@ -2,14 +2,14 @@ var fsm = require('./fsm.js');
 var button = require('./button.js');
 var util = require('./util.js');
 
-function State(id, name, x, y, type) {
+function State(id, name, x, y) {
     this.id = id;
     this.name = name;
     this.x = x;
     this.y = y;
     this.height = 50;
     this.width = 50;
-    this.type = type;
+    this.type = 'state';
     this.selected = false;
     this.remote_selected = false;
     this.edit_label = false;
@@ -38,9 +38,7 @@ State.prototype.toJSON = function () {
     return {id: this.id,
             name: this.name,
             x: this.x,
-            y: this.y,
-            size: this.size,
-            type: this.type};
+            y: this.y};
 
 };
 

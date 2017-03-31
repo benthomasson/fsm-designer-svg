@@ -15,23 +15,21 @@ function StateMove(sender, id, x, y, previous_x, previous_y) {
 }
 exports.StateMove = StateMove;
 
-function StateCreate(sender, id, x, y, name, type) {
+function StateCreate(sender, id, x, y, name) {
     this.sender = sender;
     this.id = id;
     this.x = x;
     this.y = y;
     this.name = name;
-    this.type = type;
 }
 exports.StateCreate = StateCreate;
 
-function StateDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
+function StateDestroy(sender, id, previous_x, previous_y, previous_name) {
     this.sender = sender;
     this.id = id;
     this.previous_x = previous_x;
     this.previous_y = previous_y;
     this.previous_name = previous_name;
-    this.previous_type = previous_type;
 }
 exports.StateDestroy = StateDestroy;
 
