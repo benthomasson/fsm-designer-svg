@@ -9,6 +9,12 @@
       ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
       class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
 <g ng-if="!debug.hidden && current_scale > 0.5">
+<line ng-if="transition.to_state !== null"
+      ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x}}"
+      ng-attr-y1="{{transition.perpendicular(scaledX, scaledY).y}}"
+      ng-attr-x2="{{scaledX}}"
+      ng-attr-y2="{{scaledY}}"
+      ng-attr-class="debug" />
 <g ng-attr-transform="translate({{transition.to_state.x}},
                                 {{transition.to_state.y}})
                       rotate({{transition.slope()}})
@@ -17,6 +23,12 @@
         ng-attr-cy="0"
         r=10
         class="debug" ></circle>
+</g>
+<g ng-attr-transform="translate({{transition.to_state.x}},
+                                {{transition.to_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{transition.length()/2}}, 0)">
+<line x1="0" y1=-20  x2=0 y2=20 class="debug"/>
 </g>
 <g ng-attr-transform="translate({{transition.to_state.x}},
                                 {{transition.to_state.y}})
@@ -37,7 +49,7 @@
         class="debug" ></circle>
 </g>
 </g>
-<g ng-attr-transform="translate({{transition.to_state.x}},
+<g ng-if="transition.to_state !== null"  ng-attr-transform="translate({{transition.to_state.x}},
                                 {{transition.to_state.y}})
                       rotate({{transition.slope()}})
                       translate({{transition.to_state.size}}, 0)

@@ -63,6 +63,32 @@ Transition.prototype.slope = function () {
     return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 180;
 };
 
+Transition.prototype.pslope = function () {
+    var x1 = this.from_state.x;
+    var y1 = this.from_state.y;
+    var x2 = this.to_state.x;
+    var y2 = this.to_state.y;
+    var slope = (y2 - y1)/(x2 - x1);
+    //var intercept = - slope * x1;
+    var pslope = 1/slope;
+    return Math.atan(pslope)  * 180 / Math.PI + 180;
+};
+
+Transition.prototype.perpendicular = function (x, y) {
+    var x1 = this.from_state.x;
+    var y1 = this.from_state.y;
+    var x2 = this.to_state.x;
+    var y2 = this.to_state.y;
+    var slope = (y2 - y1)/(x2 - x1);
+    var intercept = y1 - slope * x1;
+    var pslope = -1/slope;
+    var pintercept = y - pslope * x;
+
+    var xi = (pintercept - intercept) / (slope - pslope);
+    var yi = pslope * xi + pintercept;
+    return {x: xi, y: yi};
+};
+
 Transition.prototype.length = function () {
     var x1 = this.from_state.x;
     var y1 = this.from_state.y;
