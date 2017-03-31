@@ -672,5 +672,9 @@ app.directive('download', function() {
   return { restrict: 'A', templateUrl: 'widgets/download.svg' };
 });
 
+app.directive('upload', function() {
+  return { restrict: 'A', templateUrl: 'widgets/upload.svg' };
+});
+
 
 exports.app = app;
