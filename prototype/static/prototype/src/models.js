@@ -14,7 +14,6 @@ function State(id, name, x, y) {
     this.selected = false;
     this.remote_selected = false;
     this.edit_label = false;
-    this.status = null;
     this.frame = 10;
 }
 exports.State = State;
@@ -43,11 +42,11 @@ State.prototype.toJSON = function () {
 
 };
 
-function Transition(from_state, to_state) {
+function Transition(from_state, to_state, label) {
     this.from_state = from_state;
     this.to_state = to_state;
     this.selected = false;
-    this.status = null;
+    this.label = label;
 }
 exports.Transition = Transition;
 

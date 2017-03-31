@@ -53,10 +53,11 @@ function StateUnSelected(sender, id) {
 }
 exports.StateUnSelected = StateUnSelected;
 
-function TransitionCreate(sender, from_id, to_id) {
+function TransitionCreate(sender, from_id, to_id, label) {
     this.sender = sender;
     this.from_id = from_id;
     this.to_id = to_id;
+    this.label = label;
 }
 exports.TransitionCreate = TransitionCreate;
 

@@ -46,3 +46,11 @@
                       ">
 <path d="M0,0 L0,18 L18,9 z" class="transition"/>
 </g>
+<g ng-attr-transform="translate({{transition.to_state.x}},
+                                {{transition.to_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{transition.length()/2}}, 0)
+                      translate(0, -5)
+                      ">
+<text>{{transition.label}}</text>
+</g>

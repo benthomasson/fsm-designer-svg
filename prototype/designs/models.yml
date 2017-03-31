@@ -77,7 +77,7 @@ models:
   name: State
   x: 516
   y: 154
-- display: name
+- display: label
   fields:
   - name: transition_id
     pk: true

@@ -38,11 +38,12 @@ def ws_connect(message):
     states = list(State.objects
                   .filter(finite_state_machine_id=finite_state_machine_id).values())
     transitions = [dict(from_state=x['from_state__id'],
-                        to_state=x['to_state__id'])
+                        to_state=x['to_state__id'],
+                        label=x['label'])
                    for x in list(Transition.objects
                                  .filter(Q(from_state__finite_state_machine_id=finite_state_machine_id) |
                                          Q(to_state__finite_state_machine_id=finite_state_machine_id))
-                                 .values('from_state__id', 'to_state__id'))]
+                                 .values('from_state__id', 'to_state__id', 'label'))]
     snapshot = dict(sender=0,
                     states=states,
                     transitions=transitions)

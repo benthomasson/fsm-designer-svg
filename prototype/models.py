@@ -56,4 +56,4 @@ class Transition(models.Model):
     label = models.CharField(max_length=200, )
 
     def __unicode__(self):
-        return self.name
+        return self.label

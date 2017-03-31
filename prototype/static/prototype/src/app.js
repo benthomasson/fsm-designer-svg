@@ -540,8 +540,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var transition = null;
         for (i = 0; i < data.transitions.length; i++) {
             transition = data.transitions[i];
+            console.log(transition);
             $scope.transitions.push(new models.Transition(state_map[transition.from_state],
-                                              state_map[transition.to_state]));
+                                              state_map[transition.to_state],
+                                              transition.label));
         }
 
         var diff_x;
