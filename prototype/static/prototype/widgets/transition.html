@@ -1,10 +1,39 @@
-                <line ng-attr-x1="{{transition.from_state.x}}"
-                      ng-attr-y1="{{transition.from_state.y}}"
-                      ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
-                      ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
-                      ng-attr-class="{{transition.selected && 'selected' || 'hidden'}}"/>
-                <line ng-attr-x1="{{transition.from_state.x}}"
-                      ng-attr-y1="{{transition.from_state.y}}"
-                      ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
-                      ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
-                      class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
+<line ng-attr-x1="{{transition.from_state.x}}"
+      ng-attr-y1="{{transition.from_state.y}}"
+      ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
+      ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
+      ng-attr-class="{{transition.selected && 'selected' || 'hidden'}}"/>
+<line ng-attr-x1="{{transition.from_state.x}}"
+      ng-attr-y1="{{transition.from_state.y}}"
+      ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
+      ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
+      class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
+<g ng-if="!debug.hidden">
+<g ng-attr-transform="translate({{transition.to_state.x}},
+                                {{transition.to_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{transition.length()/2}}, 0)">
+<circle ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+<g ng-attr-transform="translate({{transition.to_state.x}},
+                                {{transition.to_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{transition.to_state.size}}, 0)">
+<circle ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+<g ng-attr-transform="translate({{transition.from_state.x}},
+                                {{transition.from_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{-transition.from_state.size}}, 0)">
+<circle ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+</g>

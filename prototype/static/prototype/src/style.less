@@ -7,7 +7,7 @@
 @light-widget-detail: #ffffff;
 @dark-widget-detail: #707070;
 @widget-body: #D7D7D7;
-@transition: #D7D7D7;
+@transition: #707070;
 @debug-copynot: rgb(77,200,242);
 @button-body: #f6f6f6;
 @button-text: #707070;
@@ -37,6 +37,10 @@ svg text {
 }
 
 .debug text {
+    fill: @debug-copynot;
+}
+
+circle.debug {
     fill: @debug-copynot;
 }
 
@@ -108,7 +112,7 @@ svg line.debug {
 }
 
 .state line {
-    stroke: @light-widget-detail;
+    stroke: @dark-widget-detail;
     stroke-width: 20;
 }
 
