@@ -27,7 +27,7 @@
 		</defs>
          <g transform="scale(1.0)" id="frame_g">
             <g ng-repeat="transition in transitions">
-            <g transition></g>
+            <g fsm-transition></g>
             </g>
             <g ng-repeat="state in states"
                ng-attr-transform="translate({{state.x}},{{state.y}})"

@@ -104,8 +104,8 @@ _Connecting.prototype.onMouseUp = function (controller) {
     if (selected_state !== null) {
         controller.scope.new_transition.to_state = selected_state;
         controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.client_id,
-                                                                      controller.scope.new_transition.from_state.id,
-                                                                      controller.scope.new_transition.to_state.id));
+                                                                            controller.scope.new_transition.from_state.id,
+                                                                            controller.scope.new_transition.to_state.id));
         controller.scope.new_transition = null;
         controller.changeState(Connected);
     } else {

@@ -7,6 +7,7 @@ function FSMController (scope, initial_state, next_controller) {
 exports.FSMController = FSMController;
 
 FSMController.prototype.changeState = function (state) {
+    console.log(state);
     if(this.state !== null) {
         this.state.end(this);
     }

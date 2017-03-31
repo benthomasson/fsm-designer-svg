@@ -13,6 +13,8 @@ var messages = require('./messages.js');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
+  window.scope = $scope;
+
   $scope.finite_state_machine_id = $location.search().finite_state_machine_id || 0;
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?finite_state_machine_id=" + $scope.finite_state_machine_id,
@@ -460,9 +462,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onFiniteStateMachine = function(data) {
         $scope.finite_state_machine_id = data.finite_state_machine_id;
-        $scope.panX = data.panX;
-        $scope.panY = data.panX;
-        $scope.current_scale = data.scale;
         $location.search({finite_state_machine_id: data.finite_state_machine_id});
     };
 
@@ -643,7 +642,7 @@ app.directive('state', function() {
   return { restrict: 'A', templateUrl: 'widgets/state.html' };
 });
 
-app.directive('transition', function() {
+app.directive('fsmTransition', function() {
   return { restrict: 'A', templateUrl: 'widgets/transition.html' };
 });
 
