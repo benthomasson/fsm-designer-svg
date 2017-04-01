@@ -337,7 +337,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.create_transition = function(data) {
         var i = 0;
-        var new_transition = new models.Transition(null, null);
+        var new_transition = new models.Transition(null, null, null);
+        new_transition.id = data.id;
+        $scope.transition_id_seq = util.natural_numbers(data.id);
         for (i = 0; i < $scope.states.length; i++){
             if ($scope.states[i].id === data.from_id) {
                 new_transition.from_state = $scope.states[i];
@@ -575,7 +577,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         for (i = 0; i < data.transitions.length; i++) {
             transition = data.transitions[i];
             console.log(transition);
-            $scope.transitions.push(new models.Transition(state_map[transition.from_state],
+            $scope.transitions.push(new models.Transition(transition.id,
+                                              state_map[transition.from_state],
                                               state_map[transition.to_state],
                                               transition.label));
         }

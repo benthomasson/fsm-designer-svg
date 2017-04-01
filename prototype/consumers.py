@@ -175,7 +175,8 @@ class _Persistence(object):
                          .filter(finite_state_machine_id=finite_state_machine_id,
                                  id__in=[transition['from_id'], transition['to_id']])
                          .values_list('id', 'pk'))
-        Transition.objects.get_or_create(from_state_id=state_map[transition['from_id']],
+        Transition.objects.get_or_create(id=transition['id'],
+                                         from_state_id=state_map[transition['from_id']],
                                          to_state_id=state_map[transition['to_id']])
 
     def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
@@ -183,7 +184,8 @@ class _Persistence(object):
                          .filter(finite_state_machine_id=finite_state_machine_id,
                                  id__in=[transition['from_id'], transition['to_id']])
                          .values_list('id', 'pk'))
-        Transition.objects.filter(from_state_id=state_map[transition['from_id']],
+        Transition.objects.filter(id=transition['id'],
+                                  from_state_id=state_map[transition['from_id']],
                                   to_state_id=state_map[transition['to_id']]).delete()
 
     def onStateSelected(self, message_value, finite_state_machine_id, client_id):
