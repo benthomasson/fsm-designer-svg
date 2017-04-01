@@ -54,7 +54,7 @@ admin.site.register(State, StateAdmin)
 
 
 class TransitionAdmin(admin.ModelAdmin):
-    fields = ('from_state', 'to_state', 'label',)
+    fields = ('from_state', 'to_state', 'label', 'id',)
     raw_id_fields = ('from_state', 'to_state',)
 
 

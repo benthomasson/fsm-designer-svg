@@ -95,11 +95,13 @@ models:
   - len: 200
     name: label
     type: CharField
+  - name: id
+    type: IntegerField
   name: Transition
   x: 812
   y: 158
 modules: []
 view:
-  panX: -202.21247346629514
-  panY: -165.01732661964252
+  panX: -333.16485441867604
+  panY: -107.8744694767854
   scaleXY: 1.6800000000000002
