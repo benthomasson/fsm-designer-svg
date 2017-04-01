@@ -15,31 +15,32 @@ function StateMove(sender, id, x, y, previous_x, previous_y) {
 }
 exports.StateMove = StateMove;
 
-function StateCreate(sender, id, x, y, name) {
+function StateCreate(sender, id, x, y, label) {
     this.sender = sender;
     this.id = id;
     this.x = x;
     this.y = y;
-    this.name = name;
+    this.label = label;
 }
 exports.StateCreate = StateCreate;
 
-function StateDestroy(sender, id, previous_x, previous_y, previous_name) {
+function StateDestroy(sender, id, previous_x, previous_y, previous_label) {
     this.sender = sender;
     this.id = id;
     this.previous_x = previous_x;
     this.previous_y = previous_y;
-    this.previous_name = previous_name;
+    this.previous_label = previous_label;
 }
 exports.StateDestroy = StateDestroy;
 
-function StateLabelEdit(sender, id, name, previous_name) {
+function StateLabelEdit(sender, id, label, previous_label) {
     this.sender = sender;
     this.id = id;
-    this.name = name;
-    this.previous_name = previous_name;
+    this.label = label;
+    this.previous_label = previous_label;
 }
 exports.StateLabelEdit = StateLabelEdit;
+
 
 function StateSelected(sender, id) {
     this.sender = sender;
@@ -67,6 +68,26 @@ function TransitionDestroy(sender, from_id, to_id) {
     this.to_id = to_id;
 }
 exports.TransitionDestroy = TransitionDestroy;
+
+function TransitionLabelEdit(sender, id, label, previous_label) {
+    this.sender = sender;
+    this.id = id;
+    this.label = label;
+    this.previous_label = previous_label;
+}
+exports.TransitionLabelEdit = TransitionLabelEdit;
+
+function TransitionSelected(sender, id) {
+    this.sender = sender;
+    this.id = id;
+}
+exports.TransitionSelected = TransitionSelected;
+
+function TransitionUnSelected(sender, id) {
+    this.sender = sender;
+    this.id = id;
+}
+exports.TransitionUnSelected = TransitionUnSelected;
 
 function Undo(sender, original_message) {
     this.sender = sender;

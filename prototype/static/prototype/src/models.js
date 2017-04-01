@@ -2,9 +2,9 @@ var fsm = require('./fsm.js');
 var button = require('./button.js');
 var util = require('./util.js');
 
-function State(id, name, x, y) {
+function State(id, label, x, y) {
     this.id = id;
-    this.name = name;
+    this.label = label;
     this.x = x;
     this.y = y;
     this.height = 50;
@@ -36,13 +36,14 @@ State.prototype.is_selected = function (x, y) {
 
 State.prototype.toJSON = function () {
     return {id: this.id,
-            name: this.name,
+            label: this.label,
             x: this.x,
             y: this.y};
 
 };
 
-function Transition(from_state, to_state, label) {
+function Transition(id, from_state, to_state, label) {
+    this.id = id;
     this.from_state = from_state;
     this.to_state = to_state;
     this.selected = false;
@@ -103,8 +104,8 @@ Transition.prototype.length = function () {
     return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 };
 
-function Button(name, x, y, width, height, callback) {
-    this.name = name;
+function Button(label, x, y, width, height, callback) {
+    this.label = label;
     this.x = x;
     this.y = y;
     this.width = width;

@@ -67,5 +67,10 @@
                       rotate(180)
                       translate(0, -5)
                       ">
-<text text-anchor="middle" x=0 y=0>{{transition.label}}</text>
+<text ng-attr-class="{{transition.selected && ! transition.edit_label ? 'selected' : 'hidden'}}"
+      filter="url(#selected)"
+      text-anchor="middle"
+      x="0"
+      y="0"> {{transition.label}}</text>
+<text text-anchor="middle" x="0" y="0">{{transition.label}}{{transition.edit_label?'_':''}}</text>
 </g>

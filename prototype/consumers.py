@@ -4,9 +4,18 @@ from channels.sessions import channel_session
 from prototype.models import FiniteStateMachine, State, Transition, Client, History, MessageType
 import urlparse
 from django.db.models import Q
+from . views import transform_state, transform_dict
 
 import json
 # Connected to websocket.connect
+from functools import partial
+
+transition_map = dict(from_state__id="from_state",
+                      to_state__id="to_state",
+                      label="label")
+
+
+transform_transition = partial(transform_dict, transition_map)
 
 
 @channel_session
@@ -37,13 +46,12 @@ def ws_connect(message):
     message.reply_channel.send({"text": json.dumps(["FiniteStateMachine", fsm_data])})
     states = list(State.objects
                   .filter(finite_state_machine_id=finite_state_machine_id).values())
-    transitions = [dict(from_state=x['from_state__id'],
-                        to_state=x['to_state__id'],
-                        label=x['label'])
-                   for x in list(Transition.objects
+    states = map(transform_state, states)
+    transitions = list(Transition.objects
                                  .filter(Q(from_state__finite_state_machine_id=finite_state_machine_id) |
                                          Q(to_state__finite_state_machine_id=finite_state_machine_id))
-                                 .values('from_state__id', 'to_state__id', 'label'))]
+                                 .values('from_state__id', 'to_state__id', 'label'))
+    transitions = map(transform_transition, transitions)
     snapshot = dict(sender=0,
                     states=states,
                     transitions=transitions)
@@ -138,6 +146,8 @@ class _Persistence(object):
             del state['sender']
         if 'message_id' in state:
             del state['message_id']
+        state['name'] = state['label']
+        del state['label']
         d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
                                            id=state['id'],
                                            defaults=state)
@@ -154,7 +164,7 @@ class _Persistence(object):
 
     def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
         State.objects.filter(finite_state_machine_id=finite_state_machine_id,
-                             id=state['id']).update(name=state['name'])
+                             id=state['id']).update(name=state['label'])
 
     def onTransitionCreate(self, transition, finite_state_machine_id, client_id):
         if 'sender' in transition:
@@ -216,7 +226,7 @@ class _UndoPersistence(object):
 
     def onStateDestroy(self, state, finite_state_machine_id, client_id):
         inverted = state.copy()
-        inverted['name'] = state['previous_name']
+        inverted['label'] = state['previous_label']
         inverted['x'] = state['previous_x']
         inverted['y'] = state['previous_y']
         persistence.onStateCreate(inverted, finite_state_machine_id, client_id)
@@ -229,7 +239,7 @@ class _UndoPersistence(object):
 
     def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
         inverted = state.copy()
-        inverted['name'] = state['previous_name']
+        inverted['label'] = state['previous_label']
         persistence.onStateLabelEdit(inverted, finite_state_machine_id, client_id)
 
     def onTransitionCreate(self, transition, finite_state_machine_id, client_id):

@@ -100,9 +100,9 @@ _Connecting.prototype.onMouseDown = function () {
 
 _Connecting.prototype.onMouseUp = function (controller) {
 
-    var selected_state = controller.scope.select_states(false);
-    if (selected_state !== null) {
-        controller.scope.new_transition.to_state = selected_state;
+    var selected = controller.scope.select_items(false);
+    if (selected.last_selected_state !== null) {
+        controller.scope.new_transition.to_state = selected.last_selected_state;
         controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.client_id,
                                                                             controller.scope.new_transition.from_state.id,
                                                                             controller.scope.new_transition.to_state.id),
@@ -125,9 +125,9 @@ _Selecting.prototype.onMouseDown = function () {
 
 _Selecting.prototype.onMouseUp = function (controller) {
 
-    var selected_state = controller.scope.select_states(false);
-    if (selected_state !== null) {
-        controller.scope.new_transition = new models.Transition(selected_state, null, '');
+    var selected = controller.scope.select_items(false);
+    if (selected.last_selected_state !== null) {
+        controller.scope.new_transition = new models.Transition(controller.scope.transition_id_seq(), selected.last_selected_state, null, '');
         controller.scope.transitions.push(controller.scope.new_transition);
         controller.changeState(Connecting);
     }

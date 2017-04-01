@@ -77,9 +77,11 @@ exports.EditLabel = EditLabel;
 
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
-    var last_selected = controller.scope.select_states($event.shiftKey);
+    var last_selected = controller.scope.select_items($event.shiftKey);
 
     if (last_selected.last_selected_state !== null) {
+        controller.changeState(Selected1);
+    } else if (last_selected.last_selected_transition !== null) {
         controller.changeState(Selected1);
     } else {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
@@ -107,7 +109,7 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
                                                              state.id,
                                                              state.x,
                                                              state.y,
-                                                             state.name));
+                                                             state.label));
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
@@ -124,10 +126,21 @@ _Start.prototype.start.transitions = ['Ready'];
 
 _Selected2.prototype.onMouseDown = function (controller, $event) {
 
+    var last_selected = null;
+
     if (controller.scope.selected_states.length === 1) {
         var current_selected_state = controller.scope.selected_states[0];
-        var last_selected = controller.scope.select_states($event.shiftKey);
+        last_selected = controller.scope.select_items($event.shiftKey);
         if (current_selected_state === last_selected.last_selected_state) {
+            controller.changeState(Selected3);
+            return;
+        }
+    }
+
+    if (controller.scope.selected_transitions.length === 1) {
+        var current_selected_transition = controller.scope.selected_transitions[0];
+        last_selected = controller.scope.select_items($event.shiftKey);
+        if (current_selected_transition === last_selected.last_selected_transition) {
             controller.changeState(Selected3);
             return;
         }
@@ -159,7 +172,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
                                                                                  states[i].id,
                                                                                  states[i].x,
                                                                                  states[i].y,
-                                                                                 states[i].name));
+                                                                                 states[i].label));
             }
             for (j = 0; j < all_transitions.length; j++) {
                 if (all_transitions[j].to_state === states[i] ||
@@ -239,11 +252,11 @@ _Selected3.prototype.onMouseMove.transitions = ['Move'];
 
 
 _EditLabel.prototype.start = function (controller) {
-    controller.scope.selected_states[0].edit_label = true;
+    controller.scope.selected_items[0].edit_label = true;
 };
 
 _EditLabel.prototype.end = function (controller) {
-    controller.scope.selected_states[0].edit_label = false;
+    controller.scope.selected_items[0].edit_label = false;
 };
 
 _EditLabel.prototype.onMouseDown = function (controller, $event) {
@@ -258,20 +271,28 @@ _EditLabel.prototype.onMouseDown.transitions = ['Ready'];
 _EditLabel.prototype.onKeyDown = function (controller, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-	var state = controller.scope.selected_states[0];
-    var previous_name = state.name;
+	var item = controller.scope.selected_items[0];
+    var previous_label = item.label;
 	if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
-		state.name = state.name.slice(0, -1);
+		item.label = item.label.slice(0, -1);
 	} else if ($event.keyCode >= 48 && $event.keyCode <=90) { //Alphanumeric
-        state.name += $event.key;
+        item.label += $event.key;
 	} else if ($event.keyCode >= 186 && $event.keyCode <=222) { //Punctuation
-        state.name += $event.key;
+        item.label += $event.key;
 	} else if ($event.keyCode === 13) { //Enter
         controller.changeState(Selected2);
     }
-    controller.scope.send_control_message(new messages.StateLabelEdit(controller.scope.client_id,
-                                                                       state.id,
-                                                                       state.name,
-                                                                       previous_name));
+    if (item.constructor.name === "State") {
+        controller.scope.send_control_message(new messages.StateLabelEdit(controller.scope.client_id,
+                                                                           item.id,
+                                                                           item.label,
+                                                                           previous_label));
+    }
+    if (item.constructor.name === "Transition") {
+        controller.scope.send_control_message(new messages.TransitionLabelEdit(controller.scope.client_id,
+                                                                           item.id,
+                                                                           item.label,
+                                                                           previous_label));
+    }
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];

@@ -41,6 +41,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.pressedScaledY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
+  $scope.selected_items = [];
   $scope.selected_states = [];
   $scope.selected_transitions = [];
   $scope.new_transition = null;
@@ -62,6 +63,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                   'height': window.innerHeight};
   $scope.state_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
+  $scope.transition_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
 
@@ -132,6 +134,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var i = 0;
         var states = $scope.states;
         var transitions = $scope.transitions;
+        $scope.selected_items = [];
         $scope.selected_states = [];
         $scope.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
@@ -145,7 +148,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.select_states = function (multiple_selection) {
+    $scope.select_items = function (multiple_selection) {
 
         var i = 0;
         var states = $scope.states;
@@ -166,6 +169,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 states[i].selected = true;
                 $scope.send_control_message(new messages.StateSelected($scope.client_id, states[i].id));
                 last_selected_state = states[i];
+                if ($scope.selected_items.indexOf(states[i]) === -1) {
+                    $scope.selected_items.push(states[i]);
+                }
                 if ($scope.selected_states.indexOf(states[i]) === -1) {
                     $scope.selected_states.push(states[i]);
                 }
@@ -180,6 +186,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             for (i = $scope.transitions.length - 1; i >= 0; i--) {
                 if($scope.transitions[i].is_selected($scope.scaledX, $scope.scaledY)) {
                     $scope.transitions[i].selected = true;
+                    last_selected_transition = $scope.transitions[i];
+                    if ($scope.selected_items.indexOf($scope.transitions[i]) === -1) {
+                        $scope.selected_items.push($scope.transitions[i]);
+                    }
                     if ($scope.selected_transitions.indexOf($scope.transitions[i]) === -1) {
                         $scope.selected_transitions.push($scope.transitions[i]);
                         if (!multiple_selection) {
@@ -276,12 +286,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.onDownloadButton = function (button) {
-        console.log(button.name);
+        console.log(button.label);
         window.open("/prototype/download?finite_state_machine_id=" + $scope.finite_state_machine_id);
     };
 
     $scope.onUploadButton = function (button) {
-        console.log(button.name);
+        console.log(button.label);
         window.open("/prototype/upload", "_top");
     };
 
@@ -300,9 +310,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.create_state = function(data) {
         var state = new models.State(data.id,
-                                       data.name,
-                                       data.x,
-                                       data.y);
+                                     data.label,
+                                     data.x,
+                                     data.y);
         $scope.state_id_seq = util.natural_numbers(data.id);
         $scope.states.push(state);
     };
@@ -315,7 +325,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var i = 0;
         for (i = 0; i < $scope.states.length; i++) {
             if ($scope.states[i].id === data.id) {
-                $scope.states[i].name = data.name;
+                $scope.states[i].label = data.label;
                 break;
             }
         }
@@ -459,14 +469,14 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                                       data.id,
                                                       data.previous_x,
                                                       data.previous_y,
-                                                      data.previous_name,
+                                                      data.previous_label,
                                                       data.previous_type);
             $scope.create_state(inverted_data);
         }
 
         if (type === "StateLabelEdit") {
             inverted_data = angular.copy(data);
-            inverted_data.name = data.previous_name;
+            inverted_data.label = data.previous_label;
             $scope.edit_state_label(inverted_data);
         }
 
@@ -553,7 +563,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 max_y = state.y;
             }
             new_state = new models.State(state.id,
-                                           state.name,
+                                           state.label,
                                            state.x,
                                            state.y);
             $scope.states.push(new_state);
