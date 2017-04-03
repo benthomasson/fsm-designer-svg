@@ -1,0 +1,5 @@
+<ul>
+    {%for fsm in fsms%}
+    <li><a href="/static/prototype/index.html#!?finite_state_machine_id={{fsm.pk}}">{{fsm.pk}} {{fsm.name}}</a></li>
+    {%endfor%}
+</ul>

@@ -20,7 +20,7 @@ class UploadFileForm(forms.Form):
 
 
 def index(request):
-    return HttpResponse("")
+    return render(request, "prototype/index.html", dict(fsms=FiniteStateMachine.objects.all().order_by('-pk')))
 
 
 state_map = dict(x='x',
