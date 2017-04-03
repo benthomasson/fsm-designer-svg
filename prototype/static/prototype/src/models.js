@@ -58,6 +58,7 @@ Transition.prototype.toJSON = function () {
 };
 
 Transition.prototype.slope = function () {
+    //Return the slope in degrees for this transition.
     var x1 = this.from_state.x;
     var y1 = this.from_state.y;
     var x2 = this.to_state.x;
@@ -66,6 +67,8 @@ Transition.prototype.slope = function () {
 };
 
 Transition.prototype.pslope = function () {
+    //Return the slope of a perpendicular line to this
+    //transition
     var x1 = this.from_state.x;
     var y1 = this.from_state.y;
     var x2 = this.to_state.x;
@@ -76,7 +79,45 @@ Transition.prototype.pslope = function () {
     return Math.atan(pslope)  * 180 / Math.PI + 180;
 };
 
+function pDistance(x, y, x1, y1, x2, y2) {
+  //Code from http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+  //Joshua
+
+  var A = x - x1;
+  var B = y - y1;
+  var C = x2 - x1;
+  var D = y2 - y1;
+
+  var dot = A * C + B * D;
+  var len_sq = C * C + D * D;
+  var param = -1;
+  if (len_sq !== 0) {
+	  //in case of 0 length line
+      param = dot / len_sq;
+  }
+
+  var xx, yy;
+
+  if (param < 0) {
+    xx = x1;
+    yy = y1;
+  }
+  else if (param > 1) {
+    xx = x2;
+    yy = y2;
+  }
+  else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  }
+
+  var dx = x - xx;
+  var dy = y - yy;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 Transition.prototype.perpendicular = function (x, y) {
+    //Find the perpendicular line through x, y to this transition.
     var x1 = this.from_state.x;
     var y1 = this.from_state.y;
     var x2 = this.to_state.x;
@@ -92,12 +133,14 @@ Transition.prototype.perpendicular = function (x, y) {
 };
 
 Transition.prototype.is_selected = function (x, y) {
-
-    var line = this.perpendicular(x, y);
-    return Math.sqrt(Math.pow(line.x1-line.x2, 2) + Math.pow(line.y1-line.y2, 2)) < 10;
+    // Is the distance to the mouse location less than 10
+    // from the shortest line to the transition?
+	console.log(pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y));
+	return pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y) < 10;
 };
 
 Transition.prototype.length = function () {
+    //Return the length of this transition.
     var x1 = this.from_state.x;
     var y1 = this.from_state.y;
     var x2 = this.to_state.x;
