@@ -47,6 +47,7 @@ function Transition(id, from_state, to_state, label) {
     this.from_state = from_state;
     this.to_state = to_state;
     this.selected = false;
+    this.remote_selected = false;
     this.label = label;
 }
 exports.Transition = Transition;

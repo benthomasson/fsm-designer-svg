@@ -2,7 +2,9 @@
       ng-attr-y1="{{transition.from_state.y}}"
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
       ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
-      ng-attr-class="{{transition.selected && 'selected' || 'hidden'}}"/>
+      ng-attr-class="{{transition.selected || transition.remote_selected ?
+                       transition.selected && transition.remote_selected ? 'selected-conflict' :
+                       transition.selected ? 'selected' : 'remote-selected' : 'hidden'}}"/>
 <line ng-attr-x1="{{transition.from_state.x}}"
       ng-attr-y1="{{transition.from_state.y}}"
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"

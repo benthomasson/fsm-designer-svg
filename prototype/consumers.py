@@ -65,7 +65,12 @@ def ws_connect(message):
                     states=states,
                     transitions=transitions)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
-    history_message_ignore_types = ['StateSelected', 'StateUnSelected', 'Undo', 'Redo']
+    history_message_ignore_types = ['StateSelected',
+                                    'StateUnSelected',
+                                    'TransitionSelected',
+                                    'TransitionUnSelected',
+                                    'Undo',
+                                    'Redo']
     history = list(History.objects
                           .filter(finite_state_machine_id=finite_state_machine_id)
                           .exclude(message_type__name__in=history_message_ignore_types)
@@ -198,6 +203,14 @@ class _Persistence(object):
 
     def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
         'Ignore StateSelected messages'
+        pass
+
+    def onTransitionSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore TransitionSelected messages'
+        pass
+
+    def onTransitionUnSelected(self, message_value, finite_state_machine_id, client_id):
+        'Ignore TransitionSelected messages'
         pass
 
     def onUndo(self, message_value, finite_state_machine_id, client_id):

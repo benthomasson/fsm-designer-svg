@@ -145,6 +145,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
         for (i = 0; i < transitions.length; i++) {
             transitions[i].selected = false;
+            $scope.send_control_message(new messages.TransitionUnSelected($scope.client_id, transitions[i].id));
         }
     };
 
@@ -186,6 +187,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             for (i = $scope.transitions.length - 1; i >= 0; i--) {
                 if($scope.transitions[i].is_selected($scope.scaledX, $scope.scaledY)) {
                     $scope.transitions[i].selected = true;
+                    $scope.send_control_message(new messages.TransitionSelected($scope.client_id, $scope.transitions[i].id));
                     last_selected_transition = $scope.transitions[i];
                     if ($scope.selected_items.indexOf($scope.transitions[i]) === -1) {
                         $scope.selected_items.push($scope.transitions[i]);
@@ -372,6 +374,16 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
+    $scope.onTransitionLabelEdit = function(data) {
+        var i = 0;
+        for (i = 0; i < $scope.transitions.length; i++) {
+            if ($scope.transitions[i].id === data.id) {
+                $scope.transitions[i].label = data.label;
+                break;
+            }
+        }
+    };
+
     $scope.onStateMove = function(data) {
         $scope.move_states(data);
     };
@@ -498,6 +510,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.onFiniteStateMachine = function(data) {
         $scope.finite_state_machine_id = data.finite_state_machine_id;
         $location.search({finite_state_machine_id: data.finite_state_machine_id});
+    };
+
+    $scope.onTransitionSelected = function(data) {
+        console.log('onTransitionSelected');
+        var i = 0;
+        for (i = 0; i < $scope.transitions.length; i++) {
+            if ($scope.transitions[i].id === data.id) {
+                $scope.transitions[i].remote_selected = true;
+                console.log($scope.transitions[i].remote_selected);
+            }
+        }
+    };
+
+    $scope.onTransitionUnSelected = function(data) {
+        console.log('onTransitionSelected');
+        var i = 0;
+        for (i = 0; i < $scope.transitions.length; i++) {
+            if ($scope.transitions[i].id === data.id) {
+                $scope.transitions[i].remote_selected = false;
+                console.log($scope.transitions[i].remote_selected);
+            }
+        }
     };
 
     $scope.onStateSelected = function(data) {

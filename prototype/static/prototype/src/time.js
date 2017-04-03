@@ -69,6 +69,7 @@ _Past.prototype.onMessage = function(controller, message) {
          'StateDestroy',
          'StateMove',
          'StateLabelEdit',
+         'TransitionLabelEdit',
          'TransitionCreate',
          'TransitionDestroy'].indexOf(type) !== -1) {
         controller.changeState(Present);
@@ -77,6 +78,17 @@ _Past.prototype.onMessage = function(controller, message) {
             controller.state.onMessage(controller, message);
         } else {
             controller.scope.history.push(message.data);
+        }
+    }
+
+    if (type === 'TransitionSelected') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onTransitionSelected(data);
+        }
+    }
+    if (type === 'TransitionUnSelected') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onTransitionUnSelected(data);
         }
     }
 
@@ -221,6 +233,22 @@ _Present.prototype.onMessage = function(controller, message) {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
             controller.scope.onStateLabelEdit(data);
+        }
+    }
+    if (type === 'TransitionLabelEdit') {
+        controller.scope.history.push(message.data);
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onTransitionLabelEdit(data);
+        }
+    }
+    if (type === 'TransitionSelected') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onTransitionSelected(data);
+        }
+    }
+    if (type === 'TransitionUnSelected') {
+        if (data.sender !== controller.scope.client_id) {
+            controller.scope.onTransitionUnSelected(data);
         }
     }
     if (type === 'StateSelected') {
