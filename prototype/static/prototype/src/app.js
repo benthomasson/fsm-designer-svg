@@ -66,6 +66,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.transition_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
+  $scope.client_messages = {};
+  $scope.out_of_order_messages = {};
 
 
   $scope.states = [

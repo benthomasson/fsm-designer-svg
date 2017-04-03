@@ -205,6 +205,47 @@ _Present.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
+
+    //Fix out of order messages
+    console.log(["RECV", data.sender, data.message_id]);
+    if (typeof(controller.scope.client_messages[data.sender]) === "undefined") {
+        controller.scope.client_messages[data.sender] = data.message_id;
+    }
+
+    if (typeof(controller.scope.out_of_order_messages[data.sender]) === "undefined") {
+        controller.scope.out_of_order_messages[data.sender] = [];
+    }
+
+    if (controller.scope.out_of_order_messages[data.sender].length > 0) {
+        console.log(["Handling oom", data.sender]);
+
+        var oom = controller.scope.out_of_order_messages[data.sender].slice();
+        controller.scope.out_of_order_messages[data.sender] = [];
+
+        var i = 0;
+        for (i = 0; i < oom.length; i++) {
+            console.log(["Check", oom[i][0], oom[i][1]]);
+            if (oom[i][0] < data.message_id) {
+                console.log(["Resend", oom[i][0], oom[i][1]]);
+                this.onMessage(controller, oom[i][1]);
+            } else {
+                controller.scope.out_of_order_messages[data.sender].push(oom[i]);
+            }
+        }
+    }
+
+    if (controller.scope.client_messages[data.sender] < data.message_id &&
+        controller.scope.client_messages[data.sender] + 1 !== data.message_id) {
+        console.log(["Missing message", controller.scope.client_messages[data.sender], data.message_id]);
+        controller.scope.out_of_order_messages[data.sender].push([data.message_id, message]);
+        return;
+    } else if (controller.scope.client_messages[data.sender] > data.message_id) {
+        console.log(["Out of order message", controller.scope.client_messages[data.sender], data.message_id]);
+    }
+    controller.scope.client_messages[data.sender] = data.message_id;
+    //End fix out of order messages
+    console.log(["PROCESS", data.sender, data.message_id]);
+
     if (type === 'StateCreate') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
