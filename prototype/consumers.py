@@ -10,12 +10,21 @@ import json
 # Connected to websocket.connect
 from functools import partial
 
+
 transition_map = dict(from_state__id="from_state",
                       to_state__id="to_state",
-                      label="label")
+                      label="label",
+                      id='id')
+
+
+state_map_in = dict(x='x',
+                    y='y',
+                    label='name',
+                    id='id')
 
 
 transform_transition = partial(transform_dict, transition_map)
+transform_state_in = partial(transform_dict, state_map_in)
 
 
 @channel_session
@@ -50,7 +59,7 @@ def ws_connect(message):
     transitions = list(Transition.objects
                                  .filter(Q(from_state__finite_state_machine_id=finite_state_machine_id) |
                                          Q(to_state__finite_state_machine_id=finite_state_machine_id))
-                                 .values('from_state__id', 'to_state__id', 'label'))
+                                 .values('from_state__id', 'to_state__id', 'label', 'id'))
     transitions = map(transform_transition, transitions)
     snapshot = dict(sender=0,
                     states=states,
@@ -122,12 +131,7 @@ class _Persistence(object):
     def onSnapshot(self, snapshot, finite_state_machine_id, client_id):
         state_map = dict()
         for state in snapshot['states']:
-            if 'size' in state:
-                del state['size']
-            if 'height' in state:
-                del state['height']
-            if 'width' in state:
-                del state['width']
+            state = transform_state_in(state)
             d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
                                                id=state['id'],
                                                defaults=state)
@@ -142,12 +146,7 @@ class _Persistence(object):
                                              to_state=state_map[transition['to_state']])
 
     def onStateCreate(self, state, finite_state_machine_id, client_id):
-        if 'sender' in state:
-            del state['sender']
-        if 'message_id' in state:
-            del state['message_id']
-        state['name'] = state['label']
-        del state['label']
+        state = transform_state_in(state)
         d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
                                            id=state['id'],
                                            defaults=state)
@@ -178,6 +177,11 @@ class _Persistence(object):
         Transition.objects.get_or_create(id=transition['id'],
                                          from_state_id=state_map[transition['from_id']],
                                          to_state_id=state_map[transition['to_id']])
+
+    def onTransitionLabelEdit(self, transition, finite_state_machine_id, client_id):
+        print transition
+        Transition.objects.filter(from_state__finite_state_machine_id=finite_state_machine_id,
+                                  id=transition['id']).update(label=transition['label'])
 
     def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
         state_map = dict(State.objects

@@ -541,6 +541,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var state = null;
         var new_state = null;
         var max_state_id = null;
+        var max_transition_id = null;
         var min_x = null;
         var min_y = null;
         var max_x = null;
@@ -564,23 +565,29 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             if (max_y === null || state.y > max_y) {
                 max_y = state.y;
             }
-            new_state = new models.State(state.id,
-                                           state.label,
-                                           state.x,
-                                           state.y);
-            $scope.states.push(new_state);
-            state_map[state.id] = new_state;
+            if (typeof(state_map[state.id]) === "undefined") {
+                new_state = new models.State(state.id,
+                                               state.label,
+                                               state.x,
+                                               state.y);
+                $scope.states.push(new_state);
+                state_map[state.id] = new_state;
+            }
         }
+        window.state_map = state_map;
 
         //Build the transitions
         var transition = null;
         for (i = 0; i < data.transitions.length; i++) {
             transition = data.transitions[i];
+            if (max_transition_id === null || state.id > max_transition_id) {
+                max_transition_id = transition.id;
+            }
             console.log(transition);
             $scope.transitions.push(new models.Transition(transition.id,
-                                              state_map[transition.from_state],
-                                              state_map[transition.to_state],
-                                              transition.label));
+                                                          state_map[transition.from_state],
+                                                          state_map[transition.to_state],
+                                                          transition.label));
         }
 
         var diff_x;
@@ -622,6 +629,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             console.log(['max_state_id', max_state_id]);
             $scope.state_id_seq = util.natural_numbers(max_state_id);
         }
+
+        if (max_transition_id !== null) {
+            console.log(['max_transition_id', max_transition_id]);
+            $scope.transition_id_seq = util.natural_numbers(max_transition_id);
+        }
     };
 
 
@@ -640,6 +652,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 	}
 
     $scope.send_control_message = function (message) {
+        console.log(message);
         if ($scope.history.length === 0) {
             $scope.send_snapshot();
         }
