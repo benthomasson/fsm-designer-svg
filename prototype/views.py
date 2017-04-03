@@ -85,8 +85,9 @@ def upload_fsm(data):
     states_map = dict(State.objects
                            .filter(finite_state_machine_id=fsm.pk)
                            .values_list("name", "pk"))
-    for transition in data.get('transitions', []):
+    for i, transition in enumerate(data.get('transitions', [])):
         new_transition = Transition(label=transition['label'],
+                                    id=i + 1,
                                     from_state_id=states_map[transition['from_state']],
                                     to_state_id=states_map[transition['to_state']])
         transitions.append(new_transition)
