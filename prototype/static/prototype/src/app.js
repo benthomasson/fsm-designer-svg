@@ -66,6 +66,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.transition_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
+  $scope.client_messages = {};
+  $scope.out_of_order_messages = {};
 
 
   $scope.states = [
@@ -693,6 +695,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         message.sender = $scope.client_id;
         message.message_id = $scope.message_id_seq();
         var data = messages.serialize(message);
+        console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
         $scope.control_socket.send(data);
     };
 

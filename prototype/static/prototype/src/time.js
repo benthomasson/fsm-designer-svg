@@ -198,12 +198,72 @@ _Start.prototype.start = function (controller) {
 };
 _Start.prototype.start.transitions = ['Present'];
 
+_Present.prototype.handle_oom = function(controller, data) {
+
+    var oom = null;
+    var i = null;
+    var oom_type_data = null;
+
+    if (typeof(controller.scope.client_messages[data.sender]) === "undefined") {
+        controller.scope.client_messages[data.sender] = data.message_id;
+    }
+
+    if (typeof(controller.scope.out_of_order_messages[data.sender]) === "undefined") {
+        controller.scope.out_of_order_messages[data.sender] = [];
+    }
+
+    if (controller.scope.out_of_order_messages[data.sender].length > 0) {
+        console.log(["Handling oom", data.sender, controller.scope.out_of_order_messages[data.sender].length]);
+
+        oom = controller.scope.out_of_order_messages[data.sender].slice();
+        controller.scope.out_of_order_messages[data.sender] = [];
+
+        for (i = 0; i < oom.length; i++) {
+            console.log(["Check", controller.scope.client_messages[data.sender] + 1, oom[i][0]]);
+            if (controller.scope.client_messages[data.sender] + 1 === oom[i][0]) {
+                console.log(["Resend", oom[i][0], oom[i][1]]);
+                oom_type_data = JSON.parse(oom[i][1].data);
+                controller.scope.client_messages[data.sender] = oom_type_data[1].message_id;
+                this.processMessage(controller, oom[i][1], oom_type_data[0], oom_type_data[1]);
+            } else {
+                controller.scope.out_of_order_messages[data.sender].push(oom[i]);
+            }
+        }
+    }
+};
+
 _Present.prototype.onMessage = function(controller, message) {
 
     //console.log(message.data);
     var type_data = JSON.parse(message.data);
     var type = type_data[0];
     var data = type_data[1];
+
+
+    //Fix out of order messages
+    console.log(["RECV", data.sender, data.message_id]);
+
+    this.handle_oom(controller, data);
+
+    if (controller.scope.client_messages[data.sender] < data.message_id &&
+        controller.scope.client_messages[data.sender] + 1 !== data.message_id) {
+        console.log(["Missing message", controller.scope.client_messages[data.sender] + 1]);
+        controller.scope.out_of_order_messages[data.sender].push([data.message_id, message]);
+        return;
+    } else if (controller.scope.client_messages[data.sender] > data.message_id) {
+        console.log(["Out of order message", controller.scope.client_messages[data.sender], data.message_id]);
+    }
+    controller.scope.client_messages[data.sender] = data.message_id;
+    //End fix out of order messages
+    this.processMessage(controller, message, type, data);
+
+    this.handle_oom(controller, data);
+
+};
+
+_Present.prototype.processMessage = function(controller, message, type, data) {
+
+    console.log(["PROCESS", data.sender, data.message_id]);
 
     if (type === 'StateCreate') {
         controller.scope.history.push(message.data);
