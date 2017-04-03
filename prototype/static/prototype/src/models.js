@@ -1,6 +1,7 @@
 var fsm = require('./fsm.js');
 var button = require('./button.js');
 var util = require('./util.js');
+var math = require('mathjs');
 
 function State(id, label, x, y) {
     this.id = id;
@@ -82,6 +83,10 @@ Transition.prototype.pslope = function () {
 function pDistance(x, y, x1, y1, x2, y2) {
   //Code from http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
   //Joshua
+  // Find the dot product of two vectors <A, B>, <C, D>
+  // Divide by the length squared of <C, D>
+  // Use scalar project to find param
+  //
 
   var A = x - x1;
   var B = y - y1;
@@ -98,6 +103,10 @@ function pDistance(x, y, x1, y1, x2, y2) {
 
   var xx, yy;
 
+  //Find a point xx, yy where the projection and the <C, D> vector intersect.
+  //If less than 0 use x1, y1 as the closest point.
+  //If less than 1 use x2, y2 as the closest point.
+  //If between 0 and 1 use the projection intersection xx, yy
   if (param < 0) {
     xx = x1;
     yy = y1;
@@ -114,6 +123,15 @@ function pDistance(x, y, x1, y1, x2, y2) {
   var dx = x - xx;
   var dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
+}
+
+function cross_z_pos(x, y, x1, y1, x2, y2) {
+  var A = x - x1;
+  var B = y - y1;
+  var C = x2 - x1;
+  var D = y2 - y1;
+
+  return math.cross([A, B, 0], [C, D, 0])[2] > 0;
 }
 
 Transition.prototype.perpendicular = function (x, y) {
@@ -133,10 +151,14 @@ Transition.prototype.perpendicular = function (x, y) {
 };
 
 Transition.prototype.is_selected = function (x, y) {
-    // Is the distance to the mouse location less than 10
-    // from the shortest line to the transition?
-	console.log(pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y));
-	return pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y) < 10;
+    // Is the distance to the mouse location less than 25 if on the label side
+    // or 5 on the other from the shortest line to the transition?
+	var d = pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y);
+    if (cross_z_pos(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y)) {
+        return d < 25;
+    } else {
+        return d < 5;
+    }
 };
 
 Transition.prototype.length = function () {
