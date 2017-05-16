@@ -219,7 +219,6 @@ _Present.prototype.handle_oom = function(controller, data) {
         controller.scope.out_of_order_messages[data.sender] = [];
 
         for (i = 0; i < oom.length; i++) {
-            console.log(["Check", controller.scope.client_messages[data.sender] + 1, oom[i][0]]);
             if (controller.scope.client_messages[data.sender] + 1 === oom[i][0]) {
                 console.log(["Resend", oom[i][0], oom[i][1]]);
                 oom_type_data = JSON.parse(oom[i][1].data);
