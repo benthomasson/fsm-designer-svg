@@ -7,6 +7,9 @@ COPY ./requirements /requirements
 
 RUN pip install -r /requirements/production.txt
 
+RUN mkdir -p /app/staticfiles
+VOLUME /app/staticfiles
+
 RUN groupadd -r django && useradd -r -g django django
 COPY . /app
 RUN chown -R django /app
@@ -18,5 +21,6 @@ RUN chmod +x /entrypoint.sh && chown django /entrypoint.sh
 RUN chmod +x /gunicorn.sh && chown django /gunicorn.sh
 
 WORKDIR /app
+
 
 ENTRYPOINT ["/entrypoint.sh"]
