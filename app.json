@@ -1,6 +1,6 @@
 {
-  "name": "ansible-network-ui",
-  "description": "A prototype of a UI for networking visualization for Ansible Tower.",
+  "name": "fsm-designer-svg",
+  "description": "A simple UI for designing finite state machines",
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-python",
     "DJANGO_SETTINGS_MODULE": "config.settings.production",

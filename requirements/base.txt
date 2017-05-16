@@ -46,3 +46,8 @@ sqlparse==0.1.19
 
 
 # Your custom requirements go here
+
+jinja2-cli
+pyyaml
+autopep8
+flake8

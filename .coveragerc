@@ -1,5 +1,5 @@
 [run]
-include = ansible-network-ui/*
+include = fsm-designer-svg/*
 omit = *migrations*, *tests*
 plugins =
     django_coverage_plugin

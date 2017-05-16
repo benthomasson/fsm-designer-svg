@@ -10,6 +10,7 @@
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
       ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
       class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
+<path class="transition" ng-if="transition.to_state !== null" ng-attr-d="M {{transition.from_state.x}} {{transition.from_state.y}} A 101 160 0 0 0 {{transition.to_state.x}} {{transition.to_state.y}}"></path>
 <g ng-if="!debug.hidden && current_scale > 0.5">
 <line ng-if="transition.to_state !== null"
       ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x2}}"
