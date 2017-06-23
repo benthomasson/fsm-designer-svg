@@ -170,6 +170,34 @@ Transition.prototype.length = function () {
     return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 };
 
+
+Transition.prototype.inter_length = function () {
+    //Return the length of this transition between states.
+    return this.length() - this.from_state.size - this.to_state.size;
+};
+
+Transition.prototype.arc_r = function () {
+    return this.inter_length();
+};
+
+Transition.prototype.arc_offset = function () {
+    var r = this.arc_r();
+    var offset =  r - (Math.sin(this.arc_angle_rad()) * r);
+    return offset;
+};
+
+Transition.prototype.arc_angle_rad = function () {
+    return Math.acos((this.inter_length() / 2) / this.arc_r());
+};
+
+Transition.prototype.arc_angle_tan_rad = function () {
+    return Math.PI/2 - Math.acos((this.inter_length() / 2) / this.arc_r());
+};
+
+Transition.prototype.arc_angle_tan = function () {
+    return this.arc_angle_tan_rad() * 180 / Math.PI;
+};
+
 function Button(label, x, y, width, height, callback) {
     this.label = label;
     this.x = x;

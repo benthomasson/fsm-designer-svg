@@ -1,3 +1,4 @@
+<g ng-if="!debug.hidden">
 <line ng-attr-x1="{{transition.from_state.x}}"
       ng-attr-y1="{{transition.from_state.y}}"
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
@@ -10,7 +11,57 @@
       ng-attr-x2="{{transition.to_state !== null ? transition.to_state.x : scaledX}}"
       ng-attr-y2="{{transition.to_state !== null ? transition.to_state.y : scaledY}}"
       class="transition {{transition.status === null ? 'unknown' : transition.status ? 'pass' : 'fail'}}"/>
-<path class="transition" ng-if="transition.to_state !== null" ng-attr-d="M {{transition.from_state.x}} {{transition.from_state.y}} A 101 160 0 0 0 {{transition.to_state.x}} {{transition.to_state.y}}"></path>
+</g>
+<g ng-attr-transform="translate({{transition.from_state.x}},
+                                {{transition.from_state.y}})
+                      rotate({{transition.slope()}})
+                      translate({{-transition.from_state.size}}, 0)">
+<g ng-if="!debug.hidden">
+<line x1=0
+      y1=0
+      ng-attr-x2="{{-transition.inter_length()/2}}"
+      ng-attr-y2="{{transition.inter_length()}}"
+      class="debug"></line>
+<line ng-attr-x1="{{-transition.inter_length()/2}}"
+      y1=0
+      ng-attr-x2="{{-transition.inter_length()/2}}"
+      ng-attr-y2="{{transition.inter_length()}}"
+      class="debug"></line>
+<line ng-attr-x1="{{-transition.inter_length()/2}}"
+      y1=0
+      ng-attr-x2="{{-transition.inter_length()/2}}"
+      ng-attr-y2="{{-transition.arc_offset()}}"
+      class="debug"></line>
+<line ng-attr-x1="{{-transition.inter_length()}}"
+      y1=0
+      ng-attr-x2="{{-transition.inter_length()/2}}"
+      ng-attr-y2="{{transition.inter_length()}}"
+      class="debug"></line>
+<circle ng-attr-cx="{{-transition.inter_length()/2}}"
+        ng-attr-cy="{{transition.inter_length() - transition.arc_offset()}}"
+        ng-attr-r="{{transition.inter_length()}}"
+        class="debug-empty" ></circle>
+<g ng-attr-transform="rotate({{transition.arc_angle_tan()}})">
+<line x1=0
+      y1=0
+      x2=-200
+      y2=0
+      class="debug"></line>
+</g>
+<g ng-attr-transform="translate({{-transition.inter_length()}}, 0)
+                      rotate({{180-transition.arc_angle_tan()}})">
+<line x1=0
+      y1=0
+      x2=-200
+      y2=0
+      class="debug"></line>
+</g>
+</g>
+<g ng-if="!debug.hidden">
+<path class="debug" ng-if="transition.to_state !== null" ng-attr-d="M0 0 A {{transition.inter_length()}} {{transition.inter_length()}} 0 1 1 {{-transition.inter_length()}} 0"></path>
+</g>
+<path class="transition" ng-if="transition.to_state !== null" ng-attr-d="M0 0 A {{transition.inter_length()}} {{transition.inter_length()}} 0 0 0 {{-transition.inter_length()}} 0"></path>
+</g>
 <g ng-if="!debug.hidden && current_scale > 0.5">
 <line ng-if="transition.to_state !== null"
       ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x2}}"
@@ -57,9 +108,10 @@
                       rotate({{transition.slope()}})
                       translate({{transition.to_state.size}}, 0)
                       rotate(180)
+                      rotate({{-transition.arc_angle_tan()}})
                       translate(-19, -9)
                       ">
-<path transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" class="transition {{transition.selected && 'selected' || 'hidden'}}"/>
+<path ng-attr-transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" class="transition {{transition.selected && 'selected' || 'hidden'}}"/>
 <path d="M0,0 L0,18 L18,9 z" class="transition"/>
 </g>
 <g ng-if="current_scale > 0.5 && transition.to_state !== null"
@@ -67,7 +119,6 @@
                                 {{transition.from_state.y}})
                       rotate({{transition.slope()}})
                       translate({{-transition.length()/2}}, 0)
-                      rotate(180)
                       translate(0, -5)
                       ">
 <text ng-attr-class="{{transition.selected && ! transition.edit_label ? 'selected' : 'hidden'}}"
@@ -75,5 +126,5 @@
       text-anchor="middle"
       x="0"
       y="0"> {{transition.label}}</text>
-<text text-anchor="middle" x="0" y="0">{{transition.label}}{{transition.edit_label?'_':''}}</text>
+<text text-anchor="middle" x="0" ng-attr-y="{{-transition.arc_offset()}}">{{transition.label}}{{transition.edit_label?'_':''}}</text>
 </g>
