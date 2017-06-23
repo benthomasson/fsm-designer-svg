@@ -180,9 +180,20 @@ Transition.prototype.arc_r = function () {
     return this.inter_length();
 };
 
+Transition.prototype.arc_r2 = function () {
+    return this.length();
+};
+
 Transition.prototype.arc_offset = function () {
     var r = this.arc_r();
     var offset =  r - (Math.sin(this.arc_angle_rad()) * r);
+    return offset;
+};
+
+Transition.prototype.arc_offset2 = function () {
+    var r = this.arc_r2();
+    var theta = Math.acos((this.length() / 2) / r);
+    var offset =  r * (1 - Math.sin(theta));
     return offset;
 };
 
@@ -197,6 +208,36 @@ Transition.prototype.arc_angle_tan_rad = function () {
 Transition.prototype.arc_angle_tan = function () {
     return this.arc_angle_tan_rad() * 180 / Math.PI;
 };
+
+Transition.prototype.arc_angle_tan_rad2 = function () {
+    var r = this.arc_r2();
+    var l = this.length();
+    var phi = this.end_arc_angle_rad();
+    return Math.PI/2 - Math.acos((l/2 - Math.cos(phi) * this.to_state.size) / r);
+};
+
+Transition.prototype.arc_angle_tan2 = function () {
+    return this.arc_angle_tan_rad2() * 180 / Math.PI;
+};
+
+Transition.prototype.end_arc_angle_rad = function () {
+    var r = this.arc_r2();
+    var l = this.length();
+    return Math.acos((this.to_state.size / 2) / r) - Math.acos((l/2)/r);
+};
+
+Transition.prototype.end_arc_angle = function () {
+    return this.end_arc_angle_rad() * 180 / Math.PI;
+};
+
+Transition.prototype.start_arc_angle_rad = function () {
+    return Math.acos((this.from_state.size / 2) / this.arc_r2()) - Math.acos((this.length()/2)/this.arc_r2());
+};
+
+Transition.prototype.start_arc_angle = function () {
+    return this.start_arc_angle_rad() * 180 / Math.PI;
+};
+
 
 function Button(label, x, y, width, height, callback) {
     this.label = label;
