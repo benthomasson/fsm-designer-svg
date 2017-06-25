@@ -16,7 +16,7 @@
         ng-attr-cy="{{-transition.arc_offset2()}}"
         r=10
         class="debug" ></circle>
-<path class="transition" ng-if="transition.to_state !== null" ng-attr-d="M0 0 A {{transition.length()}} {{transition.length()}} 0 0 0 {{-transition.length()}} 0"></path>
+<path class="transition" ng-if="transition.to_state !== null" ng-attr-d="M0 0 A {{transition.arc_r2()}} {{transition.arc_r2()}} 0 0 0 {{-transition.length()}} 0"></path>
 <line ng-if="!debug.hidden"
       ng-attr-x1="{{-transition.length()/2}}"
       y1=0
@@ -31,6 +31,12 @@
         r=10
         class="debug" ></circle>
 </g>
+<rect ng-if="!debug.hidden"
+      ng-attr-x="{{-transition.length()}}"
+      ng-attr-y="{{-transition.arc_offset2()}}"
+      ng-attr-width="{{transition.length()}}"
+      ng-attr-height="{{transition.arc_offset2()}}"
+      class="debug"></rect>
 </g>
 <!-- End Large arc -->
 
