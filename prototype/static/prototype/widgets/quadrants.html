@@ -1,10 +1,25 @@
+                <g ng-if="!debug.hidden">
+                <g ng-attr-transform="rotate({{quadrant_rotation}})">
                  <line ng-attr-x1="-100000"
-                       ng-attr-y1="0"
+                       ng-attr-y1="-1"
                        ng-attr-x2="100000"
-                       ng-attr-y2="0"
+                       ng-attr-y2="-1"
+                       ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+                 <line ng-attr-x1="-100000"
+                       ng-attr-y1="1"
+                       ng-attr-x2="100000"
+                       ng-attr-y2="1"
                        ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
                  <line ng-attr-x1="0"
                        ng-attr-y1="-100000"
                        ng-attr-x2="0"
                        ng-attr-y2="100000"
                        ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
+                <circle ng-repeat="point in debug_points" 
+                        ng-attr-cx="{{point.x}}"
+                        ng-attr-cy="{{point.y}}"
+                        r=10
+                        class="debug">
+                </circle>
+                </g>
+                </g>

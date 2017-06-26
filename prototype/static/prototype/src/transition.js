@@ -109,6 +109,7 @@ _Connecting.prototype.onMouseUp = function (controller) {
                                                                             controller.scope.new_transition.to_state.id),
                 '');
         controller.scope.new_transition = null;
+        controller.scope.update_offsets();
         controller.changeState(Connected);
     } else {
         var index = controller.scope.transitions.indexOf(controller.scope.new_transition);

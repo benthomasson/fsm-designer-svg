@@ -1,5 +1,5 @@
 
-//console.log = function () { };
+console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -379,6 +379,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         if (new_transition.from_state !== null && new_transition.to_state !== null) {
             $scope.transitions.push(new_transition);
         }
+
+        $scope.update_offsets();
     };
 
     $scope.onTransitionDestroy = function(data) {
@@ -396,6 +398,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 $scope.transitions.splice(index, 1);
             }
         }
+
+        $scope.update_offsets();
     };
 
     $scope.onTransitionLabelEdit = function(data) {
@@ -692,6 +696,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             console.log(['max_transition_id', max_transition_id]);
             $scope.transition_id_seq = util.natural_numbers(max_transition_id);
         }
+
+        $scope.update_offsets();
     };
 
 
