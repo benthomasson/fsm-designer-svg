@@ -16,6 +16,7 @@
 <!-- Straight line -->
 <!-- Large arc -->
 <g ng-if="transition.to_state !== null">
+<g ng-if="transition.to_state !== transition.from_state">
 <g ng-attr-transform="translate({{transition.from_state.x}},
                                 {{transition.from_state.y}})
                       rotate({{transition.slope()}})">
@@ -47,10 +48,12 @@
       class="debug"></rect>
 </g>
 </g>
+</g>
 <!-- End Large arc -->
 
 <!-- Debug -->
 <g ng-if="transition.to_state !== null">
+<g ng-if="transition.to_state !== transition.from_state">
 <g ng-if="!debug.hidden && current_scale > 0.5">
 <line ng-if="transition.to_state !== null"
       ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x2}}"
@@ -83,8 +86,10 @@
 </g>
 </g>
 </g>
+</g>
 <!-- End Debug -->
 <!-- Arrow -->
+<g ng-if="transition.to_state !== transition.from_state">
 <g ng-if="transition.to_state !== null"  ng-attr-transform="translate({{transition.to_state.x}},
                                                                       {{transition.to_state.y}})
                       rotate({{transition.slope()}})
@@ -119,5 +124,6 @@
       x="0"
       ng-attr-y="{{-transition.arc_offset2()}}"> {{transition.label}}</text>
 <text text-anchor="middle" x="0" ng-attr-y="{{-transition.arc_offset2()}}">{{transition.label}}{{transition.edit_label?'_':''}}</text>
+</g>
 </g>
 <!-- End Text -->
