@@ -50,12 +50,22 @@ function Transition(id, from_state, to_state, label) {
     this.selected = false;
     this.remote_selected = false;
     this.label = label;
+    this.offset = 0;
 }
 exports.Transition = Transition;
 
 Transition.prototype.toJSON = function () {
     return {to_state: this.to_state.id,
             from_state: this.from_state.id};
+};
+
+Transition.prototype.slope_rad = function () {
+    //Return the slope in radians for this transition.
+    var x1 = this.from_state.x;
+    var y1 = this.from_state.y;
+    var x2 = this.to_state.x;
+    var y2 = this.to_state.y;
+    return Math.atan2(y2 - y1, x2 - x1) + Math.PI;
 };
 
 Transition.prototype.slope = function () {
@@ -133,6 +143,7 @@ function cross_z_pos(x, y, x1, y1, x2, y2) {
 
   return math.cross([A, B, 0], [C, D, 0])[2] > 0;
 }
+exports.cross_z_pos = cross_z_pos;
 
 Transition.prototype.perpendicular = function (x, y) {
     //Find the perpendicular line through x, y to this transition.
@@ -153,13 +164,38 @@ Transition.prototype.perpendicular = function (x, y) {
 Transition.prototype.is_selected = function (x, y) {
     // Is the distance to the mouse location less than 25 if on the label side
     // or 5 on the other from the shortest line to the transition?
-	var d = pDistance(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y);
-    if (cross_z_pos(x, y, this.from_state.x, this.from_state.y, this.to_state.x, this.to_state.y)) {
-        return d < 25;
-    } else {
-        return d < 5;
-    }
+    console.log("is_selected");
+    var phi = this.slope_rad();
+    console.log({"phi": phi});
+    console.log({'x': this.from_state.x, 'y': this.from_state.y});
+    console.log({'x': this.to_state.x, 'y': this.to_state.y});
+    console.log({'x': x, 'y': y});
+    var p1 = util.cartesianToPolar(this.from_state.x, this.from_state.y);
+    var p2 = util.cartesianToPolar(this.to_state.x, this.to_state.y);
+    var p3 = util.cartesianToPolar(x, y);
+    console.log(p1);
+    p1.theta -= phi;
+    console.log(p1);
+    console.log(p2);
+    p2.theta -= phi;
+    console.log(p2);
+    p3.theta -= phi;
+
+    p1 = util.polarToCartesian_rad(0, 0, p1.r, p1.theta);
+    p2 = util.polarToCartesian_rad(0, 0, p2.r, p2.theta);
+    p3 = util.polarToCartesian_rad(0, 0, p3.r, p3.theta);
+    p2.y -= this.arc_offset2();
+    console.log(p1);
+    console.log(p2);
+    console.log(p3);
+    var max_x = Math.max(p1.x, p2.x);
+    var min_x = Math.min(p1.x, p2.x);
+    var max_y = Math.max(p1.y, p2.y) + 5;
+    var min_y = Math.min(p1.y, p2.y) - 25 ;
+
+    return p3.x > min_x && p3.x < max_x && p3.y > min_y && p3.y < max_y;
 };
+exports.pDistance = pDistance;
 
 Transition.prototype.length = function () {
     //Return the length of this transition.
@@ -181,7 +217,7 @@ Transition.prototype.arc_r = function () {
 };
 
 Transition.prototype.arc_r2 = function () {
-    return this.length();
+    return this.length() * (1 - 0.5 * this.offset) ;
 };
 
 Transition.prototype.arc_offset = function () {

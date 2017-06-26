@@ -18,6 +18,25 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     y: centerY + (radius * Math.sin(angleInRadians))
   };
 }
+exports.polarToCartesian = polarToCartesian;
+
+function polarToCartesian_rad(centerX, centerY, radius, angleInRadians) {
+
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+exports.polarToCartesian_rad = polarToCartesian_rad;
+
+function cartesianToPolar(x, y) {
+
+    return {
+        r: Math.sqrt(Math.pow(x,2) + Math.pow(y, 2)),
+        theta: Math.atan2(y, x)
+    };
+}
+exports.cartesianToPolar = cartesianToPolar;
 
 // describeArc
 // From http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
