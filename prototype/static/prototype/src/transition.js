@@ -65,7 +65,7 @@ exports.Selecting = Selecting;
 
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
-    if ($event.key === 'l') {
+    if ($event.key === 'l' && $event.metaKey) {
         controller.state.onNewTransition(controller, $event);
     }
 
