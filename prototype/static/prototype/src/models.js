@@ -217,7 +217,8 @@ Transition.prototype.arc_r = function () {
 };
 
 Transition.prototype.arc_r2 = function () {
-    return this.length() * (1 - 0.5 * this.offset) ;
+    var offset_to_r = [2, 1, 0.75, 0.6, 0.55, 0.53, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+    return this.length() * offset_to_r[this.offset];
 };
 
 Transition.prototype.arc_offset = function () {

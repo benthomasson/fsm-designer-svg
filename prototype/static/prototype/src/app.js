@@ -1,5 +1,5 @@
 
-console.log = function () { };
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -29,6 +29,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.onMouseMoveResult = "";
   $scope.onMouseMoveResult = "";
   $scope.current_scale = 1.0;
+  $scope.quadrant_rotation = 0;
+  $scope.debug_points = [];
   $scope.panX = 0;
   $scope.panY = 0;
   $scope.mouseX = 0;
@@ -131,6 +133,26 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         g.setAttribute('transform','translate(' + $scope.panX + ',' + $scope.panY + ') scale(' + $scope.current_scale + ')');
     };
 
+    $scope.update_offsets = function () {
+
+        var i = 0;
+        var transitions = $scope.transitions;
+        var map = new Map();
+        var transition = null;
+        var key = null;
+        for (i = 0; i < transitions.length; i++) {
+            transition = transitions[i];
+            key = "" + transition.from_state.id + "_" + transition.to_state.id;
+            map.set(key, 0);
+        }
+        for (i = 0; i < transitions.length; i++) {
+            transition = transitions[i];
+            key = "" + transition.from_state.id + "_" + transition.to_state.id;
+            transition.offset = map.get(key);
+            map.set(key, transition.offset + 1);
+        }
+    };
+
     $scope.clear_selections = function () {
 
         var i = 0;
@@ -186,7 +208,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
         // Do not select links if a state was selected
         if (last_selected_state === null) {
-            for (i = $scope.transitions.length - 1; i >= 0; i--) {
+            for (i = 0; i < $scope.transitions.length; i++) {
                 if($scope.transitions[i].is_selected($scope.scaledX, $scope.scaledY)) {
                     $scope.transitions[i].selected = true;
                     $scope.send_control_message(new messages.TransitionSelected($scope.client_id, $scope.transitions[i].id));
