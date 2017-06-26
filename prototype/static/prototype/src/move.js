@@ -161,6 +161,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         var j = 0;
         var index = -1;
         var states = controller.scope.selected_states;
+        var transitions = controller.scope.selected_transitions.slice();
         var all_transitions = controller.scope.transitions.slice();
         controller.scope.selected_states = [];
         controller.scope.selected_transitions = [];
@@ -183,6 +184,17 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
                     }
                 }
             }
+        }
+        for (i = 0; i < transitions.length; i++) {
+            index = controller.scope.transitions.indexOf(transitions[i]);
+            if (index !== -1) {
+                controller.scope.transitions.splice(index, 1);
+                controller.scope.send_control_message(new messages.TransitionDestroy(controller.scope.client_id,
+                                                                                     transitions[i].id,
+                                                                                     transitions[i].from_state.id,
+                                                                                     transitions[i].to_state.id,
+                                                                                     transitions[i].label));
+                }
         }
     }
 };

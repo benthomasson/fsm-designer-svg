@@ -63,11 +63,12 @@ function TransitionCreate(sender, id, from_id, to_id, label) {
 }
 exports.TransitionCreate = TransitionCreate;
 
-function TransitionDestroy(sender, id, from_id, to_id) {
+function TransitionDestroy(sender, id, from_id, to_id, label) {
     this.sender = sender;
     this.id = id;
     this.from_id = from_id;
     this.to_id = to_id;
+    this.label = label;
 }
 exports.TransitionDestroy = TransitionDestroy;
 
