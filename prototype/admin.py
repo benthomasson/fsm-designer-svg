@@ -38,7 +38,7 @@ admin.site.register(MessageType, MessageTypeAdmin)
 
 
 class FiniteStateMachineAdmin(admin.ModelAdmin):
-    fields = ('name',)
+    fields = ('name', 'state_id_seq', 'transition_id_seq',)
     raw_id_fields = ()
 
 

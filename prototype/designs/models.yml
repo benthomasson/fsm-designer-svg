@@ -53,6 +53,12 @@ models:
   - len: 200
     name: name
     type: CharField
+  - default: 0
+    name: state_id_seq
+    type: IntegerField
+  - default: 0
+    name: transition_id_seq
+    type: IntegerField
   name: FiniteStateMachine
   x: 225
   y: 152
