@@ -93,6 +93,9 @@ def upload_fsm(data):
         transitions.append(new_transition)
 
     Transition.objects.bulk_create(transitions)
+    fsm.state_id_seq = len(states)
+    fsm.transition_id_seq = len(transitions)
+    fsm.save()
     return fsm.pk
 
 

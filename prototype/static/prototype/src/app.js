@@ -537,6 +537,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onFiniteStateMachine = function(data) {
         $scope.finite_state_machine_id = data.finite_state_machine_id;
+        $scope.state_id_seq = util.natural_numbers(data.state_id_seq);
+        $scope.transition_id_seq = util.natural_numbers(data.transition_id_seq);
         $location.search({finite_state_machine_id: data.finite_state_machine_id});
     };
 

@@ -158,6 +158,9 @@ class _Persistence(object):
         d.x = state['x']
         d.y = state['y']
         d.save()
+        (FiniteStateMachine.objects
+                           .filter(finite_state_machine_id=finite_state_machine_id)
+                           .update(state_id_seq=state['id']))
 
     def onStateDestroy(self, state, finite_state_machine_id, client_id):
         State.objects.filter(finite_state_machine_id=finite_state_machine_id, id=state['id']).delete()
@@ -182,6 +185,9 @@ class _Persistence(object):
         Transition.objects.get_or_create(id=transition['id'],
                                          from_state_id=state_map[transition['from_id']],
                                          to_state_id=state_map[transition['to_id']])
+        (FiniteStateMachine.objects
+                           .filter(finite_state_machine_id=finite_state_machine_id)
+                           .update(transition_id_seq=transition['id']))
 
     def onTransitionLabelEdit(self, transition, finite_state_machine_id, client_id):
         print transition
