@@ -57,5 +57,3 @@ function describeArc(x, y, radius, startAngle, endAngle){
     return d;
 }
 exports.describeArc = describeArc;
-
-window.describeArc = describeArc;
