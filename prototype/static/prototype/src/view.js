@@ -74,7 +74,7 @@ _Ready.prototype.onMouseWheel = function (controller, msg_type, $event) {
 };
 _Ready.prototype.onMouseWheel.transitions = ['Scale'];
 
-_Ready.prototype.onKeyDown = function(controller, $event) {
+_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
 	var scope = controller.scope;
 

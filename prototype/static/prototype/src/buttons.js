@@ -81,7 +81,7 @@ _Start.prototype.start.transitions = ['Ready'];
 
 
 
-_ButtonPressed.prototype.onMouseUp = function (controller, $event) {
+_ButtonPressed.prototype.onMouseUp = function (controller, msg_type, $event) {
 
     var i = 0;
     var buttons = controller.scope.buttons;

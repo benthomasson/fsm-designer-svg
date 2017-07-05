@@ -135,7 +135,7 @@ _Selected2.prototype.onMouseDown = function (controller, msg_type, $event) {
 };
 _Selected2.prototype.onMouseDown.transitions = ['Ready', 'Selected3'];
 
-_Selected2.prototype.onKeyDown = function (controller, $event) {
+_Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
 
     if ($event.keyCode === 8) {
         //Delete
