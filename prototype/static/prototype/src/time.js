@@ -64,6 +64,7 @@ _Past.prototype.onMessage = function(controller, msg_type, message) {
         controller.handle_message(type, data);
     }
 };
+_Past.prototype.onMessage.transitions = ['Present'];
 
 _Past.prototype.onTransitionSelected = function(controller, msg_type, message) {
     if (message.sender !== controller.scope.client_id) {
@@ -102,6 +103,7 @@ _Past.prototype.onRedo = function(controller, msg_type, message) {
         }
     }
 };
+_Past.prototype.onRedo.transitions = ['Present'];
 
 _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
 
@@ -120,7 +122,7 @@ _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
     }
 
 };
-_Past.prototype.onMouseWheel.transitions = ['Past'];
+_Past.prototype.onMouseWheel.transitions = ['Present'];
 
 _Past.prototype.onKeyDown = function(controller, msg_type, $event) {
 
@@ -142,11 +144,10 @@ _Past.prototype.onKeyDown = function(controller, msg_type, $event) {
         controller.next_controller.handle_message(msg_type, $event);
     }
 };
-_Past.prototype.onKeyDown.transitions = ['Past'];
+_Past.prototype.onKeyDown.transitions = ['Present'];
 
 
 _Past.prototype.undo = function(controller) {
-    //controller.changeState(Past);
     controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
     if (controller.scope.time_pointer >= 0) {
         var change = controller.scope.history[controller.scope.time_pointer];
@@ -368,7 +369,6 @@ _Present.prototype.onKeyDown.transitions = ['Past'];
 
 
 _Present.prototype.undo = function(controller) {
-    //controller.changeState(Past);
     controller.scope.time_pointer = controller.scope.history.length - 1;
     if (controller.scope.time_pointer >= 0) {
         var change = controller.scope.history[controller.scope.time_pointer];
