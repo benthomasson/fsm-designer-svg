@@ -1,5 +1,5 @@
 
-console.log = function () { };
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -238,14 +238,14 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onMouseDown = function ($event) {
       $scope.last_event = $event;
-      $scope.first_controller.state.onMouseDown($scope.first_controller, $event);
+      $scope.first_controller.handle_message("MouseDown", $event);
       $scope.onMouseDownResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
 
     $scope.onMouseUp = function ($event) {
       $scope.last_event = $event;
-      $scope.first_controller.state.onMouseUp($scope.first_controller, $event);
+      $scope.first_controller.handle_message("MouseUp", $event);
       $scope.onMouseUpResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -270,7 +270,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
       $scope.mouseX = coords.x;
       $scope.mouseY = coords.y;
       $scope.updateScaledXY();
-      $scope.first_controller.state.onMouseMove($scope.first_controller, $event);
+      $scope.first_controller.handle_message("MouseMove", $event);
       $scope.onMouseMoveResult = getMouseEventResult($event);
 	  $event.preventDefault();
     };
@@ -283,7 +283,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onMouseWheel = function ($event, delta, deltaX, deltaY) {
       $scope.last_event = $event;
-      $scope.first_controller.state.onMouseWheel($scope.first_controller, $event, delta, deltaX, deltaY);
+      $scope.first_controller.handle_message("MouseWheel", [$event, delta, deltaX, deltaY]);
       event.preventDefault();
     };
 
@@ -291,7 +291,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.last_event = $event;
         $scope.last_key = $event.key;
         $scope.last_key_code = $event.keyCode;
-        $scope.first_controller.state.onKeyDown($scope.first_controller, $event);
+        $scope.first_controller.handle_message("KeyDown", $event);
         $scope.$apply();
         $event.preventDefault();
     };
@@ -704,7 +704,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
     $scope.control_socket.onmessage = function(message) {
-        $scope.first_controller.state.onMessage($scope.first_controller, message);
+        $scope.first_controller.handle_message("Message", message);
         $scope.$apply();
     };
 

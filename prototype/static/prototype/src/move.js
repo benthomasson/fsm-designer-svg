@@ -7,22 +7,6 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
-_State.prototype.onMouseMove = function (controller, $event) {
-    controller.next_controller.state.onMouseMove(controller.next_controller, $event);
-};
-_State.prototype.onMouseUp = function (controller, $event) {
-    controller.next_controller.state.onMouseUp(controller.next_controller, $event);
-};
-_State.prototype.onMouseDown = function (controller, $event) {
-    controller.next_controller.state.onMouseDown(controller.next_controller, $event);
-};
-_State.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
-    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
-};
-_State.prototype.onKeyDown = function (controller, $event) {
-    controller.next_controller.state.onKeyDown(controller.next_controller, $event);
-};
-
 
 function _Ready () {
     this.name = 'Ready';
@@ -75,7 +59,7 @@ inherits(_EditLabel, _State);
 var EditLabel = new _EditLabel();
 exports.EditLabel = EditLabel;
 
-_Ready.prototype.onMouseDown = function (controller, $event) {
+_Ready.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     var last_selected = controller.scope.select_items($event.shiftKey);
 
@@ -84,13 +68,13 @@ _Ready.prototype.onMouseDown = function (controller, $event) {
     } else if (last_selected.last_selected_transition !== null) {
         controller.changeState(Selected1);
     } else {
-        controller.next_controller.state.onMouseDown(controller.next_controller, $event);
+        controller.next_controller.handle_message(msg_type, $event);
     }
 };
 _Ready.prototype.onMouseDown.transitions = ['Selected1'];
 
 
-_Ready.prototype.onKeyDown = function(controller, $event) {
+_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
 	var scope = controller.scope;
     var state = null;
@@ -112,7 +96,7 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
                                                              state.label));
     }
 
-	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+	controller.next_controller.handle_message(msg_type, $event);
 };
 
 _Start.prototype.start = function (controller) {
@@ -124,7 +108,7 @@ _Start.prototype.start.transitions = ['Ready'];
 
 
 
-_Selected2.prototype.onMouseDown = function (controller, $event) {
+_Selected2.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     var last_selected = null;
 
@@ -147,7 +131,7 @@ _Selected2.prototype.onMouseDown = function (controller, $event) {
     }
 
     controller.changeState(Ready);
-    controller.state.onMouseDown(controller, $event);
+    controller.handle_message(msg_type, $event);
 };
 _Selected2.prototype.onMouseDown.transitions = ['Ready', 'Selected3'];
 
@@ -198,7 +182,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         }
     }
 };
-_Selected2.prototype.onMouseUp.transitions = ['Ready'];
+_Selected2.prototype.onKeyDown.transitions = ['Ready'];
 
 
 _Selected1.prototype.onMouseMove = function (controller) {
@@ -244,10 +228,10 @@ _Move.prototype.onMouseMove = function (controller) {
 };
 
 
-_Move.prototype.onMouseUp = function (controller, $event) {
+_Move.prototype.onMouseUp = function (controller, msg_type, $event) {
 
     controller.changeState(Selected2);
-    controller.state.onMouseUp(controller, $event);
+    controller.handle_message(msg_type, $event);
 };
 _Move.prototype.onMouseUp.transitions = ['Selected2'];
 
@@ -271,16 +255,15 @@ _EditLabel.prototype.end = function (controller) {
     controller.scope.selected_items[0].edit_label = false;
 };
 
-_EditLabel.prototype.onMouseDown = function (controller, $event) {
+_EditLabel.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     controller.changeState(Ready);
-    controller.state.onMouseDown(controller, $event);
-
+    controller.handle_message(msg_type, $event);
 };
 _EditLabel.prototype.onMouseDown.transitions = ['Ready'];
 
 
-_EditLabel.prototype.onKeyDown = function (controller, $event) {
+_EditLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var item = controller.scope.selected_items[0];

@@ -8,23 +8,6 @@ function _State () {
 inherits(_State, fsm._State);
 
 
-_State.prototype.onMouseMove = function (controller, $event) {
-    controller.next_controller.state.onMouseMove(controller.next_controller, $event);
-};
-_State.prototype.onMouseUp = function (controller, $event) {
-    controller.next_controller.state.onMouseUp(controller.next_controller, $event);
-};
-_State.prototype.onMouseDown = function (controller, $event) {
-    controller.next_controller.state.onMouseDown(controller.next_controller, $event);
-};
-_State.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
-    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
-};
-_State.prototype.onKeyDown = function (controller, $event) {
-    controller.next_controller.state.onKeyDown(controller.next_controller, $event);
-};
-
-
 function _Ready () {
     this.name = 'Ready';
 }
@@ -63,13 +46,13 @@ exports.Selecting = Selecting;
 
 
 
-_Ready.prototype.onKeyDown = function(controller, $event) {
+_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     if ($event.key === 'l' && $event.metaKey) {
-        controller.state.onNewTransition(controller, $event);
+        controller.handle_message("NewTransition", $event);
     }
 
-	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+	controller.next_controller.handle_message(msg_type, $event);
 };
 
 _Ready.prototype.onNewTransition = function (controller) {
