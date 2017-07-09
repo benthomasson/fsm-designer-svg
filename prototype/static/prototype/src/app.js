@@ -1,5 +1,5 @@
 
-//console.log = function () { };
+console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
