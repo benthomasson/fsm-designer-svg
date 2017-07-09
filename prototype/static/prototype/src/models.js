@@ -77,6 +77,24 @@ Transition.prototype.slope = function () {
     return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 180;
 };
 
+Transition.prototype.flip_text_rotate = function () {
+    var slope = this.slope();
+    if (slope > 90 && slope < 270) {
+        return 180;
+    } else {
+        return 0;
+    }
+};
+
+Transition.prototype.flip_text_offset = function () {
+    var slope = this.slope();
+    if (slope > 90 && slope < 270) {
+        return 10;
+    } else {
+        return 0;
+    }
+};
+
 Transition.prototype.pslope = function () {
     //Return the slope of a perpendicular line to this
     //transition

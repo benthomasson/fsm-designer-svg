@@ -116,14 +116,17 @@
                                 {{transition.from_state.y}})
                       rotate({{transition.slope()}})
                       translate({{-transition.length()/2}}, 0)
+                      translate(0, {{-transition.arc_offset2()}})
                       translate(0, -5)
+                      rotate({{transition.flip_text_rotate()}})
+                      translate(0, {{transition.flip_text_offset()}})
                       ">
 <text ng-attr-class="{{transition.selected && ! transition.edit_label ? 'selected' : 'hidden'}}"
       filter="url(#selected)"
       text-anchor="middle"
       x="0"
-      ng-attr-y="{{-transition.arc_offset2()}}"> {{transition.label}}</text>
-<text text-anchor="middle" x="0" ng-attr-y="{{-transition.arc_offset2()}}">{{transition.label}}{{transition.edit_label?'_':''}}</text>
+      y="0"> {{transition.label}}</text>
+<text text-anchor="middle" x="0" y="0">{{transition.label}}{{transition.edit_label?'_':''}}</text>
 </g>
 </g>
 <!-- End Text -->
