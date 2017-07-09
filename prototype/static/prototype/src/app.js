@@ -644,7 +644,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var transition = null;
         for (i = 0; i < data.transitions.length; i++) {
             transition = data.transitions[i];
-            if (max_transition_id === null || state.id > max_transition_id) {
+            if (max_transition_id === null || transition.id > max_transition_id) {
                 max_transition_id = transition.id;
             }
             console.log(transition);
