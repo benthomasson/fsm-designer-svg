@@ -11,7 +11,7 @@ services:
       user: django
       links:
         - postgres
-      command: /gunicorn.sh
+      command: /runserver.sh
       env_file: .env
       volumes:
           - static-files:/app/staticfiles
