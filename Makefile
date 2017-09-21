@@ -9,12 +9,8 @@ ui:
 	cd prototype/static/prototype; npm i; make
 
 
-docker-compose-build:
+docker-compose-build: ui
 	docker-compose build
 
 docker-compose:
 	docker-compose up
-
-docker-compose-fix:
-	docker exec -it --user root fsmdesignersvg_django_1 chown -R django.django /app
-	docker exec -it fsmdesignersvg_django_1 /entrypoint.sh /app/manage.py collectstatic --noinput

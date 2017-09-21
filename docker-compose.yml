@@ -21,7 +21,7 @@ services:
       links:
         - django
       ports:
-        - "0.0.0.0:80:80"
+        - "0.0.0.0:8000:80"
       volumes:
           - static-files:/app/staticfiles
 volumes:
