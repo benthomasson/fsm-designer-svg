@@ -79,7 +79,7 @@ _Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 	var scope = controller.scope;
     var state = null;
 
-    if ($event.key === 's' && $event.metaKey) {
+    if ($event.key === 's' && ($event.metaKey || $event.ctrlKey)) {
 		state = new models.State(controller.scope.state_id_seq(),
                                    "State",
                                    scope.scaledX,
