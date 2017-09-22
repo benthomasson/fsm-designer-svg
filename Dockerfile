@@ -8,11 +8,11 @@ COPY ./requirements /requirements
 RUN pip install -r /requirements/production.txt
 
 RUN mkdir -p /app/staticfiles
-VOLUME /app/staticfiles
 
 RUN groupadd -r django && useradd -r -g django django
 COPY . /app
-RUN chown -R django /app
+RUN chown -R django.django /app
+VOLUME /app/staticfiles
 
 COPY ./compose/django/runserver.sh /runserver.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
