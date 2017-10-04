@@ -1,6 +1,13 @@
+<html>
+<head>
+    <link rel="shortcut icon" href="/static/prototype/favicon.ico" />
+</head>
+<body>
 <ul>
     <li><a href="/static/prototype/index.html">New</a></li>
     {%for fsm in fsms%}
     <li><a href="/static/prototype/index.html#!?finite_state_machine_id={{fsm.pk}}">{{fsm.pk}} {{fsm.name}}</a></li>
     {%endfor%}
 </ul>
+</body>
+</html>
