@@ -1,6 +1,26 @@
-finite_state_machine_id: 79
+finite_state_machine_id: 17
 name: move
 states:
+- id: 3
+  label: Selected1
+  x: 197
+  y: 292
+- id: 7
+  label: Selected3
+  x: 235
+  y: 914
+- id: 6
+  label: EditLabel
+  x: 593
+  y: 610
+- id: 4
+  label: Selected2
+  x: 226
+  y: 564
+- id: 5
+  label: Move
+  x: -85
+  y: 588
 - id: 1
   label: Start
   x: 533
@@ -9,27 +29,10 @@ states:
   label: Ready
   x: 531
   y: 320
-- id: 3
-  label: Selected1
-  x: 226
-  y: 325
-- id: 4
-  label: Selected2
-  x: 230
-  y: 582
-- id: 5
-  label: Move
-  x: -54
-  y: 587
-- id: 6
-  label: EditLabel
-  x: 535
-  y: 583
-- id: 7
-  label: Selected3
-  x: 231
-  y: 867
 transitions:
+- from_state: Selected2
+  label: onKeyDown
+  to_state: Ready
 - from_state: Start
   label: start
   to_state: Ready
