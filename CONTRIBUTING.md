@@ -3,18 +3,12 @@ Git Repositories
 ----------------
 
 * UI and Django: git@github.com:benthomasson/fsm-designer-svg.git
-* UI only: git@github.com:benthomasson/svg-test.git
 
 
 
 Push to main repo:
 
     $ git push
-
-
-Push to UI repo:
-
-    $ git subtree push --prefix prototype/static git@github.com:benthomasson/svg-test.git master
 
 
 
@@ -54,11 +48,8 @@ make ui
 make docker-compose-build
 make docker-compose
 
-In a new terminal:
-make docker-compose-fix
-
 Browse to server:
 
-http://hostname:80/static/prototype/index.html
+http://hostname:8000/static/prototype/index.html
 
 
