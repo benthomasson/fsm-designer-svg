@@ -303,7 +303,7 @@ function Button(label, x, y, width, height, callback) {
     this.callback = callback;
     this.is_pressed = false;
     this.mouse_over = false;
-    this.fsm = new fsm.FSMController(this, button.Start, null);
+    this.fsm = new fsm.FSMController(this, button.Start);
 }
 exports.Button = Button;
 

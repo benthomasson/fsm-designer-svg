@@ -52,7 +52,7 @@ _Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
         controller.handle_message("NewTransition", $event);
     }
 
-	controller.next_controller.handle_message(msg_type, $event);
+	controller.delegate_channel.send(msg_type, $event);
 };
 
 _Ready.prototype.onNewTransition = function (controller) {

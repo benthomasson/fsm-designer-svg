@@ -1,8 +1,25 @@
-function FSMController (scope, initial_state, next_controller) {
+function Channel(from_controller, to_controller) {
+    this.from_controller = from_controller;
+    this.to_controller = to_controller;
+}
+exports.Channel = Channel;
+
+Channel.prototype.send = function(msg_type, message) {
+    this.to_controller.handle_message(msg_type, message);
+};
+
+function NullChannel(from_controller) {
+    this.from_controller = from_controller;
+}
+
+NullChannel.prototype.send = function() {
+};
+
+function FSMController (scope, initial_state) {
     this.scope = scope;
     this.state = initial_state;
     this.state.start(this);
-    this.next_controller = next_controller;
+    this.delegate_channel = new NullChannel(this);
 }
 exports.FSMController = FSMController;
 
@@ -28,9 +45,7 @@ FSMController.prototype.handle_message = function(msg_type, message) {
 };
 
 FSMController.prototype.default_handler = function(msg_type, message) {
-    if (this.next_controller !== null) {
-        this.next_controller.handle_message(msg_type, message);
-    }
+    this.delegate_channel.send(msg_type, message);
 };
 
 

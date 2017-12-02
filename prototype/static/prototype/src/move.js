@@ -68,7 +68,7 @@ _Ready.prototype.onMouseDown = function (controller, msg_type, $event) {
     } else if (last_selected.last_selected_transition !== null) {
         controller.changeState(Selected1);
     } else {
-        controller.next_controller.handle_message(msg_type, $event);
+        controller.delegate_channel.send(msg_type, $event);
     }
 };
 _Ready.prototype.onMouseDown.transitions = ['Selected1'];
@@ -96,7 +96,7 @@ _Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
                                                              state.label));
     }
 
-	controller.next_controller.handle_message(msg_type, $event);
+	controller.delegate_channel.send(msg_type, $event);
 };
 
 _Start.prototype.start = function (controller) {

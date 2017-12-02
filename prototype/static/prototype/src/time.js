@@ -34,7 +34,7 @@ _Past.prototype.start = function (controller) {
 
 _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
 
-    controller.next_controller.handle_message(msg_type, message);
+    controller.delegate_channel.send(msg_type, message);
 };
 _Past.prototype.onMouseWheel.transitions = ['Present'];
 
@@ -118,7 +118,7 @@ _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
             this.redo(controller);
         }
     } else {
-        controller.next_controller.handle_message(msg_type, message);
+        controller.delegate_channel.send(msg_type, message);
     }
 
 };
@@ -141,7 +141,7 @@ _Past.prototype.onKeyDown = function(controller, msg_type, $event) {
         this.redo(controller);
         return;
     } else {
-        controller.next_controller.handle_message(msg_type, $event);
+        controller.delegate_channel.send(msg_type, $event);
     }
 };
 _Past.prototype.onKeyDown.transitions = ['Present'];
@@ -345,7 +345,7 @@ _Present.prototype.onMouseWheel = function (controller, msg_type, message) {
             this.undo(controller);
         }
     } else {
-        controller.next_controller.handle_message(msg_type, message);
+        controller.delegate_channel.send(msg_type, message);
     }
 
 };
@@ -362,7 +362,7 @@ _Present.prototype.onKeyDown = function(controller, msg_type, $event) {
         this.undo(controller);
         return;
     } else {
-        controller.next_controller.handle_message(msg_type, $event);
+        controller.delegate_channel.send(msg_type, $event);
     }
 };
 _Present.prototype.onKeyDown.transitions = ['Past'];
