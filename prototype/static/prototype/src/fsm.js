@@ -1,33 +1,58 @@
-function Channel(from_controller, to_controller) {
+var messages = require('./messages.js');
+
+function Channel(from_controller, to_controller, tracer) {
+    this.tracer = tracer;
     this.from_controller = from_controller;
     this.to_controller = to_controller;
+    this.trace = false;
 }
 exports.Channel = Channel;
 
 Channel.prototype.send = function(msg_type, message) {
+    if (this.trace && this.from_controller !== null) {
+        this.tracer.send_trace_message(new messages.ChannelTrace(this.from_controller.name,
+                                                                 this.to_controller.name,
+                                                                 msg_type));
+    }
     this.to_controller.handle_message(msg_type, message);
 };
 
-function NullChannel(from_controller) {
+function NullChannel(from_controller, tracer) {
+    this.tracer = tracer;
     this.from_controller = from_controller;
+    this.trace = false;
 }
 
-NullChannel.prototype.send = function() {
+NullChannel.prototype.send = function(msg_type) {
+    if (this.trace) {
+        this.tracer.send_trace_message(new messages.ChannelTrace(this.from_controller.name,
+                                                                 'null',
+                                                                 msg_type));
+    }
 };
 
-function FSMController (scope, initial_state) {
+function FSMController (scope, name, initial_state, tracer) {
     this.scope = scope;
+    this.name = name;
     this.state = initial_state;
     this.state.start(this);
-    this.delegate_channel = new NullChannel(this);
+    this.delegate_channel = new NullChannel(this, tracer);
+    this.tracer = tracer;
+    this.trace = true;
+    this.handling_message_type = null;
 }
 exports.FSMController = FSMController;
 
 FSMController.prototype.changeState = function (state) {
-    console.log(state);
     if(this.state !== null) {
         this.state.end(this);
     }
+    if (this.trace) {
+        this.tracer.send_trace_message(new messages.FSMTrace(this.name,
+                                                             this.state.name,
+                                                             state.name,
+                                                             this.handling_message_type));
+        }
     this.state = state;
     if(state !== null) {
         state.start(this);
@@ -36,12 +61,15 @@ FSMController.prototype.changeState = function (state) {
 
 FSMController.prototype.handle_message = function(msg_type, message) {
 
+    var old_handling_message_type = this.handling_message_type;
+    this.handling_message_type = msg_type;
     var handler_name = 'on' + msg_type;
     if (typeof(this.state[handler_name]) !== "undefined") {
         this.state[handler_name](this, msg_type, message);
     } else {
         this.default_handler(msg_type, message);
     }
+    this.handling_message_type = old_handling_message_type;
 };
 
 FSMController.prototype.default_handler = function(msg_type, message) {

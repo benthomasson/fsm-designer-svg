@@ -1,5 +1,5 @@
 
-console.log = function () { };
+//console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
@@ -21,6 +21,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.history = [];
+  $scope.client_id = 0;
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";
   $scope.onMouseUpResult = "";
@@ -48,22 +49,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.selected_transitions = [];
   $scope.new_transition = null;
   //Define the FSMs
-  $scope.view_controller = new fsm.FSMController($scope, view.Start);
-  $scope.move_controller = new fsm.FSMController($scope, move.Start);
-  $scope.transition_controller = new fsm.FSMController($scope, transition.Start);
-  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start);
-  $scope.time_controller = new fsm.FSMController($scope, time.Start);
+  $scope.view_controller = new fsm.FSMController($scope, 'view_fsm', view.Start, $scope);
+  $scope.move_controller = new fsm.FSMController($scope, 'move_fsm', move.Start, $scope);
+  $scope.transition_controller = new fsm.FSMController($scope, 'transition_fsm', transition.Start, $scope);
+  $scope.buttons_controller = new fsm.FSMController($scope, 'buttons_fsm', buttons.Start, $scope);
+  $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
 
   //Wire up the FSMs
   $scope.move_controller.delegate_channel = new fsm.Channel($scope.move_controller,
-                                                            $scope.view_controller);
+                                                            $scope.view_controller,
+                                                            $scope);
   $scope.transition_controller.delegate_channel = new fsm.Channel($scope.transition_controller,
-                                                                  $scope.move_controller);
+                                                                  $scope.move_controller,
+                                                                  $scope);
   $scope.buttons_controller.delegate_channel = new fsm.Channel($scope.buttons_controller,
-                                                               $scope.transition_controller);
+                                                               $scope.transition_controller,
+                                                               $scope);
   $scope.time_controller.delegate_channel = new fsm.Channel($scope.time_controller,
-                                                            $scope.buttons_controller);
-  $scope.first_channel = new fsm.Channel(null, $scope.time_controller);
+                                                            $scope.buttons_controller,
+                                                            $scope);
+  $scope.first_channel = new fsm.Channel(null,
+                                         $scope.time_controller,
+                                         $scope);
   $scope.last_key = "";
   $scope.last_key_code = null;
   $scope.last_event = null;
@@ -77,6 +84,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.state_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.transition_id_seq = util.natural_numbers(0);
+  $scope.trace_id_seq = util.natural_numbers(0);
+  $scope.trace_id = $scope.trace_id_seq();
   $scope.time_pointer = -1;
   $scope.frame = 0;
   $scope.client_messages = {};
@@ -335,10 +344,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton),
-      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton)
+      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton, $scope),
+      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope)
     ];
-
 
 
     $scope.onStateCreate = function(data) {
@@ -728,15 +736,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 		$scope.control_socket.onopen();
 	}
 
-    $scope.send_control_message = function (message) {
+    $scope.send_trace_message = function (message) {
         console.log(message);
+        if ($scope.history.length === 0) {
+            $scope.send_snapshot();
+        }
+        message.sender = $scope.client_id;
+        message.trace_id = $scope.trace_id;
+        message.message_id = $scope.message_id_seq();
+        var data = messages.serialize(message);
+        //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
+        $scope.control_socket.send(data);
+    };
+
+    $scope.send_control_message = function (message) {
+        //console.log(message);
         if ($scope.history.length === 0) {
             $scope.send_snapshot();
         }
         message.sender = $scope.client_id;
         message.message_id = $scope.message_id_seq();
         var data = messages.serialize(message);
-        console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
+        //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
         $scope.control_socket.send(data);
     };
 

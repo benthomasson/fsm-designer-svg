@@ -115,3 +115,24 @@ function Redo(sender, original_message) {
     this.original_message = original_message;
 }
 exports.Redo = Redo;
+
+function FSMTrace(fsm_name, from_state, to_state, recv_message_type) {
+    this.msg_type = 'FSMTrace';
+    this.sender = 0;
+    this.trace_id = 0;
+    this.fsm_name = fsm_name;
+    this.from_state = from_state;
+    this.to_state = to_state;
+    this.recv_message_type = recv_message_type;
+}
+exports.FSMTrace = FSMTrace;
+
+function ChannelTrace(from_fsm, to_fsm, sent_message_type) {
+    this.msg_type = 'ChannelTrace';
+    this.sender = 0;
+    this.trace_id = 0;
+    this.from_fsm = from_fsm;
+    this.to_fsm = to_fsm;
+    this.sent_message_type = sent_message_type;
+}
+exports.ChannelTrace = ChannelTrace;

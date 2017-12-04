@@ -182,30 +182,30 @@ Transition.prototype.perpendicular = function (x, y) {
 Transition.prototype.is_selected = function (x, y) {
     // Is the distance to the mouse location less than 25 if on the label side
     // or 5 on the other from the shortest line to the transition?
-    console.log("is_selected");
+    //console.log("is_selected");
     var phi = this.slope_rad();
-    console.log({"phi": phi});
-    console.log({'x': this.from_state.x, 'y': this.from_state.y});
-    console.log({'x': this.to_state.x, 'y': this.to_state.y});
-    console.log({'x': x, 'y': y});
+    //console.log({"phi": phi});
+    //console.log({'x': this.from_state.x, 'y': this.from_state.y});
+    //console.log({'x': this.to_state.x, 'y': this.to_state.y});
+    //console.log({'x': x, 'y': y});
     var p1 = util.cartesianToPolar(this.from_state.x, this.from_state.y);
     var p2 = util.cartesianToPolar(this.to_state.x, this.to_state.y);
     var p3 = util.cartesianToPolar(x, y);
-    console.log(p1);
+    //console.log(p1);
     p1.theta -= phi;
-    console.log(p1);
-    console.log(p2);
+    //console.log(p1);
+    //console.log(p2);
     p2.theta -= phi;
-    console.log(p2);
+    //console.log(p2);
     p3.theta -= phi;
 
     p1 = util.polarToCartesian_rad(0, 0, p1.r, p1.theta);
     p2 = util.polarToCartesian_rad(0, 0, p2.r, p2.theta);
     p3 = util.polarToCartesian_rad(0, 0, p3.r, p3.theta);
     p2.y -= this.arc_offset2();
-    console.log(p1);
-    console.log(p2);
-    console.log(p3);
+    //console.log(p1);
+    //console.log(p2);
+    //console.log(p3);
     var max_x = Math.max(p1.x, p2.x);
     var min_x = Math.min(p1.x, p2.x);
     var max_y = Math.max(p1.y, p2.y) + 5;
@@ -294,7 +294,7 @@ Transition.prototype.start_arc_angle = function () {
 };
 
 
-function Button(label, x, y, width, height, callback) {
+function Button(label, x, y, width, height, callback, tracer) {
     this.label = label;
     this.x = x;
     this.y = y;
@@ -303,7 +303,7 @@ function Button(label, x, y, width, height, callback) {
     this.callback = callback;
     this.is_pressed = false;
     this.mouse_over = false;
-    this.fsm = new fsm.FSMController(this, button.Start);
+    this.fsm = new fsm.FSMController(this, 'button_fsm', button.Start, tracer);
 }
 exports.Button = Button;
 
