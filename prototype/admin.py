@@ -12,6 +12,8 @@ from prototype.models import State
 
 from prototype.models import Transition
 
+from prototype.models import FSMTrace
+
 
 class ClientAdmin(admin.ModelAdmin):
     fields = ()
@@ -59,3 +61,11 @@ class TransitionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Transition, TransitionAdmin)
+
+
+class FSMTraceAdmin(admin.ModelAdmin):
+    fields = ('fsm_name', 'from_state', 'to_state', 'message_type', 'client', 'trace_session_id',)
+    raw_id_fields = ('client',)
+
+
+admin.site.register(FSMTrace, FSMTraceAdmin)

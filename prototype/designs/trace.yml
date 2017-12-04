@@ -1,13 +1,12 @@
 app: fsm
-external_models: []
 models:
 - fields:
   - name: client_id
     pk: true
     type: AutoField
   name: Client
-  x: -455
-  y: 109
+  x: -602
+  y: 112
 - fields:
   - name: history_id
     pk: true
@@ -34,8 +33,7 @@ models:
   name: History
   x: -205
   y: 240
-- display: name
-  fields:
+- fields:
   - name: message_type_id
     pk: true
     type: AutoField
@@ -43,10 +41,9 @@ models:
     name: name
     type: CharField
   name: MessageType
-  x: -509
-  y: 383
-- display: name
-  fields:
+  x: -472
+  y: 378
+- fields:
   - name: finite_state_machine_id
     pk: true
     type: AutoField
@@ -62,8 +59,7 @@ models:
   name: FiniteStateMachine
   x: 225
   y: 152
-- display: name
-  fields:
+- fields:
   - name: state_id
     pk: true
     type: AutoField
@@ -83,20 +79,17 @@ models:
   name: State
   x: 516
   y: 154
-- display: label
-  fields:
+- fields:
   - name: transition_id
     pk: true
     type: AutoField
   - name: from_state
     ref: State
     ref_field: state_id
-    related_name: from_transition
     type: ForeignKey
   - name: to_state
     ref: State
     ref_field: state_id
-    related_name: to_transition
     type: ForeignKey
   - len: 200
     name: label
@@ -130,5 +123,5 @@ models:
     name: trace_session_id
     type: IntegerField
   name: FSMTrace
-  x: -427
-  y: -73
+  x: -191
+  y: -122

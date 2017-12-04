@@ -2,6 +2,7 @@
 from channels import Group, Channel
 from channels.sessions import channel_session
 from prototype.models import FiniteStateMachine, State, Transition, Client, History, MessageType
+from prototype.models import FSMTrace
 import urlparse
 from django.db.models import Q
 from . views import transform_state, transform_dict
@@ -225,6 +226,13 @@ class _Persistence(object):
     def onRedo(self, message_value, finite_state_machine_id, client_id):
         redo_persistence.handle(message_value['original_message'], finite_state_machine_id, client_id)
 
+    def onFSMTrace(self, message_value, finite_state_machine_id, client_id):
+        FSMTrace(trace_session_id=message_value['trace_id'],
+                 fsm_name=message_value['fsm_name'],
+                 from_state=message_value['from_state'],
+                 to_state=message_value['to_state'],
+                 client_id=client_id,
+                 message_type=message_value['recv_message_type']).save()
 
 persistence = _Persistence()
 
