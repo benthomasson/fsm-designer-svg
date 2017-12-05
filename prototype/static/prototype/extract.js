@@ -1,65 +1,47 @@
 #!/usr/bin/env node
-YAML = require('yamljs');
-//console.log('start')
-var args = process.argv.slice(2)
-//console.log(args[0])
-var module_name = args[0]
-var app = module_name.slice(2).split('.')[0]
-//console.log(module_name)
-//console.log(app)
-var module = require(module_name)
-//console.log(module)
-var names = Object.keys(module)
-//console.log(names)
-var i = 0
-var j = 0
-var k = 0
-var fnames = null
-var name = null
-var fname = null
-var o = null
-var fn = null
-var states = []
-var transitions = []
-var data = {}
-for(i = 0; i < names.length; i++) {
-    name = names[i]
-    o = module[name]
-    //console.log(o)
-    //console.log(typeof o)
-    if (typeof o !== 'object') {
-        continue
-    }
+var YAML = require('yamljs');
 
-    if (typeof o.constructor.super_ === 'undefined') {
-        continue
-    }
+function Iterator(o){
+    var k=Object.keys(o);
+    return {
+        next:function(){
+            return k.shift();
+        }
+    };
+}
 
-    if (o.constructor.super_.name !== '_State') {
-        continue
-    }
+var myArgs = process.argv.slice(2);
+var implementation = require(myArgs[0]);
+var states = [];
+var transitions = [];
+var data = {states: states,
+            transitions: transitions};
 
-
-    fnames = Object.keys(o.__proto__)
-    //console.log(fnames)
-    for (j = 0; j < fnames.length; j++) {
-        fname = fnames[j]
-        fn = o.__proto__[fname]
-        if (typeof fn.transitions !== 'undefined') {
-            for (k = 0; k < fn.transitions.length; k++) {
-                transition = fn.transitions[k]
-                transitions.push({from_state: name,
-                                  to_state: transition,
-                                  label: fname})
-                //console.log(name + " on " + fname + " to " + fn.transitions)
+var state_iter = Iterator(implementation);
+var transition_iter = null;
+var next_state = state_iter.next();
+var next_transition = null;
+var state = null;
+var transition = null;
+var i = 0;
+while(next_state !== undefined) {
+    state = implementation[next_state];
+    transition_iter = Iterator(state.constructor.prototype)
+    next_transition = transition_iter.next();
+    while (next_transition !== undefined) {
+        transition = state.constructor.prototype[next_transition];
+        if (transition.transitions !== undefined) {
+            for (i = 0; i < transition.transitions.length; i++) {
+                transitions.push({from_state: next_state,
+                                  to_state:transition.transitions[i],
+                                  label:next_transition});
             }
         }
+        next_transition = transition_iter.next();
     }
-    states.push({label: name, size: 100, x:100, y:100})
+    states.push({label: state.name});
+    next_state = state_iter.next();
 }
-data.app = app
-data.states = states
-data.transitions = transitions
-console.log(YAML.stringify(data))
 
-//console.log('end')
+
+console.log(YAML.stringify(data));
