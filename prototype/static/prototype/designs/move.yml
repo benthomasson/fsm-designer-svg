@@ -1,5 +1,5 @@
 finite_state_machine_id: 17
-name: move
+name: move_fsm
 states:
 - id: 3
   label: Selected1
