@@ -381,7 +381,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.buttons = [
       new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton, $scope),
-      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope)
+      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope),
+      new models.Button("DownloadTrace", 130, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
+      new models.Button("UploadTrace", 190, 10, 60, 50, $scope.onUploadTraceButton, $scope)
     ];
 
 
