@@ -837,6 +837,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         if ($scope.replay_data.length > 0) {
             $scope.clear_all_selections();
             var replay = $scope.replay_data.pop(0);
+            while(replay.fsm_name !== $scope.finite_state_machine_name && $scope.replay_data.length > 0) {
+                replay = $scope.replay_data.pop(0);
+            }
             console.log(replay);
             if (replay.fsm_name === $scope.finite_state_machine_name) {
                 var from_state = null;
@@ -856,9 +859,16 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                 if (from_state !== null && to_state !== null) {
                     for (i = 0; i < $scope.transitions.length; i++) {
                         transition = $scope.transitions[i];
+                        //Match the message handlers with an "on" prefix
                         if (from_state.id === transition.from_state.id &&
                             to_state.id === transition.to_state.id &&
                             transition.label === "on" + replay.message_type) {
+                            transition.selected = true;
+                        }
+                        //Match the start and end special cases
+                        if (from_state.id === transition.from_state.id &&
+                            to_state.id === transition.to_state.id &&
+                            transition.label === replay.message_type) {
                             transition.selected = true;
                         }
                     }

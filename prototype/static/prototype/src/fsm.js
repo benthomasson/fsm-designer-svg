@@ -44,8 +44,12 @@ function FSMController (scope, name, initial_state, tracer) {
 exports.FSMController = FSMController;
 
 FSMController.prototype.changeState = function (state) {
+    var old_handling_message_type;
     if(this.state !== null) {
+        old_handling_message_type = this.handling_message_type;
+        this.handling_message_type = 'end';
         this.state.end(this);
+        this.handling_message_type = old_handling_message_type;
     }
     if (this.trace) {
         this.tracer.send_trace_message(new messages.FSMTrace(this.name,
@@ -55,7 +59,10 @@ FSMController.prototype.changeState = function (state) {
         }
     this.state = state;
     if(state !== null) {
+        old_handling_message_type = this.handling_message_type;
+        this.handling_message_type = 'start';
         state.start(this);
+        this.handling_message_type = old_handling_message_type;
     }
 };
 
