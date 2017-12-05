@@ -14,6 +14,8 @@ from prototype.models import Transition
 
 from prototype.models import FSMTrace
 
+from prototype.models import FSMTraceReplay
+
 
 class ClientAdmin(admin.ModelAdmin):
     fields = ()
@@ -69,3 +71,11 @@ class FSMTraceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FSMTrace, FSMTraceAdmin)
+
+
+class FSMTraceReplayAdmin(admin.ModelAdmin):
+    fields = ('replay_data',)
+    raw_id_fields = ()
+
+
+admin.site.register(FSMTraceReplay, FSMTraceReplayAdmin)

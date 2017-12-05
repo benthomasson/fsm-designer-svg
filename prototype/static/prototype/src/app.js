@@ -11,16 +11,20 @@ var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
 
-app.controller('MainCtrl', function($scope, $document, $location, $window) {
+app.controller('MainCtrl', function($scope, $document, $location, $window, $http) {
 
   window.scope = $scope;
 
   $scope.finite_state_machine_id = $location.search().finite_state_machine_id || 0;
+  $scope.replay_id = $location.search().replay_id || 0;
+  $scope.replay_data = [];
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?finite_state_machine_id=" + $scope.finite_state_machine_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
+  $scope.location = $location;
   $scope.history = [];
+  $scope.frame = 0;
   $scope.client_id = 0;
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";
@@ -170,6 +174,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             key = "" + transition.from_state.id + "_" + transition.to_state.id;
             transition.offset = map.get(key);
             map.set(key, transition.offset + 1);
+        }
+    };
+
+    $scope.clear_all_selections = function () {
+
+        var i = 0;
+        var states = $scope.states;
+        var transitions = $scope.transitions;
+        $scope.selected_items = [];
+        $scope.selected_states = [];
+        $scope.selected_transitions = [];
+        for (i = 0; i < states.length; i++) {
+            if (states[i].selected) {
+                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
+            }
+            states[i].selected = false;
+            states[i].remote_selected = false;
+        }
+        for (i = 0; i < transitions.length; i++) {
+            transitions[i].remote_selected = false;
+            transitions[i].selected = false;
+            $scope.send_control_message(new messages.TransitionUnSelected($scope.client_id, transitions[i].id));
         }
     };
 
@@ -339,6 +365,16 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.onUploadButton = function (button) {
         console.log(button.label);
         window.open("/prototype/upload", "_top");
+    };
+
+    $scope.onDownloadTraceButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/download_trace?finite_state_machine_id=" + $scope.finite_state_machine_id + "&trace_id=" + $scope.trace_id + "&client_id=" + $scope.client_id);
+    };
+
+    $scope.onUploadTraceButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/upload_trace?finite_state_machine_id=" + $scope.finite_state_machine_id, "_top");
     };
 
     // Buttons
@@ -556,9 +592,22 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.onFiniteStateMachine = function(data) {
         $scope.finite_state_machine_id = data.finite_state_machine_id;
+        $scope.finite_state_machine_name = data.name;
         $scope.state_id_seq = util.natural_numbers(data.state_id_seq);
         $scope.transition_id_seq = util.natural_numbers(data.transition_id_seq);
-        $location.search({finite_state_machine_id: data.finite_state_machine_id});
+        var search_data = {finite_state_machine_id: data.finite_state_machine_id};
+        if ($scope.replay_id !== 0) {
+            search_data.replay_id = $scope.replay_id;
+            $http.get('/prototype/download_replay?replay_id=' + $scope.replay_id)
+                .then(function (response) {
+                    $scope.replay_data = response.data;
+                    console.log(response);
+                })
+                .catch(function (response) {
+                    console.log(response);
+                });
+        }
+        $location.search(search_data);
     };
 
     $scope.onTransitionSelected = function(data) {
@@ -775,6 +824,46 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 		// is outside of angular
 	 	$scope.$digest();
     });
+
+    //60fps ~ 17ms delay
+    setInterval( function () {
+        $scope.frame = Math.floor(window.performance.now());
+        $scope.$apply();
+    }, 17);
+
+    setInterval( function () {
+        if ($scope.replay_data.length > 0) {
+            $scope.clear_all_selections();
+            var replay = $scope.replay_data.pop(0);
+            console.log(replay);
+            if (replay.fsm_name === $scope.finite_state_machine_name) {
+                var from_state = null;
+                var to_state = null;
+                var transition = null;
+                var i = 0;
+                for (i = 0; i < $scope.states.length; i++) {
+                    if ($scope.states[i].label === replay.from_state) {
+                        from_state = $scope.states[i];
+                        from_state.remote_selected = true;
+                    }
+                    if ($scope.states[i].label === replay.to_state) {
+                        to_state = $scope.states[i];
+                        to_state.selected = true;
+                    }
+                }
+                if (from_state !== null && to_state !== null) {
+                    for (i = 0; i < $scope.transitions.length; i++) {
+                        transition = $scope.transitions[i];
+                        if (from_state.id === transition.from_state.id &&
+                            to_state.id === transition.to_state.id &&
+                            transition.label === "on" + replay.message_type) {
+                            transition.selected = true;
+                        }
+                    }
+                }
+            }
+        }
+    }, 1000);
 
     window.scope = $scope;
 });

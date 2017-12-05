@@ -132,3 +132,12 @@ models:
   name: FSMTrace
   x: -427
   y: -73
+- fields:
+  - name: fsm_trace_replay_id
+    pk: true
+    type: AutoField
+  - name: replay_data
+    type: TextField
+  name: FSMTraceReplay
+  x: 166
+  y: -222

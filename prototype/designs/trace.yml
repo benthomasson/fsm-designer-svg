@@ -5,8 +5,8 @@ models:
     pk: true
     type: AutoField
   name: Client
-  x: -602
-  y: 112
+  x: -455
+  y: 109
 - fields:
   - name: history_id
     pk: true
@@ -41,8 +41,8 @@ models:
     name: name
     type: CharField
   name: MessageType
-  x: -472
-  y: 378
+  x: -509
+  y: 383
 - fields:
   - name: finite_state_machine_id
     pk: true
@@ -123,5 +123,14 @@ models:
     name: trace_session_id
     type: IntegerField
   name: FSMTrace
-  x: -191
-  y: -122
+  x: -224
+  y: -213
+- fields:
+  - name: f_s_m_trace_replay_id
+    pk: true
+    type: AutoField
+  - name: replay_data
+    type: TextField
+  name: FSMTraceReplay
+  x: 166
+  y: -222
