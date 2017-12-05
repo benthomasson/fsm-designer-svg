@@ -14,9 +14,6 @@ _State.prototype.onMouseUp = function () {
 _State.prototype.onMouseDown = function () {
 };
 
-_State.prototype.onKeyDown = function () {
-};
-
 
 function _Ready () {
     this.name = 'Ready';
@@ -73,25 +70,6 @@ _Ready.prototype.onMouseWheel = function (controller, msg_type, $event) {
     controller.handle_message(msg_type, $event);
 };
 _Ready.prototype.onMouseWheel.transitions = ['Scale'];
-
-_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
-
-	var scope = controller.scope;
-
-    if ($event.key === 'd') {
-        scope.debug.hidden = !scope.debug.hidden;
-        return;
-    }
-    if ($event.key === 'p') {
-        scope.cursor.hidden = !scope.cursor.hidden;
-        return;
-    }
-    if ($event.key === 'b') {
-        scope.hide_buttons = !scope.hide_buttons;
-        return;
-    }
-};
-
 
 _Start.prototype.start = function (controller) {
 

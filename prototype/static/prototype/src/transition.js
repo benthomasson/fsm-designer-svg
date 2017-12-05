@@ -44,17 +44,6 @@ var Selecting = new _Selecting();
 exports.Selecting = Selecting;
 
 
-
-
-_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
-
-    if ($event.key === 'l' && ($event.metaKey || $event.ctrlKey)) {
-        controller.handle_message("NewTransition", $event);
-    }
-
-	controller.delegate_channel.send(msg_type, $event);
-};
-
 _Ready.prototype.onNewTransition = function (controller) {
 
     controller.scope.clear_selections();

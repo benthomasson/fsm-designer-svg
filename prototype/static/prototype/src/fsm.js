@@ -4,7 +4,7 @@ function Channel(from_controller, to_controller, tracer) {
     this.tracer = tracer;
     this.from_controller = from_controller;
     this.to_controller = to_controller;
-    this.trace = false;
+    this.trace = true;
 }
 exports.Channel = Channel;
 

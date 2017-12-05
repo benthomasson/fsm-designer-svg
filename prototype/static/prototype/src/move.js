@@ -74,29 +74,23 @@ _Ready.prototype.onMouseDown = function (controller, msg_type, $event) {
 _Ready.prototype.onMouseDown.transitions = ['Selected1'];
 
 
-_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
+_Ready.prototype.onNewState = function(controller) {
 
 	var scope = controller.scope;
     var state = null;
 
-    if ($event.key === 's' && ($event.metaKey || $event.ctrlKey)) {
-		state = new models.State(controller.scope.state_id_seq(),
-                                   "State",
-                                   scope.scaledX,
-                                   scope.scaledY,
-                                   "state");
-	}
+    state = new models.State(controller.scope.state_id_seq(),
+                               "State",
+                               scope.scaledX,
+                               scope.scaledY,
+                               "state");
 
-    if (state !== null) {
-        scope.states.push(state);
-        scope.send_control_message(new messages.StateCreate(scope.client_id,
-                                                             state.id,
-                                                             state.x,
-                                                             state.y,
+    scope.states.push(state);
+    scope.send_control_message(new messages.StateCreate(scope.client_id,
+                                                         state.id,
+                                                         state.x,
+                                                         state.y,
                                                              state.label));
-    }
-
-	controller.delegate_channel.send(msg_type, $event);
 };
 
 _Start.prototype.start = function (controller) {
@@ -180,6 +174,8 @@ _Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
                                                                                      transitions[i].label));
                 }
         }
+    } else {
+        controller.delegate_channel.send(msg_type, $event);
     }
 };
 _Selected2.prototype.onKeyDown.transitions = ['Ready'];

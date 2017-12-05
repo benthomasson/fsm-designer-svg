@@ -4,6 +4,7 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
+var hotkeys_fsm = require('./hotkeys.fsm.js');
 var transition = require('./transition.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
@@ -53,6 +54,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.selected_transitions = [];
   $scope.new_transition = null;
   //Define the FSMs
+  $scope.hotkeys_controller = new fsm.FSMController($scope, 'hotkeys_fsm', hotkeys_fsm.Start, $scope);
   $scope.view_controller = new fsm.FSMController($scope, 'view_fsm', view.Start, $scope);
   $scope.move_controller = new fsm.FSMController($scope, 'move_fsm', move.Start, $scope);
   $scope.transition_controller = new fsm.FSMController($scope, 'transition_fsm', transition.Start, $scope);
@@ -60,6 +62,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
 
   //Wire up the FSMs
+  $scope.view_controller.delegate_channel = new fsm.Channel($scope.view_controller,
+                                                            $scope.hotkeys_controller,
+                                                            $scope);
   $scope.move_controller.delegate_channel = new fsm.Channel($scope.move_controller,
                                                             $scope.view_controller,
                                                             $scope);
