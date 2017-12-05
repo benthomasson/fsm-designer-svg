@@ -122,7 +122,7 @@ class _Persistence(object):
             return
         message_type = data[0]
         message_value = data[1]
-        message_type_id = MessageType.objects.get_or_create(name=message_type)[0].pk
+        message_type_id = MessageType.objects.get(name=message_type).pk
         History(finite_state_machine_id=finite_state_machine_id,
                 client_id=client_id,
                 message_type_id=message_type_id,
