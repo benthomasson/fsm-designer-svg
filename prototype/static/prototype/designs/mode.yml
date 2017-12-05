@@ -1,0 +1,25 @@
+finite_state_machine_id: 4
+name: mode_fsm
+states:
+- id: 3
+  label: MultiFSM
+  x: 433
+  y: 413
+- id: 2
+  label: FSM
+  x: 431
+  y: 755
+- id: 1
+  label: Start
+  x: 438
+  y: 179
+transitions:
+- from_state: Start
+  label: start
+  to_state: MultiFSM
+- from_state: MultiFSM
+  label: onMouseWheel
+  to_state: FSM
+- from_state: FSM
+  label: onMouseWheel
+  to_state: MultiFSM
