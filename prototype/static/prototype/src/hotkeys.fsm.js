@@ -1,6 +1,7 @@
 /* Copyright (c) 2017 Red Hat, Inc. */
 var inherits = require('inherits');
 var fsm = require('./fsm.js');
+var messages = require('./messages.js');
 
 function _State () {
 }
@@ -59,6 +60,10 @@ _Enabled.prototype.onKeyDown = function(controller, msg_type, $event) {
     }
     else if ($event.key === 's') {
         scope.first_channel.send("NewState", $event);
+        return;
+	}
+    else if ($event.key === 'f') {
+        scope.first_channel.send("NewGroup", new messages.NewGroup("fsm"));
         return;
 	}
     else if ($event.key === '0') {

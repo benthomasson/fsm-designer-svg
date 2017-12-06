@@ -35,6 +35,9 @@
                ng-attr-class="{{state.type}}">
                <g state></g>
             </g>
+            <g ng-repeat="item in groups">
+                <g fsm-group></g>
+            </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>
                 <line x1="0" y1="-5" x2="0" y2="5"/>

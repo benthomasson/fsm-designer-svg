@@ -14,7 +14,8 @@
     "require": "",
     "jshint": "",
     "less": "",
-    "mathjs": ""
+    "mathjs": "",
+    "titlecase": ""
   },
   "devDependencies": {
     "eslint": "^3.17.1",

@@ -136,3 +136,80 @@ function ChannelTrace(from_fsm, to_fsm, sent_message_type) {
     this.sent_message_type = sent_message_type;
 }
 exports.ChannelTrace = ChannelTrace;
+
+function NewGroup(type) {
+    this.type = type;
+}
+exports.NewGroup = NewGroup;
+
+function GroupMove(sender, id, x1, y1, x2, y2, previous_x1, previous_y1, previous_x2, previous_y2) {
+    this.msg_type = "GroupMove";
+    this.sender = sender;
+    this.id = id;
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.previous_x1 = previous_x1;
+    this.previous_y1 = previous_y1;
+    this.previous_x2 = previous_x2;
+    this.previous_y2 = previous_y2;
+}
+exports.GroupMove = GroupMove;
+
+function GroupCreate(sender, id, x1, y1, x2, y2, name, type) {
+    this.msg_type = "GroupCreate";
+    this.sender = sender;
+    this.id = id;
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.name = name;
+    this.type = type;
+}
+exports.GroupCreate = GroupCreate;
+
+function GroupDestroy(sender, id, previous_x1, previous_y1, previous_x2, previous_y2, previous_name, previous_type) {
+    this.msg_type = "GroupDestroy";
+    this.sender = sender;
+    this.id = id;
+    this.previous_x1 = previous_x1;
+    this.previous_y1 = previous_y1;
+    this.previous_x2 = previous_x2;
+    this.previous_y2 = previous_y2;
+    this.previous_name = previous_name;
+    this.previous_type = previous_type;
+}
+exports.GroupDestroy = GroupDestroy;
+
+function GroupLabelEdit(sender, id, name, previous_name) {
+    this.msg_type = "GroupLabelEdit";
+    this.sender = sender;
+    this.id = id;
+    this.name = name;
+    this.previous_name = previous_name;
+}
+exports.GroupLabelEdit = GroupLabelEdit;
+
+function GroupSelected(sender, id) {
+    this.msg_type = "GroupSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.GroupSelected = GroupSelected;
+
+function GroupUnSelected(sender, id) {
+    this.msg_type = "GroupUnSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.GroupUnSelected = GroupUnSelected;
+
+function GroupMembership(sender, id, members) {
+    this.msg_type = "GroupMembership";
+    this.sender = sender;
+    this.id = id;
+    this.members = members;
+}
+exports.GroupMembership = GroupMembership;

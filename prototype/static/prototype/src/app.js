@@ -9,6 +9,7 @@ var transition = require('./transition.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
 var mode_fsm = require('./mode.fsm.js');
+var group_fsm = require('./group.fsm.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
@@ -50,8 +51,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.pressedScaledY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
+  $scope.groups = [];
   $scope.selected_items = [];
   $scope.selected_states = [];
+  $scope.selected_groups = [];
   $scope.selected_transitions = [];
   $scope.new_transition = null;
   //Define the FSMs
@@ -59,6 +62,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.view_controller = new fsm.FSMController($scope, 'view_fsm', view.Start, $scope);
   $scope.move_controller = new fsm.FSMController($scope, 'move_fsm', move.Start, $scope);
   $scope.transition_controller = new fsm.FSMController($scope, 'transition_fsm', transition.Start, $scope);
+  $scope.group_controller = new fsm.FSMController($scope, 'group_fsm', group_fsm.Start, $scope);
   $scope.buttons_controller = new fsm.FSMController($scope, 'buttons_fsm', buttons.Start, $scope);
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
   $scope.mode_controller = new fsm.FSMController($scope, 'mode_fsm', mode_fsm.Start, $scope);
@@ -73,8 +77,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.transition_controller.delegate_channel = new fsm.Channel($scope.transition_controller,
                                                                   $scope.move_controller,
                                                                   $scope);
+  $scope.group_controller.delegate_channel = new fsm.Channel($scope.group_controller,
+                                                                  $scope.transition_controller,
+                                                                  $scope);
   $scope.buttons_controller.delegate_channel = new fsm.Channel($scope.buttons_controller,
-                                                               $scope.transition_controller,
+                                                               $scope.group_controller,
                                                                $scope);
   $scope.time_controller.delegate_channel = new fsm.Channel($scope.time_controller,
                                                             $scope.buttons_controller,
@@ -92,9 +99,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
   $scope.debug = {'hidden': true};
   $scope.hide_buttons = false;
+  $scope.hide_groups = false;
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
+  $scope.group_id_seq = util.natural_numbers(0);
   $scope.state_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.transition_id_seq = util.natural_numbers(0);
@@ -918,5 +927,12 @@ app.directive('upload', function() {
   return { restrict: 'A', templateUrl: 'widgets/upload.svg' };
 });
 
+app.directive('fsmGroup', function() {
+  return { restrict: 'A', templateUrl: 'widgets/group.html' };
+});
+
+app.directive('fsmFsm', function() {
+  return { restrict: 'A', templateUrl: 'widgets/fsm.html' };
+});
 
 exports.app = app;

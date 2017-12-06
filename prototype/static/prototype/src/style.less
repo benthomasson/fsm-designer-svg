@@ -14,6 +14,7 @@
 @button-outline: #b4b6b4;
 @button-body-hover: #dfdfdf;
 @button-body-pressed: #d5d5d5;
+@group: #707070;
 @green: #5CB85C;
 @red: #D9534F;
 @unknown: #D7D7D7;
@@ -196,4 +197,104 @@ path.arrow-selected {
 
 .button-hover text {
     fill: @button-text;
+}
+
+.FSM--construction {
+    fill-opacity: 0;
+    stroke: @debug-copynot;
+    stroke-width: 1;
+}
+
+.FSM__group--selected {
+    stroke: @selected-blue;
+    stroke-width: 6;
+    fill: none;
+}
+
+.FSM__group--remote-selected {
+    stroke: @selected-mango;
+    stroke-width: 6;
+    fill: none;
+}
+
+.FSM__group--selected-conflict {
+    stroke: @selected-red;
+    stroke-width: 6;
+    fill: none;
+}
+
+.FSM__group {
+    stroke: @group;
+    stroke-width: 2;
+    fill: none;
+}
+
+.FSM__group--debug {
+    stroke: @debug-copynot;
+    stroke-width: 1;
+    fill: none;
+}
+
+.FSM__group-text {
+    fill: @button-text;
+    font-family: 'Open Sans';
+}
+
+
+.FSM__group-text--selected {
+    font-family: 'Open Sans';
+}
+
+.FSM--hidden {
+    display: none;
+}
+
+.FSM__fsm {
+    fill: @widget-body;
+    stroke: @dark-widget-detail;
+    stroke-width: 2;
+}
+
+.FSM__fsm--selected {
+    stroke: @selected-blue;
+    stroke-width: 4;
+}
+
+.FSM__fsm--remote-selected {
+    stroke: @selected-mango;
+    stroke-width: 4;
+}
+
+.FSM__fsm--selected-conflict {
+    stroke: @selected-red;
+    stroke-width: 4;
+}
+
+.FSM__fsm line {
+    stroke: @light-widget-detail;
+    stroke-width: 20;
+}
+
+.FSM__fsm-state {
+    fill: @light-widget-detail;
+    stroke: none;
+}
+
+.FSM__fsm-transition {
+    fill: none;
+    stroke: @light-widget-detail;
+}
+
+.FSM__fsm-arrow {
+    fill: @light-widget-detail;
+    stroke: @light-widget-detail;
+}
+
+.FSM__fsm-text {
+    fill: @button-text;
+    font-family: 'Open Sans';
+}
+
+.FSM__fsm-text--selected {
+    font-family: 'Open Sans';
 }
