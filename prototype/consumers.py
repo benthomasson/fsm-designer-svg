@@ -1,11 +1,12 @@
 # In consumers.py
 from channels import Group, Channel
 from channels.sessions import channel_session
-from prototype.models import FiniteStateMachine, State, Transition, Client, History, MessageType
+from prototype.models import Diagram, State, Transition, Client, History, MessageType
 from prototype.models import FSMTrace
 import urlparse
 from django.db.models import Q
 from . views import transform_state, transform_dict
+from django.core.exceptions import ObjectDoesNotExist
 
 import json
 # Connected to websocket.connect
@@ -33,33 +34,33 @@ def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
     data = urlparse.parse_qs(message.content['query_string'])
-    finite_state_machine_id = data.get('finite_state_machine_id', ['null'])
+    diagram_id = data.get('diagram_id', ['null'])
     try:
-        finite_state_machine_id = int(finite_state_machine_id[0])
+        diagram_id = int(diagram_id[0])
     except ValueError:
-        finite_state_machine_id = None
-    if not finite_state_machine_id:
-        finite_state_machine_id = None
-    fsm, created = FiniteStateMachine.objects.get_or_create(
-        finite_state_machine_id=finite_state_machine_id, defaults=dict(name="fsm"))
-    finite_state_machine_id = fsm.finite_state_machine_id
-    message.channel_session['finite_state_machine_id'] = finite_state_machine_id
-    Group("fsm-%s" % finite_state_machine_id).add(message.reply_channel)
+        diagram_id = None
+    if not diagram_id:
+        diagram_id = None
+    diagram, created = Diagram.objects.get_or_create(
+        diagram_id=diagram_id, defaults=dict(name="diagram"))
+    diagram_id = diagram.diagram_id
+    message.channel_session['diagram_id'] = diagram_id
+    Group("diagram-%s" % diagram_id).add(message.reply_channel)
     client = Client()
     client.save()
     message.channel_session['client_id'] = client.pk
     message.reply_channel.send({"text": json.dumps(["id", client.pk])})
-    message.reply_channel.send({"text": json.dumps(["finite_state_machine_id", finite_state_machine_id])})
-    fsm_data = fsm.__dict__.copy()
-    if '_state' in fsm_data:
-        del fsm_data['_state']
-    message.reply_channel.send({"text": json.dumps(["FiniteStateMachine", fsm_data])})
+    message.reply_channel.send({"text": json.dumps(["diagram_id", diagram_id])})
+    diagram_data = diagram.__dict__.copy()
+    if '_state' in diagram_data:
+        del diagram_data['_state']
+    message.reply_channel.send({"text": json.dumps(["Diagram", diagram_data])})
     states = list(State.objects
-                  .filter(finite_state_machine_id=finite_state_machine_id).values())
+                  .filter(diagram_id=diagram_id).values())
     states = map(transform_state, states)
     transitions = list(Transition.objects
-                                 .filter(Q(from_state__finite_state_machine_id=finite_state_machine_id) |
-                                         Q(to_state__finite_state_machine_id=finite_state_machine_id))
+                                 .filter(Q(from_state__diagram_id=diagram_id) |
+                                         Q(to_state__diagram_id=diagram_id))
                                  .values('from_state__id', 'to_state__id', 'label', 'id'))
     transitions = map(transform_transition, transitions)
     snapshot = dict(sender=0,
@@ -73,7 +74,7 @@ def ws_connect(message):
                                     'Undo',
                                     'Redo']
     history = list(History.objects
-                          .filter(finite_state_machine_id=finite_state_machine_id)
+                          .filter(diagram_id=diagram_id)
                           .exclude(message_type__name__in=history_message_ignore_types)
                           .exclude(undone=True)
                           .order_by('pk')
@@ -85,20 +86,20 @@ def ws_connect(message):
 def ws_message(message):
     # Send to debug printer
     Channel('console_printer').send({"text": message['text']})
-    # Send to all clients editing the fsm
-    Group("fsm-%s" % message.channel_session['finite_state_machine_id']).send({
+    # Send to all clients editing the diagram
+    Group("diagram-%s" % message.channel_session['diagram_id']).send({
         "text": message['text'],
     })
     # Send to persistence worker
     Channel('persistence').send(
         {"text": message['text'],
-         "fsm": message.channel_session['finite_state_machine_id'],
+         "diagram": message.channel_session['diagram_id'],
          "client": message.channel_session['client_id']})
 
 
 @channel_session
 def ws_disconnect(message):
-    Group("fsm-%s" % message.channel_session['finite_state_machine_id']).discard(message.reply_channel)
+    Group("diagram-%s" % message.channel_session['diagram_id']).discard(message.reply_channel)
 
 
 def console_printer(message):
@@ -108,9 +109,9 @@ def console_printer(message):
 class _Persistence(object):
 
     def handle(self, message):
-        finite_state_machine_id = message.get('fsm')
-        if finite_state_machine_id is None:
-            print "No finite_state_machine_id"
+        diagram_id = message.get('diagram')
+        if diagram_id is None:
+            print "No diagram_id"
             return
         client_id = message.get('client')
         if client_id is None:
@@ -122,23 +123,28 @@ class _Persistence(object):
             return
         message_type = data[0]
         message_value = data[1]
-        message_type_id = MessageType.objects.get(name=message_type).pk
-        History(finite_state_machine_id=finite_state_machine_id,
+        try:
+            message_type_id = MessageType.objects.get(name=message_type).pk
+        except ObjectDoesNotExist, e:
+            print ("Missing message type", message_type)
+            print "Unsupported message ", message_type
+            return
+        History(diagram_id=diagram_id,
                 client_id=client_id,
                 message_type_id=message_type_id,
                 message_id=data[1].get('message_id', 0),
                 message_data=message['text']).save()
         handler = getattr(self, "on{0}".format(message_type), None)
         if handler is not None:
-            handler(message_value, finite_state_machine_id, client_id)
+            handler(message_value, diagram_id, client_id)
         else:
             print "Unsupported message ", message_type
 
-    def onSnapshot(self, snapshot, finite_state_machine_id, client_id):
+    def onSnapshot(self, snapshot, diagram_id, client_id):
         state_map = dict()
         for state in snapshot['states']:
             state = transform_state_in(state)
-            d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
+            d, _ = State.objects.get_or_create(diagram_id=diagram_id,
                                                id=state['id'],
                                                defaults=state)
             d.name = state['name']
@@ -151,82 +157,82 @@ class _Persistence(object):
             Transition.objects.get_or_create(from_state=state_map[transition['from_state']],
                                              to_state=state_map[transition['to_state']])
 
-    def onStateCreate(self, state, finite_state_machine_id, client_id):
+    def onStateCreate(self, state, diagram_id, client_id):
         state = transform_state_in(state)
-        d, _ = State.objects.get_or_create(finite_state_machine_id=finite_state_machine_id,
+        d, _ = State.objects.get_or_create(diagram_id=diagram_id,
                                            id=state['id'],
                                            defaults=state)
         d.x = state['x']
         d.y = state['y']
         d.save()
-        (FiniteStateMachine.objects
-                           .filter(finite_state_machine_id=finite_state_machine_id)
+        (Diagram.objects
+                           .filter(diagram_id=diagram_id)
                            .update(state_id_seq=state['id']))
 
-    def onStateDestroy(self, state, finite_state_machine_id, client_id):
-        State.objects.filter(finite_state_machine_id=finite_state_machine_id, id=state['id']).delete()
+    def onStateDestroy(self, state, diagram_id, client_id):
+        State.objects.filter(diagram_id=diagram_id, id=state['id']).delete()
 
-    def onStateMove(self, state, finite_state_machine_id, client_id):
-        State.objects.filter(finite_state_machine_id=finite_state_machine_id,
+    def onStateMove(self, state, diagram_id, client_id):
+        State.objects.filter(diagram_id=diagram_id,
                              id=state['id']).update(x=state['x'], y=state['y'])
 
-    def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
-        State.objects.filter(finite_state_machine_id=finite_state_machine_id,
+    def onStateLabelEdit(self, state, diagram_id, client_id):
+        State.objects.filter(diagram_id=diagram_id,
                              id=state['id']).update(name=state['label'])
 
-    def onTransitionCreate(self, transition, finite_state_machine_id, client_id):
+    def onTransitionCreate(self, transition, diagram_id, client_id):
         if 'sender' in transition:
             del transition['sender']
         if 'message_id' in transition:
             del transition['message_id']
         state_map = dict(State.objects
-                         .filter(finite_state_machine_id=finite_state_machine_id,
+                         .filter(diagram_id=diagram_id,
                                  id__in=[transition['from_id'], transition['to_id']])
                          .values_list('id', 'pk'))
         Transition.objects.get_or_create(id=transition['id'],
                                          from_state_id=state_map[transition['from_id']],
                                          to_state_id=state_map[transition['to_id']])
-        (FiniteStateMachine.objects
-                           .filter(finite_state_machine_id=finite_state_machine_id)
+        (Diagram.objects
+                           .filter(diagram_id=diagram_id)
                            .update(transition_id_seq=transition['id']))
 
-    def onTransitionLabelEdit(self, transition, finite_state_machine_id, client_id):
+    def onTransitionLabelEdit(self, transition, diagram_id, client_id):
         print transition
-        Transition.objects.filter(from_state__finite_state_machine_id=finite_state_machine_id,
+        Transition.objects.filter(from_state__diagram_id=diagram_id,
                                   id=transition['id']).update(label=transition['label'])
 
-    def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
+    def onTransitionDestroy(self, transition, diagram_id, client_id):
         state_map = dict(State.objects
-                         .filter(finite_state_machine_id=finite_state_machine_id,
+                         .filter(diagram_id=diagram_id,
                                  id__in=[transition['from_id'], transition['to_id']])
                          .values_list('id', 'pk'))
         Transition.objects.filter(id=transition['id'],
                                   from_state_id=state_map[transition['from_id']],
                                   to_state_id=state_map[transition['to_id']]).delete()
 
-    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateUnSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onTransitionSelected(self, message_value, finite_state_machine_id, client_id):
+    def onTransitionSelected(self, message_value, diagram_id, client_id):
         'Ignore TransitionSelected messages'
         pass
 
-    def onTransitionUnSelected(self, message_value, finite_state_machine_id, client_id):
+    def onTransitionUnSelected(self, message_value, diagram_id, client_id):
         'Ignore TransitionSelected messages'
         pass
 
-    def onUndo(self, message_value, finite_state_machine_id, client_id):
-        undo_persistence.handle(message_value['original_message'], finite_state_machine_id, client_id)
+    def onUndo(self, message_value, diagram_id, client_id):
+        undo_persistence.handle(message_value['original_message'], diagram_id, client_id)
 
-    def onRedo(self, message_value, finite_state_machine_id, client_id):
-        redo_persistence.handle(message_value['original_message'], finite_state_machine_id, client_id)
+    def onRedo(self, message_value, diagram_id, client_id):
+        redo_persistence.handle(message_value['original_message'], diagram_id, client_id)
 
-    def onFSMTrace(self, message_value, finite_state_machine_id, client_id):
+    def onFSMTrace(self, message_value, diagram_id, client_id):
         FSMTrace(trace_session_id=message_value['trace_id'],
                  fsm_name=message_value['fsm_name'],
                  from_state=message_value['from_state'],
@@ -239,57 +245,57 @@ persistence = _Persistence()
 
 class _UndoPersistence(object):
 
-    def handle(self, message, finite_state_machine_id, client_id):
+    def handle(self, message, diagram_id, client_id):
         message_type = message[0]
         message_value = message[1]
-        History.objects.filter(finite_state_machine_id=finite_state_machine_id,
+        History.objects.filter(diagram_id=diagram_id,
                                client_id=message_value['sender'],
                                message_id=message_value['message_id']).update(undone=True)
         handler = getattr(self, "on{0}".format(message_type), None)
         if handler is not None:
-            handler(message_value, finite_state_machine_id, client_id)
+            handler(message_value, diagram_id, client_id)
         else:
             print "Unsupported undo message ", message_type
 
-    def onSnapshot(self, snapshot, finite_state_machine_id, client_id):
+    def onSnapshot(self, snapshot, diagram_id, client_id):
         pass
 
-    def onStateCreate(self, state, finite_state_machine_id, client_id):
-        persistence.onStateDestroy(state, finite_state_machine_id, client_id)
+    def onStateCreate(self, state, diagram_id, client_id):
+        persistence.onStateDestroy(state, diagram_id, client_id)
 
-    def onStateDestroy(self, state, finite_state_machine_id, client_id):
+    def onStateDestroy(self, state, diagram_id, client_id):
         inverted = state.copy()
         inverted['label'] = state['previous_label']
         inverted['x'] = state['previous_x']
         inverted['y'] = state['previous_y']
-        persistence.onStateCreate(inverted, finite_state_machine_id, client_id)
+        persistence.onStateCreate(inverted, diagram_id, client_id)
 
-    def onStateMove(self, state, finite_state_machine_id, client_id):
+    def onStateMove(self, state, diagram_id, client_id):
         inverted = state.copy()
         inverted['x'] = state['previous_x']
         inverted['y'] = state['previous_y']
-        persistence.onStateMove(inverted, finite_state_machine_id, client_id)
+        persistence.onStateMove(inverted, diagram_id, client_id)
 
-    def onStateLabelEdit(self, state, finite_state_machine_id, client_id):
+    def onStateLabelEdit(self, state, diagram_id, client_id):
         inverted = state.copy()
         inverted['label'] = state['previous_label']
-        persistence.onStateLabelEdit(inverted, finite_state_machine_id, client_id)
+        persistence.onStateLabelEdit(inverted, diagram_id, client_id)
 
-    def onTransitionCreate(self, transition, finite_state_machine_id, client_id):
-        persistence.onTransitionDestroy(transition, finite_state_machine_id, client_id)
+    def onTransitionCreate(self, transition, diagram_id, client_id):
+        persistence.onTransitionDestroy(transition, diagram_id, client_id)
 
-    def onTransitionDestroy(self, transition, finite_state_machine_id, client_id):
-        persistence.onTransitionCreate(transition, finite_state_machine_id, client_id)
+    def onTransitionDestroy(self, transition, diagram_id, client_id):
+        persistence.onTransitionCreate(transition, diagram_id, client_id)
 
-    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateUnSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onUndo(self, message_value, finite_state_machine_id, client_id):
+    def onUndo(self, message_value, diagram_id, client_id):
         pass
 
 
@@ -298,32 +304,32 @@ undo_persistence = _UndoPersistence()
 
 class _RedoPersistence(object):
 
-    def handle(self, message, finite_state_machine_id, client_id):
+    def handle(self, message, diagram_id, client_id):
         message_type = message[0]
         message_value = message[1]
-        History.objects.filter(finite_state_machine_id=finite_state_machine_id,
+        History.objects.filter(diagram_id=diagram_id,
                                client_id=message_value['sender'],
                                message_id=message_value['message_id']).update(undone=False)
         handler_name = "on{0}".format(message_type)
         handler = getattr(self, handler_name, getattr(persistence, handler_name, None))
         if handler is not None:
-            handler(message_value, finite_state_machine_id, client_id)
+            handler(message_value, diagram_id, client_id)
         else:
             print "Unsupported redo message ", message_type
 
-    def onStateSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onStateUnSelected(self, message_value, finite_state_machine_id, client_id):
+    def onStateUnSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
         pass
 
-    def onUndo(self, message_value, finite_state_machine_id, client_id):
+    def onUndo(self, message_value, diagram_id, client_id):
         'Ignore Undo messages'
         pass
 
-    def onRedo(self, message_value, finite_state_machine_id, client_id):
+    def onRedo(self, message_value, diagram_id, client_id):
         'Ignore Redo messages'
         pass
 

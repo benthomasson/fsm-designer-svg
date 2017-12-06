@@ -28,7 +28,7 @@ models:
     name: undone
     type: BooleanField
   - name: finite_state_machine
-    ref: FiniteStateMachine
+    ref: Diagram
     ref_field: finite_state_machine_id
     type: ForeignKey
   name: History
@@ -59,7 +59,7 @@ models:
   - default: 0
     name: transition_id_seq
     type: IntegerField
-  name: FiniteStateMachine
+  name: Diagram
   x: 225
   y: 152
 - display: name
@@ -68,7 +68,7 @@ models:
     pk: true
     type: AutoField
   - name: finite_state_machine
-    ref: FiniteStateMachine
+    ref: Diagram
     ref_field: finite_state_machine_id
     type: ForeignKey
   - len: 200

@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 import yaml
 import json
-from prototype.models import FiniteStateMachine, State, Transition, FSMTrace, FSMTraceReplay
+from prototype.models import Diagram, State, Transition, FSMTrace, FSMTraceReplay
 
 from functools import partial
 
@@ -11,8 +11,8 @@ from functools import partial
 from django import forms
 
 
-class FSMForm(forms.Form):
-    finite_state_machine_id = forms.IntegerField()
+class DiagramForm(forms.Form):
+    diagram_id = forms.IntegerField()
 
 
 class UploadFileForm(forms.Form):
@@ -22,7 +22,7 @@ class UploadFileForm(forms.Form):
 
 
 def index(request):
-    return render(request, "prototype/index.html", dict(fsms=FiniteStateMachine.objects.all().order_by('-pk')))
+    return render(request, "prototype/index.html", dict(diagrams=Diagram.objects.all().order_by('-pk')))
 
 
 state_map = dict(x='x',
@@ -45,39 +45,39 @@ transform_transition = partial(transform_dict, transition_map)
 
 def download(request):
     data = dict(states=[], transitions=[])
-    form = FSMForm(request.GET)
+    form = DiagramForm(request.GET)
     if form.is_valid():
-        finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
-        fsm = FiniteStateMachine.objects.get(pk=finite_state_machine_id)
-        data['name'] = fsm.name
-        data['finite_state_machine_id'] = fsm.pk
+        diagram_id = form.cleaned_data['diagram_id']
+        diagram = Diagram.objects.get(pk=diagram_id)
+        data['name'] = diagram.name
+        data['diagram_id'] = diagram.pk
         data['states'] = map(transform_state, list(State.objects
-                                                        .filter(finite_state_machine_id=finite_state_machine_id)
+                                                        .filter(diagram_id=diagram_id)
                                                         .values('x',
                                                                 'y',
                                                                 'name',
                                                                 'id')))
         data['transitions'] = map(transform_transition, list(Transition.objects
-                                                                       .filter(from_state__finite_state_machine_id=finite_state_machine_id)
+                                                                       .filter(from_state__diagram_id=diagram_id)
                                                                        .values('from_state__name',
                                                                                'to_state__name',
                                                                                'label')))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(fsm.name)
+        response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
         return response
     else:
         return HttpResponse(form.errors)
 
 
-def upload_fsm(data):
-    fsm = FiniteStateMachine()
-    fsm.name = data.get('name', data.get("app", "fsm"))
-    fsm.save()
+def upload_diagram(data):
+    diagram = Diagram()
+    diagram.name = data.get('name', data.get("app", "diagram"))
+    diagram.save()
     states = []
     transitions = []
     for i, state in enumerate(data.get('states', [])):
-        new_state = State(finite_state_machine_id=fsm.pk,
+        new_state = State(diagram_id=diagram.pk,
                           name=state.get('label'),
                           id=i + 1,
                           x=state.get('x', 0),
@@ -85,7 +85,7 @@ def upload_fsm(data):
         states.append(new_state)
     State.objects.bulk_create(states)
     states_map = dict(State.objects
-                           .filter(finite_state_machine_id=fsm.pk)
+                           .filter(diagram_id=diagram.pk)
                            .values_list("name", "pk"))
     for i, transition in enumerate(data.get('transitions', [])):
         new_transition = Transition(label=transition['label'],
@@ -95,10 +95,10 @@ def upload_fsm(data):
         transitions.append(new_transition)
 
     Transition.objects.bulk_create(transitions)
-    fsm.state_id_seq = len(states)
-    fsm.transition_id_seq = len(transitions)
-    fsm.save()
-    return fsm.pk
+    diagram.state_id_seq = len(states)
+    diagram.transition_id_seq = len(transitions)
+    diagram.save()
+    return diagram.pk
 
 
 def upload(request):
@@ -108,15 +108,15 @@ def upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
-            fsm_id = upload_fsm(data)
-            return HttpResponseRedirect('/static/prototype/index.html#!?finite_state_machine_id={0}'.format(fsm_id))
+            diagram_id = upload_diagram(data)
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_id))
     else:
         form = UploadFileForm()
     return render(request, 'prototype/upload.html', {'form': form})
 
 
 class FSMTraceForm(forms.Form):
-    finite_state_machine_id = forms.IntegerField()
+    diagram_id = forms.IntegerField()
     trace_id = forms.IntegerField()
     client_id = forms.IntegerField()
 
@@ -124,14 +124,14 @@ class FSMTraceForm(forms.Form):
 def download_trace(request):
     form = FSMTraceForm(request.GET)
     if form.is_valid():
-        fsm_id = form.cleaned_data['finite_state_machine_id']
+        diagram_id = form.cleaned_data['diagram_id']
         trace_id = form.cleaned_data['trace_id']
         client_id = form.cleaned_data['client_id']
         data = list(FSMTrace.objects.filter(trace_session_id=trace_id,
                                             client_id=client_id).values())
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(fsm_id, client_id, trace_id)
+        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_id, client_id, trace_id)
         return response
     else:
         return HttpResponse(form.errors)
@@ -139,7 +139,7 @@ def download_trace(request):
 
 class UploadTraceFileForm(forms.Form):
     file = forms.FileField()
-    fsm_id = forms.IntegerField()
+    diagram_id = forms.IntegerField()
 
 
 def upload_trace(request):
@@ -147,17 +147,17 @@ def upload_trace(request):
         form = UploadTraceFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
-            fsm_id = form.cleaned_data['fsm_id']
+            diagram_id = form.cleaned_data['diagram_id']
             replay = FSMTraceReplay(replay_data=json.dumps(data))
             replay.save()
-            return HttpResponseRedirect('/static/prototype/index.html#!?finite_state_machine_id={0}&replay_id={1}'.format(fsm_id, replay.pk))
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'.format(diagram_id, replay.pk))
     else:
-        form2 = FSMForm(request.GET)
+        form2 = DiagramForm(request.GET)
         if form2.is_valid():
-            fsm_id = form2.cleaned_data['finite_state_machine_id']
-            form = UploadTraceFileForm(initial=dict(fsm_id=fsm_id))
-            form.fields['fsm_id'].widget = forms.HiddenInput()
-            return render(request, 'prototype/upload_trace.html', {'form': form, 'fsm_id': fsm_id})
+            diagram_id = form2.cleaned_data['diagram_id']
+            form = UploadTraceFileForm(initial=dict(diagram_id=diagram_id))
+            form.fields['diagram_id'].widget = forms.HiddenInput()
+            return render(request, 'prototype/upload_trace.html', {'form': form, 'diagram_id': diagram_id})
         else:
             return HttpResponse(form.errors)
 

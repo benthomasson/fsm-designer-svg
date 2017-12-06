@@ -5,8 +5,8 @@
 <body>
 <ul>
     <li><a href="/static/prototype/index.html">New</a></li>
-    {%for fsm in fsms%}
-    <li><a href="/static/prototype/index.html#!?finite_state_machine_id={{fsm.pk}}">{{fsm.pk}} {{fsm.name}}</a></li>
+    {%for diagram in diagrams%}
+    <li><a href="/static/prototype/index.html#!?finite_state_machine_id={{diagram.pk}}">{{diagram.pk}} {{diagram.name}}</a></li>
     {%endfor%}
 </ul>
 </body>

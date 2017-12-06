@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dups = list(State.objects
-                         .values('finite_state_machine_id', 'id')
+                         .values('diagram_id', 'id')
                          .annotate(Count('pk'))
                          .order_by()
                          .filter(pk__count__gt=1))

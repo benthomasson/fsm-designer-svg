@@ -14,7 +14,7 @@ class History(models.Model):
     message_id = models.IntegerField()
     message_data = models.TextField()
     undone = models.BooleanField(default=False)
-    finite_state_machine = models.ForeignKey('FiniteStateMachine',)
+    diagram = models.ForeignKey('Diagram',)
 
 
 class MessageType(models.Model):
@@ -26,9 +26,9 @@ class MessageType(models.Model):
         return self.name
 
 
-class FiniteStateMachine(models.Model):
+class Diagram(models.Model):
 
-    finite_state_machine_id = models.AutoField(primary_key=True,)
+    diagram_id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=200, )
     state_id_seq = models.IntegerField(default=0)
     transition_id_seq = models.IntegerField(default=0)
@@ -40,7 +40,7 @@ class FiniteStateMachine(models.Model):
 class State(models.Model):
 
     state_id = models.AutoField(primary_key=True,)
-    finite_state_machine = models.ForeignKey('FiniteStateMachine',)
+    diagram = models.ForeignKey('Diagram',)
     name = models.CharField(max_length=200, )
     id = models.IntegerField()
     x = models.IntegerField()

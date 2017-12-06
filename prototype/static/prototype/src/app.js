@@ -16,11 +16,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
   window.scope = $scope;
 
-  $scope.finite_state_machine_id = $location.search().finite_state_machine_id || 0;
+  $scope.diagram_id = $location.search().diagram_id || 0;
   $scope.replay_id = $location.search().replay_id || 0;
   $scope.replay_data = [];
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?finite_state_machine_id=" + $scope.finite_state_machine_id,
+  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.location = $location;
@@ -364,7 +364,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.onDownloadButton = function (button) {
         console.log(button.label);
-        window.open("/prototype/download?finite_state_machine_id=" + $scope.finite_state_machine_id);
+        window.open("/prototype/download?diagram_id=" + $scope.diagram_id);
     };
 
     $scope.onUploadButton = function (button) {
@@ -374,12 +374,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.onDownloadTraceButton = function (button) {
         console.log(button.label);
-        window.open("/prototype/download_trace?finite_state_machine_id=" + $scope.finite_state_machine_id + "&trace_id=" + $scope.trace_id + "&client_id=" + $scope.client_id);
+        window.open("/prototype/download_trace?diagram_id=" + $scope.diagram_id + "&trace_id=" + $scope.trace_id + "&client_id=" + $scope.client_id);
     };
 
     $scope.onUploadTraceButton = function (button) {
         console.log(button.label);
-        window.open("/prototype/upload_trace?finite_state_machine_id=" + $scope.finite_state_machine_id, "_top");
+        window.open("/prototype/upload_trace?diagram_id=" + $scope.diagram_id, "_top");
     };
 
     // Buttons
@@ -597,12 +597,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         $scope.client_id = data;
     };
 
-    $scope.onFiniteStateMachine = function(data) {
-        $scope.finite_state_machine_id = data.finite_state_machine_id;
-        $scope.finite_state_machine_name = data.name;
+    $scope.onDiagram = function(data) {
+        $scope.diagram_id = data.diagram_id;
+        $scope.diagram_name = data.name;
         $scope.state_id_seq = util.natural_numbers(data.state_id_seq);
         $scope.transition_id_seq = util.natural_numbers(data.transition_id_seq);
-        var search_data = {finite_state_machine_id: data.finite_state_machine_id};
+        var search_data = {diagram_id: data.diagram_id};
         if ($scope.replay_id !== 0) {
             search_data.replay_id = $scope.replay_id;
             $http.get('/prototype/download_replay?replay_id=' + $scope.replay_id)
@@ -842,11 +842,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         if ($scope.replay_data.length > 0) {
             $scope.clear_all_selections();
             var replay = $scope.replay_data.pop(0);
-            while(replay.fsm_name !== $scope.finite_state_machine_name && $scope.replay_data.length > 0) {
+            while(replay.fsm_name !== $scope.diagram_name && $scope.replay_data.length > 0) {
                 replay = $scope.replay_data.pop(0);
             }
             console.log(replay);
-            if (replay.fsm_name === $scope.finite_state_machine_name) {
+            if (replay.fsm_name === $scope.diagram_name) {
                 var from_state = null;
                 var to_state = null;
                 var transition = null;

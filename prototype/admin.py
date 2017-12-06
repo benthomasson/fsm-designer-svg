@@ -6,7 +6,7 @@ from prototype.models import History
 
 from prototype.models import MessageType
 
-from prototype.models import FiniteStateMachine
+from prototype.models import Diagram
 
 from prototype.models import State
 
@@ -26,8 +26,8 @@ admin.site.register(Client, ClientAdmin)
 
 
 class HistoryAdmin(admin.ModelAdmin):
-    fields = ('client', 'message_type', 'message_id', 'message_data', 'undone', 'finite_state_machine',)
-    raw_id_fields = ('client', 'message_type', 'finite_state_machine',)
+    fields = ('client', 'message_type', 'message_id', 'message_data', 'undone', 'diagram',)
+    raw_id_fields = ('client', 'message_type', 'diagram',)
 
 
 admin.site.register(History, HistoryAdmin)
@@ -41,17 +41,17 @@ class MessageTypeAdmin(admin.ModelAdmin):
 admin.site.register(MessageType, MessageTypeAdmin)
 
 
-class FiniteStateMachineAdmin(admin.ModelAdmin):
+class DiagramAdmin(admin.ModelAdmin):
     fields = ('name', 'state_id_seq', 'transition_id_seq',)
     raw_id_fields = ()
 
 
-admin.site.register(FiniteStateMachine, FiniteStateMachineAdmin)
+admin.site.register(Diagram, DiagramAdmin)
 
 
 class StateAdmin(admin.ModelAdmin):
-    fields = ('finite_state_machine', 'name', 'id', 'x', 'y',)
-    raw_id_fields = ('finite_state_machine',)
+    fields = ('diagram', 'name', 'id', 'x', 'y',)
+    raw_id_fields = ('diagram',)
 
 
 admin.site.register(State, StateAdmin)
