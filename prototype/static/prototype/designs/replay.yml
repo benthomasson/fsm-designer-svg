@@ -1,0 +1,28 @@
+finite_state_machine_id: 40
+name: replay_fsm
+states:
+- id: 1
+  label: Pause
+  x: 526
+  y: 900
+- id: 2
+  label: Start
+  x: 542
+  y: 291
+- id: 3
+  label: Play
+  x: 543
+  y: 520
+transitions:
+- from_state: Pause
+  label: onTogglePause
+  to_state: Play
+- from_state: Pause
+  label: onRestart
+  to_state: Play
+- from_state: Start
+  label: start
+  to_state: Play
+- from_state: Play
+  label: onTogglePause
+  to_state: Pause

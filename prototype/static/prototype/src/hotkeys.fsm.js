@@ -54,6 +54,22 @@ _Enabled.prototype.onKeyDown = function(controller, msg_type, $event) {
         scope.hide_buttons = !scope.hide_buttons;
         return;
     }
+    else if ($event.key === ' ') {
+        scope.first_channel.send("TogglePause", $event);
+        return;
+    }
+    else if ($event.key === 'j') {
+        scope.first_channel.send("StepBack", $event);
+        return;
+    }
+    else if ($event.key === 'k') {
+        scope.first_channel.send("StepForward", $event);
+        return;
+    }
+    else if ($event.key === 'r') {
+        scope.first_channel.send("Restart", $event);
+        return;
+    }
     else if ($event.key === 'l') {
         scope.first_channel.send("NewTransition", $event);
         return;

@@ -10,6 +10,7 @@ var buttons = require('./buttons.js');
 var time = require('./time.js');
 var mode_fsm = require('./mode.fsm.js');
 var group_fsm = require('./group.fsm.js');
+var replay_fsm = require('./replay.fsm.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
@@ -21,7 +22,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.diagram_id = $location.search().diagram_id || 0;
   $scope.replay_id = $location.search().replay_id || 0;
   $scope.replay_data = [];
-  $scope.replay_index = 0;
+  $scope.replay_index = -1;
+  $scope.replay_delay = 1000;
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
@@ -67,6 +69,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.buttons_controller = new fsm.FSMController($scope, 'buttons_fsm', buttons.Start, $scope);
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
   $scope.mode_controller = new fsm.FSMController($scope, 'mode_fsm', mode_fsm.Start, $scope);
+  $scope.replay_controller = new fsm.FSMController($scope, 'replay_fsm', replay_fsm.Start, $scope);
 
   //Wire up the FSMs
   $scope.view_controller.delegate_channel = new fsm.Channel($scope.view_controller,
@@ -90,8 +93,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.mode_controller.delegate_channel = new fsm.Channel($scope.mode_controller,
                                                             $scope.time_controller,
                                                             $scope);
+  $scope.replay_controller.delegate_channel = new fsm.Channel($scope.replay_controller,
+                                                            $scope.mode_controller,
+                                                            $scope);
   $scope.first_channel = new fsm.Channel(null,
-                                         $scope.mode_controller,
+                                         $scope.replay_controller,
                                          $scope);
   $scope.last_key = "";
   $scope.last_key_code = null;
@@ -854,49 +860,14 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         $scope.$apply();
     }, 17);
 
-    setInterval( function () {
-        if ($scope.replay_data.length > 0) {
-            $scope.clear_all_selections();
-            var replay = $scope.replay_data.shift();
-            while(replay.fsm_name !== $scope.diagram_name && $scope.replay_data.length > 0) {
-                replay = $scope.replay_data.shift();
-            }
-            console.log(replay);
-            if (replay.fsm_name === $scope.diagram_name) {
-                var from_state = null;
-                var to_state = null;
-                var transition = null;
-                var i = 0;
-                for (i = 0; i < $scope.states.length; i++) {
-                    if ($scope.states[i].label === replay.from_state) {
-                        from_state = $scope.states[i];
-                        from_state.remote_selected = true;
-                    }
-                    if ($scope.states[i].label === replay.to_state) {
-                        to_state = $scope.states[i];
-                        to_state.selected = true;
-                    }
-                }
-                if (from_state !== null && to_state !== null) {
-                    for (i = 0; i < $scope.transitions.length; i++) {
-                        transition = $scope.transitions[i];
-                        //Match the message handlers with an "on" prefix
-                        if (from_state.id === transition.from_state.id &&
-                            to_state.id === transition.to_state.id &&
-                            transition.label === "on" + replay.message_type) {
-                            transition.selected = true;
-                        }
-                        //Match the start and end special cases
-                        if (from_state.id === transition.from_state.id &&
-                            to_state.id === transition.to_state.id &&
-                            transition.label === replay.message_type) {
-                            transition.selected = true;
-                        }
-                    }
-                }
-            }
-        }
-    }, 1000);
+
+    $scope.set_replay_timer = function() {
+        $scope.replay_timer = setInterval( function () {
+            $scope.first_channel.send("ReplayTick", {});
+        },  $scope.replay_delay);
+    };
+
+    $scope.set_replay_timer();
 
     window.scope = $scope;
 });
