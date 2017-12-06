@@ -1,0 +1,24 @@
+name: replay_fsm
+states:
+- id: 3
+  label: Pause
+  x: 541
+  y: 827
+- id: 1
+  label: Start
+  x: 542
+  y: 291
+- id: 2
+  label: Play
+  x: 543
+  y: 520
+transitions:
+- from_state: Pause
+  label: onPlay
+  to_state: Play
+- from_state: Start
+  label: start
+  to_state: Play
+- from_state: Play
+  label: onPause
+  to_state: Pause
