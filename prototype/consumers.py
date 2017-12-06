@@ -237,6 +237,7 @@ class _Persistence(object):
                  fsm_name=message_value['fsm_name'],
                  from_state=message_value['from_state'],
                  to_state=message_value['to_state'],
+                 order=message_value['order'],
                  client_id=client_id,
                  message_type=message_value['recv_message_type']).save()
 

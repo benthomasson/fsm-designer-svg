@@ -27,9 +27,9 @@ models:
   - default: false
     name: undone
     type: BooleanField
-  - name: finite_state_machine
+  - name: diagram
     ref: Diagram
-    ref_field: finite_state_machine_id
+    ref_field: diagram_id
     type: ForeignKey
   name: History
   x: -205
@@ -47,7 +47,7 @@ models:
   y: 383
 - display: name
   fields:
-  - name: finite_state_machine_id
+  - name: diagram_id
     pk: true
     type: AutoField
   - len: 200
@@ -67,9 +67,9 @@ models:
   - name: state_id
     pk: true
     type: AutoField
-  - name: finite_state_machine
+  - name: diagram
     ref: Diagram
-    ref_field: finite_state_machine_id
+    ref_field: diagram_id
     type: ForeignKey
   - len: 200
     name: name
@@ -128,6 +128,9 @@ models:
     type: ForeignKey
   - default: 0
     name: trace_session_id
+    type: IntegerField
+  - default: 0
+    name: order
     type: IntegerField
   name: FSMTrace
   x: -427

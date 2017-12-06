@@ -108,6 +108,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.transition_id_seq = util.natural_numbers(0);
   $scope.trace_id_seq = util.natural_numbers(0);
+  $scope.trace_order_seq = util.natural_numbers(0);
   $scope.trace_id = $scope.trace_id_seq();
   $scope.time_pointer = -1;
   $scope.frame = 0;

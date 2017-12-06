@@ -128,7 +128,7 @@ def download_trace(request):
         trace_id = form.cleaned_data['trace_id']
         client_id = form.cleaned_data['client_id']
         data = list(FSMTrace.objects.filter(trace_session_id=trace_id,
-                                            client_id=client_id).values())
+                                            client_id=client_id).order_by('order').values())
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_id, client_id, trace_id)

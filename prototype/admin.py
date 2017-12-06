@@ -66,7 +66,7 @@ admin.site.register(Transition, TransitionAdmin)
 
 
 class FSMTraceAdmin(admin.ModelAdmin):
-    fields = ('fsm_name', 'from_state', 'to_state', 'message_type', 'client', 'trace_session_id',)
+    fields = ('fsm_name', 'from_state', 'to_state', 'message_type', 'client', 'trace_session_id', 'order',)
     raw_id_fields = ('client',)
 
 

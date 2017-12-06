@@ -52,7 +52,8 @@ FSMController.prototype.changeState = function (state) {
         this.handling_message_type = old_handling_message_type;
     }
     if (this.trace) {
-        this.tracer.send_trace_message(new messages.FSMTrace(this.name,
+        this.tracer.send_trace_message(new messages.FSMTrace(this.tracer.trace_order_seq(),
+                                                             this.name,
                                                              this.state.name,
                                                              state.name,
                                                              this.handling_message_type));

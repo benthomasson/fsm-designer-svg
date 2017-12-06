@@ -116,8 +116,9 @@ function Redo(sender, original_message) {
 }
 exports.Redo = Redo;
 
-function FSMTrace(fsm_name, from_state, to_state, recv_message_type) {
+function FSMTrace(order, fsm_name, from_state, to_state, recv_message_type) {
     this.msg_type = 'FSMTrace';
+    this.order = order;
     this.sender = 0;
     this.trace_id = 0;
     this.fsm_name = fsm_name;

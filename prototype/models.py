@@ -71,6 +71,7 @@ class FSMTrace(models.Model):
     message_type = models.CharField(max_length=200, )
     client = models.ForeignKey('Client',)
     trace_session_id = models.IntegerField(default=0)
+    order = models.IntegerField(default=0)
 
 
 class FSMTraceReplay(models.Model):
