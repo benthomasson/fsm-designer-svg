@@ -18,6 +18,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.finite_state_machine_id = $location.search().finite_state_machine_id || 0;
   $scope.replay_id = $location.search().replay_id || 0;
   $scope.replay_data = [];
+  $scope.replay_index = 0;
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?finite_state_machine_id=" + $scope.finite_state_machine_id,
                                                            null,
@@ -836,9 +837,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
     setInterval( function () {
         if ($scope.replay_data.length > 0) {
             $scope.clear_all_selections();
-            var replay = $scope.replay_data.pop(0);
+            var replay = $scope.replay_data.shift();
             while(replay.fsm_name !== $scope.finite_state_machine_name && $scope.replay_data.length > 0) {
-                replay = $scope.replay_data.pop(0);
+                replay = $scope.replay_data.shift();
             }
             console.log(replay);
             if (replay.fsm_name === $scope.finite_state_machine_name) {
