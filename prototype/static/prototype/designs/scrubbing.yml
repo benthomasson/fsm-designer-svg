@@ -1,0 +1,42 @@
+finite_state_machine_id: 37
+name: fsm
+states:
+- id: 4
+  label: Scrubbing
+  x: 224
+  y: 647
+- id: 3
+  label: Ready
+  x: 560
+  y: 490
+- id: 2
+  label: Start
+  x: 544
+  y: 239
+- id: 5
+  label: Pressed
+  x: 555
+  y: 835
+- id: 6
+  label: Clicked
+  x: 806
+  y: 625
+transitions:
+- from_state: Scrubbing
+  label: onMouseUp
+  to_state: Ready
+- from_state: Start
+  label: start
+  to_state: Ready
+- from_state: Clicked
+  label: start
+  to_state: Ready
+- from_state: Pressed
+  label: onMouseUp
+  to_state: Clicked
+- from_state: Ready
+  label: onMouseDown
+  to_state: Pressed
+- from_state: Pressed
+  label: onMouseMove
+  to_state: Scrubbing
