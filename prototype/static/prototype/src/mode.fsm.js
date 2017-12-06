@@ -39,19 +39,26 @@ _Start.prototype.start.transitions = ['MultiFSM'];
 
 
 
-_MultiFSM.prototype.onMouseWheel = function (controller) {
+_MultiFSM.prototype.onMouseWheel = function (controller, msg_type, $event) {
 
-    controller.changeState(FSM);
+    if (controller.scope.current_scale >= 0.5) {
+        controller.changeState(FSM);
+    }
+
+    controller.delegate_channel.send(msg_type, $event);
 
 };
 _MultiFSM.prototype.onMouseWheel.transitions = ['FSM'];
 
 
 
-_FSM.prototype.onMouseWheel = function (controller) {
+_FSM.prototype.onMouseWheel = function (controller, msg_type, $event) {
 
-    controller.changeState(MultiFSM);
+    if (controller.scope.current_scale < 0.5) {
+        controller.changeState(MultiFSM);
+    }
 
+    controller.delegate_channel.send(msg_type, $event);
 };
 _FSM.prototype.onMouseWheel.transitions = ['MultiFSM'];
 

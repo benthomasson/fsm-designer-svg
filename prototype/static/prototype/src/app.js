@@ -8,6 +8,7 @@ var hotkeys_fsm = require('./hotkeys.fsm.js');
 var transition = require('./transition.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
+var mode_fsm = require('./mode.fsm.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
@@ -60,6 +61,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.transition_controller = new fsm.FSMController($scope, 'transition_fsm', transition.Start, $scope);
   $scope.buttons_controller = new fsm.FSMController($scope, 'buttons_fsm', buttons.Start, $scope);
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
+  $scope.mode_controller = new fsm.FSMController($scope, 'mode_fsm', mode_fsm.Start, $scope);
 
   //Wire up the FSMs
   $scope.view_controller.delegate_channel = new fsm.Channel($scope.view_controller,
@@ -77,8 +79,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.time_controller.delegate_channel = new fsm.Channel($scope.time_controller,
                                                             $scope.buttons_controller,
                                                             $scope);
+  $scope.mode_controller.delegate_channel = new fsm.Channel($scope.mode_controller,
+                                                            $scope.time_controller,
+                                                            $scope);
   $scope.first_channel = new fsm.Channel(null,
-                                         $scope.time_controller,
+                                         $scope.mode_controller,
                                          $scope);
   $scope.last_key = "";
   $scope.last_key_code = null;
