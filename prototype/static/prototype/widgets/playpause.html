@@ -1,0 +1,20 @@
+
+<g ng-attr-transform="translate(60, {{graph.height - 105}})">
+<g ng-if="!replay_play">
+<path d="M0,0 L0,18 L18,9 z" class="FSM__play"/>
+</g>
+<g ng-if="replay_play">
+<rect ng-attr-x=0
+      ng-attr-y=0
+      ng-attr-width=5
+      height=20
+      class="FSM__pause">
+</rect>
+<rect ng-attr-x=8
+      ng-attr-y=0
+      ng-attr-width=5
+      height=20
+      class="FSM__pause">
+</rect>
+</g>
+</g>

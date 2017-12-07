@@ -1,0 +1,14 @@
+<rect ng-attr-x="{{replay_slider.x}}"
+      ng-attr-y="{{replay_slider.y}}"
+      ng-attr-width="{{replay_slider.width}}"
+      height=10
+      class="FSM__slider">
+</rect>
+<g ng-attr-transform="translate({{replay_slider.x}}, {{replay_slider.y - 5}})">
+<rect ng-attr-x="{{replay_slider.width/replay_data.length*(replay_index+1)}}"
+      ng-attr-y=0
+      ng-attr-width=10
+      height=20
+      class="FSM__slider--control">
+</rect>
+</g>

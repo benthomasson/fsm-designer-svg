@@ -11,6 +11,7 @@ var time = require('./time.js');
 var mode_fsm = require('./mode.fsm.js');
 var group_fsm = require('./group.fsm.js');
 var replay_fsm = require('./replay.fsm.js');
+var scrubbing_fsm = require('./scrubbing.fsm.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
@@ -24,6 +25,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.replay_data = [];
   $scope.replay_index = -1;
   $scope.replay_delay = 1000;
+  $scope.replay_play = false;
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
@@ -70,6 +72,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
   $scope.mode_controller = new fsm.FSMController($scope, 'mode_fsm', mode_fsm.Start, $scope);
   $scope.replay_controller = new fsm.FSMController($scope, 'replay_fsm', replay_fsm.Start, $scope);
+  $scope.scrubbing_controller = new fsm.FSMController($scope, 'scrubbing_fsm', scrubbing_fsm.Start, $scope);
 
   //Wire up the FSMs
   $scope.view_controller.delegate_channel = new fsm.Channel($scope.view_controller,
@@ -96,8 +99,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.replay_controller.delegate_channel = new fsm.Channel($scope.replay_controller,
                                                             $scope.mode_controller,
                                                             $scope);
+  $scope.scrubbing_controller.delegate_channel = new fsm.Channel($scope.scrubbing_controller,
+                                                            $scope.replay_controller,
+                                                            $scope);
   $scope.first_channel = new fsm.Channel(null,
-                                         $scope.replay_controller,
+                                         $scope.scrubbing_controller,
                                          $scope);
   $scope.last_key = "";
   $scope.last_key_code = null;
@@ -121,6 +127,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.frame = 0;
   $scope.client_messages = {};
   $scope.out_of_order_messages = {};
+
+  $scope.replay_slider = new models.Slider(100,
+                                           $scope.graph.height - 100,
+                                           $scope.graph.width - 200,
+                                           20);
 
 
   $scope.states = [
@@ -213,16 +224,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         $scope.selected_states = [];
         $scope.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
-            if (states[i].selected) {
-                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
-            }
             states[i].selected = false;
             states[i].remote_selected = false;
         }
         for (i = 0; i < transitions.length; i++) {
             transitions[i].remote_selected = false;
             transitions[i].selected = false;
-            $scope.send_control_message(new messages.TransitionUnSelected($scope.client_id, transitions[i].id));
         }
     };
 
@@ -404,13 +411,18 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         window.open("/prototype/upload_trace?diagram_id=" + $scope.diagram_id, "_top");
     };
 
+    $scope.onPlayPause = function () {
+        $scope.first_channel.send("TogglePause", {});
+    };
+
     // Buttons
 
     $scope.buttons = [
       new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton, $scope),
       new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope),
       new models.Button("DownloadTrace", 130, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
-      new models.Button("UploadTrace", 190, 10, 60, 50, $scope.onUploadTraceButton, $scope)
+      new models.Button("UploadTrace", 190, 10, 60, 50, $scope.onUploadTraceButton, $scope),
+      new models.Button("PlayPause", 60, $scope.graph.height - 105, 20, 20, $scope.onPlayPause, $scope)
     ];
 
 
@@ -849,6 +861,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 	  	$scope.graph.right_column = $window.innerWidth - 300;
 	  	$scope.graph.height = $window.innerHeight;
 
+        $scope.replay_slider = new models.Slider(100,
+                                                 $scope.graph.height - 100,
+                                                 $scope.graph.width - 200,
+                                                 20);
+
+
 		// manuall $digest required as resize event
 		// is outside of angular
 	 	$scope.$digest();
@@ -906,6 +924,14 @@ app.directive('fsmGroup', function() {
 
 app.directive('fsmFsm', function() {
   return { restrict: 'A', templateUrl: 'widgets/fsm.html' };
+});
+
+app.directive('fsmSlider', function() {
+  return { restrict: 'A', templateUrl: 'widgets/slider.html' };
+});
+
+app.directive('fsmPlayPause', function() {
+  return { restrict: 'A', templateUrl: 'widgets/playpause.html' };
 });
 
 exports.app = app;

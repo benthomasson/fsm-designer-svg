@@ -566,3 +566,20 @@ Group.prototype.update_membership = function (states, groups) {
     }
     return [old_states, this.states, device_ids, old_groups, this.groups, group_ids];
 };
+
+function Slider(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+}
+exports.Slider = Slider;
+
+Slider.prototype.is_selected = function (x, y) {
+
+    return (x > this.x &&
+            x < this.x + this.width &&
+            y > this.y - 20 &&
+            y < this.y + this.height + 20);
+
+};
