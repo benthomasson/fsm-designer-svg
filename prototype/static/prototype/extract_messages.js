@@ -46,8 +46,10 @@ while(next_message !== undefined) {
     //    }
         next_field = field_iter.next();
     }
-    messages.push({msg_type: message_instance.msg_type,
-                   fields: fields});
+    if(message_instance.msg_type !== null && message_instance.msg_type !== undefined) {
+        messages.push({msg_type: message_instance.msg_type,
+                       fields: fields});
+    }
     next_message = message_iter.next();
 }
 
