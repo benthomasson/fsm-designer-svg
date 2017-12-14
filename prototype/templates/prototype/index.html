@@ -6,7 +6,7 @@
 <ul>
     <li><a href="/static/prototype/index.html">New</a></li>
     {%for diagram in diagrams%}
-    <li><a href="/static/prototype/index.html#!?finite_state_machine_id={{diagram.pk}}">{{diagram.pk}} {{diagram.name}}</a></li>
+    <li><a href="/static/prototype/index.html#!?diagram_id={{diagram.pk}}">{{diagram.pk}} {{diagram.name}}</a></li>
     {%endfor%}
 </ul>
 </body>
