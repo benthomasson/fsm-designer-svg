@@ -63,6 +63,29 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.selected_groups = [];
   $scope.selected_transitions = [];
   $scope.new_transition = null;
+  $scope.trace_id_seq = util.natural_numbers(0);
+  $scope.trace_order_seq = util.natural_numbers(0);
+  $scope.trace_id = $scope.trace_id_seq();
+
+  $scope.last_key = "";
+  $scope.last_key_code = null;
+  $scope.last_event = null;
+  $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
+
+  $scope.debug = {'hidden': true};
+  $scope.hide_buttons = false;
+  $scope.hide_groups = false;
+  $scope.graph = {'width': window.innerWidth,
+                  'right_column': window.innerWidth - 300,
+                  'height': window.innerHeight};
+  $scope.group_id_seq = util.natural_numbers(0);
+  $scope.state_id_seq = util.natural_numbers(0);
+  $scope.message_id_seq = util.natural_numbers(0);
+  $scope.transition_id_seq = util.natural_numbers(0);
+  $scope.time_pointer = -1;
+  $scope.frame = 0;
+  $scope.client_messages = {};
+  $scope.out_of_order_messages = {};
 
     $scope.send_trace_message = function (message) {
         console.log(message);
@@ -120,44 +143,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.first_channel = new fsm.Channel(null,
                                          $scope.scrubbing_controller,
                                          $scope);
-  $scope.last_key = "";
-  $scope.last_key_code = null;
-  $scope.last_event = null;
-  $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
-
-  $scope.debug = {'hidden': true};
-  $scope.hide_buttons = false;
-  $scope.hide_groups = false;
-  $scope.graph = {'width': window.innerWidth,
-                  'right_column': window.innerWidth - 300,
-                  'height': window.innerHeight};
-  $scope.group_id_seq = util.natural_numbers(0);
-  $scope.state_id_seq = util.natural_numbers(0);
-  $scope.message_id_seq = util.natural_numbers(0);
-  $scope.transition_id_seq = util.natural_numbers(0);
-  $scope.trace_id_seq = util.natural_numbers(0);
-  $scope.trace_order_seq = util.natural_numbers(0);
-  $scope.trace_id = $scope.trace_id_seq();
-  $scope.time_pointer = -1;
-  $scope.frame = 0;
-  $scope.client_messages = {};
-  $scope.out_of_order_messages = {};
-
-    $scope.send_trace_message = function (message) {
-        console.log(message);
-        message.sender = $scope.client_id;
-        message.trace_id = $scope.trace_id;
-        message.message_id = $scope.message_id_seq();
-        var data = messages.serialize(message);
-        //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
-        $scope.control_socket.send(data);
-        try {
-			$scope.control_socket.send(data);
-        }    
-        catch(err) {
-			$scope.initial_messages.push(message);
-        }    
-    };
 
   $scope.replay_slider = new models.Slider(100,
                                            $scope.graph.height - 100,
