@@ -26,6 +26,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.replay_index = -1;
   $scope.replay_delay = 1000;
   $scope.replay_play = false;
+  $scope.initial_messages = [];
   // Create a web socket to connect to the backend server
   $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
@@ -62,6 +63,20 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.selected_groups = [];
   $scope.selected_transitions = [];
   $scope.new_transition = null;
+
+    $scope.send_trace_message = function (message) {
+        console.log(message);
+        message.sender = $scope.client_id;
+        message.trace_id = $scope.trace_id;
+        message.message_id = $scope.message_id_seq();
+        var data = messages.serialize(message);
+        try {
+            $scope.control_socket.send(data);
+        }
+        catch(err) {
+			$scope.initial_messages.push(message);
+        }
+    };  
   //Define the FSMs
   $scope.hotkeys_controller = new fsm.FSMController($scope, 'hotkeys_fsm', hotkeys_fsm.Start, $scope);
   $scope.view_controller = new fsm.FSMController($scope, 'view_fsm', view.Start, $scope);
@@ -127,6 +142,22 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.frame = 0;
   $scope.client_messages = {};
   $scope.out_of_order_messages = {};
+
+    $scope.send_trace_message = function (message) {
+        console.log(message);
+        message.sender = $scope.client_id;
+        message.trace_id = $scope.trace_id;
+        message.message_id = $scope.message_id_seq();
+        var data = messages.serialize(message);
+        //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
+        $scope.control_socket.send(data);
+        try {
+			$scope.control_socket.send(data);
+        }    
+        catch(err) {
+			$scope.initial_messages.push(message);
+        }    
+    };
 
   $scope.replay_slider = new models.Slider(100,
                                            $scope.graph.height - 100,
@@ -629,6 +660,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.onClientId = function(data) {
         $scope.client_id = data;
+        $scope.send_initial_messages();
     };
 
     $scope.onDiagram = function(data) {
@@ -825,19 +857,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 	if ($scope.control_socket.readyState === WebSocket.OPEN) {
 		$scope.control_socket.onopen();
 	}
-
-    $scope.send_trace_message = function (message) {
-        console.log(message);
-        if ($scope.history.length === 0) {
-            $scope.send_snapshot();
-        }
-        message.sender = $scope.client_id;
-        message.trace_id = $scope.trace_id;
-        message.message_id = $scope.message_id_seq();
-        var data = messages.serialize(message);
-        //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
-        $scope.control_socket.send(data);
-    };
 
     $scope.send_control_message = function (message) {
         //console.log(message);

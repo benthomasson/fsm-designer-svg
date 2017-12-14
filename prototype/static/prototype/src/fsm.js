@@ -35,11 +35,11 @@ function FSMController (scope, name, initial_state, tracer) {
     this.scope = scope;
     this.name = name;
     this.state = initial_state;
-    this.state.start(this);
     this.delegate_channel = new NullChannel(this, tracer);
     this.tracer = tracer;
     this.trace = true;
     this.handling_message_type = null;
+    this.state.start(this);
 }
 exports.FSMController = FSMController;
 
@@ -57,7 +57,7 @@ FSMController.prototype.changeState = function (state) {
                                                              this.state.name,
                                                              state.name,
                                                              this.handling_message_type));
-        }
+    }
     this.state = state;
     if(state !== null) {
         old_handling_message_type = this.handling_message_type;
