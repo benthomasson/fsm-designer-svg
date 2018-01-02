@@ -1,0 +1,17 @@
+<g ng-attr-class="{{help.hidden && 'hidden' || ''}} help">
+    <text ng-attr-x="{{graph.right_column}}" y="15">Hot Keys:</text>
+    <text ng-attr-x="{{graph.right_column}}" y="35">h - Toggle help</text>
+    <text ng-attr-x="{{graph.right_column}}" y="56">d - Toggle debug</text>
+    <text ng-attr-x="{{graph.right_column}}" y="75">p - Toggle pointer</text>
+    <text ng-attr-x="{{graph.right_column}}" y="95">b - Toggle buttons</text>
+    <text ng-attr-x="{{graph.right_column}}" y="115">s - New state</text>
+    <text ng-attr-x="{{graph.right_column}}" y="135">l - New transition</text>
+    <text ng-attr-x="{{graph.right_column}}" y="155">f - New FSM</text>
+    <text ng-attr-x="{{graph.right_column}}" y="175">0 - Reset scale and pan</text>
+    <g ng-if="replay.data.length > 0">
+        <text ng-attr-x="{{graph.right_column}}" y="195">Space - Toggle Pause</text>
+        <text ng-attr-x="{{graph.right_column}}" y="215">r - Restart replay</text>
+        <text ng-attr-x="{{graph.right_column}}" y="235">j - Step replay back</text>
+        <text ng-attr-x="{{graph.right_column}}" y="255">k - Step replay forward</text>
+    </g>
+</g>

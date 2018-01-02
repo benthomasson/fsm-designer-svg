@@ -44,6 +44,11 @@ _Enabled.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     if ($event.key === 'd') {
         scope.debug.hidden = !scope.debug.hidden;
+        scope.help.hidden = !scope.debug.hidden;
+        return;
+    }
+    if ($event.key === 'h') {
+        scope.help.hidden = !scope.help.hidden;
         return;
     }
     else if ($event.key === 'p') {

@@ -73,6 +73,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.cursor = {'x':100, 'y': 100, 'hidden': false};
 
   $scope.debug = {'hidden': true};
+  $scope.help = {'hidden': false};
   $scope.hide_buttons = false;
   $scope.hide_groups = false;
   $scope.graph = {'width': window.innerWidth,
@@ -900,6 +901,10 @@ app.directive('cursor', function() {
 
 app.directive('debug', function() {
   return { restrict: 'A', templateUrl: 'widgets/debug.html' };
+});
+
+app.directive('help', function() {
+  return { restrict: 'A', templateUrl: 'widgets/help.html' };
 });
 
 app.directive('state', function() {
