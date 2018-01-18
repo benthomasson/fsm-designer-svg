@@ -54,6 +54,7 @@
             <g transform="translate(155, 70)"><text text-anchor="middle" > Trace</text></g>
             <g transform="translate(190, 7) scale(0.025)" upload></g>
             <g transform="translate(215, 70)"><text text-anchor="middle"> Trace</text></g>
+            <g ng-if="diagram_name && diagram_name!=='diagram'" transform="translate(275, 30) scale(1.5)"><text> FSM | {{diagram_name}}</text></g>
             <g ng-if="replay_data.length > 0">
                 <g fsm-play-pause></g>
                 <g fsm-slider></g>
@@ -65,4 +66,3 @@
     </svg>
   </body>
 </html>
-
