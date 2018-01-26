@@ -216,19 +216,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
         var i = 0;
         var transitions = $scope.transitions;
-        var map = new Map();
+        var map = {};
         var transition = null;
         var key = null;
         for (i = 0; i < transitions.length; i++) {
             transition = transitions[i];
             key = "" + transition.from_state.id + "_" + transition.to_state.id;
-            map.set(key, 0);
+            map[key] = 0;
         }
         for (i = 0; i < transitions.length; i++) {
             transition = transitions[i];
             key = "" + transition.from_state.id + "_" + transition.to_state.id;
-            transition.offset = map.get(key);
-            map.set(key, transition.offset + 1);
+            transition.offset = map[key];
+            map[key] = transition.offset + 1;
         }
     };
 
