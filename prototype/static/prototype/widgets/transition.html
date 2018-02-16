@@ -57,12 +57,6 @@
 <g ng-if="transition.to_state !== null">
 <g ng-if="transition.to_state !== transition.from_state">
 <g ng-if="!debug.hidden && current_scale > 0.5">
-<line ng-if="transition.to_state !== null"
-      ng-attr-x1="{{transition.perpendicular(scaledX, scaledY).x2}}"
-      ng-attr-y1="{{transition.perpendicular(scaledX, scaledY).y2}}"
-      ng-attr-x2="{{scaledX}}"
-      ng-attr-y2="{{scaledY}}"
-      ng-attr-class="debug" />
 <g ng-attr-transform="translate({{transition.to_state.x}},
                                 {{transition.to_state.y}})
                       rotate({{transition.slope()}})
