@@ -151,6 +151,8 @@ def upload_trace(request):
             replay = FSMTraceReplay(replay_data=json.dumps(data))
             replay.save()
             return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'.format(diagram_id, replay.pk))
+        else:
+            return HttpResponse(form.errors)
     else:
         form2 = DiagramForm(request.GET)
         if form2.is_valid():
