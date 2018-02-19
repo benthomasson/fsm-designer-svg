@@ -59,12 +59,12 @@ inherits(_Ready, _State);
 var Ready = new _Ready();
 exports.Ready = Ready;
 
-function _Disable () {
-    this.name = 'Disable';
+function _Disabled () {
+    this.name = 'Disabled';
 }
-inherits(_Disable, _State);
-var Disable = new _Disable();
-exports.Disable = Disable;
+inherits(_Disabled, _State);
+var Disabled = new _Disabled();
+exports.Disabled = Disabled;
 
 
 function _EditLabel () {

@@ -1,15 +1,15 @@
-finite_state_machine_id: 17
+diagram_id: 48
 name: move_fsm
 states:
-- id: 3
+- id: 1
   label: Selected1
   x: 197
   y: 292
-- id: 7
+- id: 2
   label: Selected3
   x: 235
   y: 914
-- id: 6
+- id: 3
   label: EditLabel
   x: 593
   y: 610
@@ -21,14 +21,18 @@ states:
   label: Move
   x: -85
   y: 588
-- id: 1
+- id: 6
   label: Start
   x: 533
   y: 121
-- id: 2
+- id: 7
   label: Ready
   x: 531
   y: 320
+- id: 8
+  label: Disabled
+  x: 796
+  y: 207
 transitions:
 - from_state: Selected2
   label: onKeyDown

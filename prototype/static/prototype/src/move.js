@@ -59,6 +59,15 @@ inherits(_EditLabel, _State);
 var EditLabel = new _EditLabel();
 exports.EditLabel = EditLabel;
 
+
+function _Disabled () {
+        this.name = 'Disabled';
+}
+inherits(_Disabled, _State);
+var Disabled = new _Disabled();
+exports.Disabled = Disabled;
+
+
 _Ready.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     var last_selected = controller.scope.select_items($event.shiftKey);
