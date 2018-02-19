@@ -5,6 +5,13 @@ function serialize(message) {
 }
 exports.serialize = serialize;
 
+function MultipleMessage(sender, messages) {
+    this.msg_type = "MultipleMessage";
+    this.sender = sender;
+    this.messages = messages;
+}
+exports.MultipleMessage = MultipleMessage;
+
 function StateMove(sender, id, x, y, previous_x, previous_y) {
     this.msg_type = "StateMove";
     this.sender = sender;

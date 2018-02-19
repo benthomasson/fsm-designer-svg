@@ -52,6 +52,7 @@
            class="FSM--construction"></line>
     </g>
 </g>
+
 <rect ng-attr-width="{{item.width(scaledX)}}"
       ng-attr-height="{{item.height(scaledY)}}"
       ng-attr-x="{{item.left_extent(scaledX)}}"
@@ -115,7 +116,7 @@
       class="FSM__group"/>
 
 <g ng-attr-transform="translate({{item.left_extent(scaledX)}},{{item.top_extent(scaledY)}})">
-<g ng-if="current_scale > 0.5 || item.type == 'site' || item.type == 'rack'">
+<g ng-if="current_scale > 0.5 || item.type == 'fsm'">
 <text ng-attr-class="{{item.selected && ! item.edit_label ? 'FSM__group-text--selected' : 'FSM--hidden'}}"
       filter="url(#selected)"
       text-anchor="left"
