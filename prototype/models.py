@@ -32,6 +32,8 @@ class Diagram(models.Model):
     name = models.CharField(max_length=200, )
     state_id_seq = models.IntegerField(default=0)
     transition_id_seq = models.IntegerField(default=0)
+    fsm_id_seq = models.IntegerField(default=0)
+    channel_id_seq = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -89,6 +91,7 @@ class FiniteStateMachine(models.Model):
     y1 = models.IntegerField()
     x2 = models.IntegerField()
     y2 = models.IntegerField()
+    id = models.IntegerField(default=0)
 
 
 class Channel(models.Model):
@@ -99,6 +102,7 @@ class Channel(models.Model):
     label = models.CharField(max_length=200, )
     inbox = models.CharField(max_length=200, )
     outbox = models.CharField(max_length=200, )
+    id = models.IntegerField(default=0)
 
 
 class FiniteStateMachineState(models.Model):

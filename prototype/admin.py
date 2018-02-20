@@ -48,7 +48,7 @@ admin.site.register(MessageType, MessageTypeAdmin)
 
 
 class DiagramAdmin(admin.ModelAdmin):
-    fields = ('name', 'state_id_seq', 'transition_id_seq',)
+    fields = ('name', 'state_id_seq', 'transition_id_seq', 'fsm_id_seq', 'channel_id_seq',)
     raw_id_fields = ()
 
 
@@ -88,7 +88,7 @@ admin.site.register(FSMTraceReplay, FSMTraceReplayAdmin)
 
 
 class FiniteStateMachineAdmin(admin.ModelAdmin):
-    fields = ('diagram', 'name', 'x1', 'y1', 'x2', 'y2',)
+    fields = ('diagram', 'name', 'x1', 'y1', 'x2', 'y2', 'id',)
     raw_id_fields = ('diagram',)
 
 
@@ -96,7 +96,7 @@ admin.site.register(FiniteStateMachine, FiniteStateMachineAdmin)
 
 
 class ChannelAdmin(admin.ModelAdmin):
-    fields = ('from_fsm', 'to_fsm', 'label', 'inbox', 'outbox',)
+    fields = ('from_fsm', 'to_fsm', 'label', 'inbox', 'outbox', 'id',)
     raw_id_fields = ('from_fsm', 'to_fsm',)
 
 

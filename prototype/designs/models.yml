@@ -59,6 +59,12 @@ models:
   - default: 0
     name: transition_id_seq
     type: IntegerField
+  - default: 0
+    name: fsm_id_seq
+    type: IntegerField
+  - default: 0
+    name: channel_id_seq
+    type: IntegerField
   name: Diagram
   x: 225
   y: 152
@@ -163,6 +169,9 @@ models:
     type: IntegerField
   - name: y2
     type: IntegerField
+  - default: 0
+    name: id
+    type: IntegerField
   name: FiniteStateMachine
   x: 529
   y: -177
@@ -189,6 +198,9 @@ models:
   - len: 200
     name: outbox
     type: CharField
+  - default: 0
+    name: id
+    type: IntegerField
   name: Channel
   x: 942
   y: -250
@@ -212,3 +224,4 @@ view:
   panX: 0.0
   panY: 0.0
   scaleXY: 1.0
+
