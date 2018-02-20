@@ -600,6 +600,8 @@ function Channel(id, from_fsm, to_fsm, label) {
     this.remote_selected = false;
     this.label = label;
     this.offset = 0;
+    this.inbox = '';
+    this.outbox = '';
 }
 exports.Channel = Channel;
 

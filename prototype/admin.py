@@ -16,6 +16,12 @@ from prototype.models import FSMTrace
 
 from prototype.models import FSMTraceReplay
 
+from prototype.models import FiniteStateMachine
+
+from prototype.models import Channel
+
+from prototype.models import FiniteStateMachineState
+
 
 class ClientAdmin(admin.ModelAdmin):
     fields = ()
@@ -79,3 +85,27 @@ class FSMTraceReplayAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FSMTraceReplay, FSMTraceReplayAdmin)
+
+
+class FiniteStateMachineAdmin(admin.ModelAdmin):
+    fields = ('diagram', 'name', 'x1', 'y1', 'x2', 'y2',)
+    raw_id_fields = ('diagram',)
+
+
+admin.site.register(FiniteStateMachine, FiniteStateMachineAdmin)
+
+
+class ChannelAdmin(admin.ModelAdmin):
+    fields = ('from_fsm', 'to_fsm', 'label', 'inbox', 'outbox',)
+    raw_id_fields = ('from_fsm', 'to_fsm',)
+
+
+admin.site.register(Channel, ChannelAdmin)
+
+
+class FiniteStateMachineStateAdmin(admin.ModelAdmin):
+    fields = ('finite_state_machine', 'state',)
+    raw_id_fields = ('finite_state_machine', 'state',)
+
+
+admin.site.register(FiniteStateMachineState, FiniteStateMachineStateAdmin)

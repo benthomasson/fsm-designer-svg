@@ -78,3 +78,31 @@ class FSMTraceReplay(models.Model):
 
     fsm_trace_replay_id = models.AutoField(primary_key=True,)
     replay_data = models.TextField()
+
+
+class FiniteStateMachine(models.Model):
+
+    finite_state_machine_id = models.AutoField(primary_key=True,)
+    diagram = models.ForeignKey('Diagram',)
+    name = models.CharField(max_length=200, )
+    x1 = models.IntegerField()
+    y1 = models.IntegerField()
+    x2 = models.IntegerField()
+    y2 = models.IntegerField()
+
+
+class Channel(models.Model):
+
+    channel_id = models.AutoField(primary_key=True,)
+    from_fsm = models.ForeignKey('FiniteStateMachine',  related_name='from_channel', )
+    to_fsm = models.ForeignKey('FiniteStateMachine',  related_name='to_channel', )
+    label = models.CharField(max_length=200, )
+    inbox = models.CharField(max_length=200, )
+    outbox = models.CharField(max_length=200, )
+
+
+class FiniteStateMachineState(models.Model):
+
+    finite_state_machine_state_id = models.AutoField(primary_key=True,)
+    finite_state_machine = models.ForeignKey('FiniteStateMachine',)
+    state = models.ForeignKey('State',)

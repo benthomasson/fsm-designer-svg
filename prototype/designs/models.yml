@@ -81,8 +81,8 @@ models:
   - name: y
     type: IntegerField
   name: State
-  x: 516
-  y: 154
+  x: 576
+  y: 177
 - display: label
   fields:
   - name: transition_id
@@ -104,8 +104,8 @@ models:
   - name: id
     type: IntegerField
   name: Transition
-  x: 812
-  y: 158
+  x: 867
+  y: 272
 - fields:
   - name: fsm_trace_id
     pk: true
@@ -133,8 +133,8 @@ models:
     name: order
     type: IntegerField
   name: FSMTrace
-  x: -427
-  y: -73
+  x: -152
+  y: -214
 - fields:
   - name: fsm_trace_replay_id
     pk: true
@@ -144,3 +144,71 @@ models:
   name: FSMTraceReplay
   x: 166
   y: -222
+- fields:
+  - name: finite_state_machine_id
+    pk: true
+    type: AutoField
+  - name: diagram
+    ref: Diagram
+    ref_field: diagram_id
+    type: ForeignKey
+  - len: 200
+    name: name
+    type: CharField
+  - name: x1
+    type: IntegerField
+  - name: y1
+    type: IntegerField
+  - name: x2
+    type: IntegerField
+  - name: y2
+    type: IntegerField
+  name: FiniteStateMachine
+  x: 529
+  y: -177
+- fields:
+  - name: channel_id
+    pk: true
+    type: AutoField
+  - name: from_fsm
+    ref: FiniteStateMachine
+    ref_field: finite_state_machine_id
+    related_name: from_channel
+    type: ForeignKey
+  - name: to_fsm
+    ref: FiniteStateMachine
+    ref_field: finite_state_machine_id
+    related_name: to_channel
+    type: ForeignKey
+  - len: 200
+    name: label
+    type: CharField
+  - len: 200
+    name: inbox
+    type: CharField
+  - len: 200
+    name: outbox
+    type: CharField
+  name: Channel
+  x: 942
+  y: -250
+- fields:
+  - name: finite_state_machine_state_id
+    pk: true
+    type: AutoField
+  - name: finite_state_machine
+    ref: FiniteStateMachine
+    ref_field: finite_state_machine_id
+    type: ForeignKey
+  - name: state
+    ref: State
+    ref_field: state_id
+    type: ForeignKey
+  name: FiniteStateMachineState
+  x: 892
+  y: 36
+modules: []
+view:
+  panX: 0.0
+  panY: 0.0
+  scaleXY: 1.0
