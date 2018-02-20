@@ -1,0 +1,129 @@
+<g ng-if="current_scale <= 0.5">
+<!-- Straight line -->
+<g ng-if="!debug.hidden">
+<line ng-attr-x1="{{channel.from_fsm.x}}"
+      ng-attr-y1="{{channel.from_fsm.y}}"
+      ng-attr-x2="{{channel.to_fsm !== null ? channel.to_fsm.x : scaledX}}"
+      ng-attr-y2="{{channel.to_fsm !== null ? channel.to_fsm.y : scaledY}}"
+      class="debug"></line>
+</g>
+<g ng-if="channel.to_fsm === null">
+<line ng-attr-x1="{{channel.from_fsm.x}}"
+      ng-attr-y1="{{channel.from_fsm.y}}"
+      ng-attr-x2="{{channel.to_fsm !== null ? channel.to_fsm.x : scaledX}}"
+      ng-attr-y2="{{channel.to_fsm !== null ? channel.to_fsm.y : scaledY}}"
+      class="channel"></line>
+</g>
+<!-- End Straight line -->
+<!-- Large arc -->
+<g ng-if="channel.to_fsm !== null">
+<g ng-if="channel.to_fsm !== channel.from_fsm">
+<g ng-attr-transform="translate({{channel.from_fsm.x}},
+                                {{channel.from_fsm.y}})
+                      rotate({{channel.slope()}})">
+<circle ng-if="!debug.hidden"
+        ng-attr-cx="{{-channel.length()/2}}"
+        ng-attr-cy="{{-channel.arc_offset2()}}"
+        r=10
+        class="debug" ></circle>
+<path class="channel-selected" ng-if="channel.to_fsm !== null && channel.selected" ng-attr-d="M0 0 A {{channel.arc_r2()}} {{channel.arc_r2()}} 0 0 0 {{-channel.length()}} 0"></path>
+<path class="channel" ng-if="channel.to_fsm !== null" ng-attr-d="M0 0 A {{channel.arc_r2()}} {{channel.arc_r2()}} 0 0 0 {{-channel.length()}} 0"></path>
+<line ng-if="!debug.hidden"
+      ng-attr-x1="{{-channel.length()/2}}"
+      y1=0
+      ng-attr-x2="{{-channel.length()/2}}"
+      ng-attr-y2="{{-channel.arc_offset2()}}"
+      class="debug"></line>
+<g ng-attr-transform="rotate({{channel.start_arc_angle()}})
+                      translate(-{{channel.from_fsm.icon_size}}, 0)">
+<circle ng-if="!debug.hidden"
+        ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+<rect ng-if="!debug.hidden"
+      ng-attr-x="{{-channel.length()}}"
+      ng-attr-y="{{-channel.arc_offset2()}}"
+      ng-attr-width="{{channel.length()}}"
+      ng-attr-height="{{channel.arc_offset2()}}"
+      class="debug"></rect>
+</g>
+</g>
+</g>
+<!-- End Large arc -->
+
+<!-- Debug -->
+<g ng-if="channel.to_fsm !== null">
+<g ng-if="channel.to_fsm !== channel.from_fsm">
+<g ng-if="!debug.hidden && current_scale > 0.5">
+<g ng-attr-transform="translate({{channel.to_fsm.x}},
+                                {{channel.to_fsm.y}})
+                      rotate({{channel.slope()}})
+                      translate({{channel.length()/2}}, 0)">
+</g>
+<g ng-attr-transform="translate({{channel.to_fsm.x}},
+                                {{channel.to_fsm.y}})
+                      rotate({{channel.slope()}})
+                      translate({{channel.to_fsm.icon_size}}, 0)">
+<circle ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+<g ng-attr-transform="translate({{channel.from_fsm.x}},
+                                {{channel.from_fsm.y}})
+                      rotate({{channel.slope()}})
+                      translate({{-channel.from_fsm.icon_size}}, 0)">
+<circle ng-attr-cx="0"
+        ng-attr-cy="0"
+        r=10
+        class="debug" ></circle>
+</g>
+</g>
+</g>
+</g>
+<!-- End Debug -->
+<!-- Arrow -->
+<g ng-if="channel.to_fsm !== channel.from_fsm">
+<g ng-if="channel.to_fsm !== null"  ng-attr-transform="translate({{channel.to_fsm.x}},
+                                                                 {{channel.to_fsm.y}})
+                      rotate({{channel.slope()}})
+                      rotate({{-channel.end_arc_angle()}})
+                      translate({{channel.to_fsm.icon_size}}, 0)
+                      rotate({{channel.end_arc_angle()}})
+                      rotate(180)
+                      rotate({{-channel.arc_angle_tan2()}})">
+<line ng-if="!debug.hidden"
+      x1=0
+      y1=0
+      x2=-100
+      y2=0
+      class="debug"></line>
+<g transform="translate(-19, -9)">
+<path ng-attr-transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" class="arrow-selected {{channel.selected && 'selected' || 'hidden'}}"/>
+<path d="M0,0 L0,18 L18,9 z" class="arrow"/>
+</g>
+</g>
+<!-- End Arrow -->
+<!-- Text -->
+<g ng-if="current_scale > 0.5 && channel.to_fsm !== null"
+   ng-attr-transform="translate({{channel.from_fsm.x}},
+                                {{channel.from_fsm.y}})
+                      rotate({{channel.slope()}})
+                      translate({{-channel.length()/2}}, 0)
+                      translate(0, {{-channel.arc_offset2()}})
+                      translate(0, -5)
+                      rotate({{channel.flip_text_rotate()}})
+                      translate(0, {{channel.flip_text_offset()}})
+                      ">
+<text ng-attr-class="{{channel.selected && ! channel.edit_label ? 'selected' : 'hidden'}}"
+      filter="url(#selected)"
+      text-anchor="middle"
+      x="0"
+      y="0"> {{channel.label}}</text>
+<text text-anchor="middle" x="0" y="0">{{channel.label}}{{channel.edit_label?'_':''}}</text>
+</g>
+</g>
+<!-- End Text -->
+</g>

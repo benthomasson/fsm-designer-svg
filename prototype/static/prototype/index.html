@@ -27,6 +27,9 @@
 		</filter>
 		</defs>
          <g transform="scale(1.0)" id="frame_g">
+            <g ng-repeat="channel in channels">
+            <g fsm-channel></g>
+            </g>
             <g ng-repeat="transition in transitions">
             <g fsm-transition></g>
             </g>

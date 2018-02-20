@@ -6,6 +6,7 @@ var view = require('./view.js');
 var move = require('./move.js');
 var hotkeys_fsm = require('./hotkeys.fsm.js');
 var transition = require('./transition.js');
+var channel_fsm = require('./channel.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
 var mode_fsm = require('./mode.fsm.js');
@@ -64,6 +65,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.selected_groups = [];
   $scope.selected_transitions = [];
   $scope.new_transition = null;
+  $scope.selected_channels = [];
+  $scope.new_channel = null;
   $scope.trace_id_seq = util.natural_numbers(0);
   $scope.trace_order_seq = util.natural_numbers(0);
   $scope.trace_id = $scope.trace_id_seq();
@@ -84,6 +87,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.state_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.transition_id_seq = util.natural_numbers(0);
+  $scope.channel_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
   $scope.client_messages = {};
@@ -109,6 +113,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.transition_controller = new fsm.FSMController($scope, 'transition_fsm', transition.Start, $scope);
   $scope.group_controller = new fsm.FSMController($scope, 'group_fsm', group_fsm.Start, $scope);
   $scope.fsm_controller = new fsm.FSMController($scope, 'fsm_fsm', fsm_fsm.Start, $scope);
+  $scope.channel_controller = new fsm.FSMController($scope, 'channel_fsm', channel_fsm.Start, $scope);
   $scope.buttons_controller = new fsm.FSMController($scope, 'buttons_fsm', buttons.Start, $scope);
   $scope.time_controller = new fsm.FSMController($scope, 'time_fsm', time.Start, $scope);
   $scope.mode_controller = new fsm.FSMController($scope, 'mode_fsm', mode_fsm.Start, $scope);
@@ -131,8 +136,11 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.fsm_controller.delegate_channel = new fsm.Channel($scope.fsm_controller,
                                                                   $scope.group_controller,
                                                                   $scope);
+  $scope.channel_controller.delegate_channel = new fsm.Channel($scope.channel_controller,
+                                                                  $scope.fsm_controller,
+                                                                  $scope);
   $scope.buttons_controller.delegate_channel = new fsm.Channel($scope.buttons_controller,
-                                                               $scope.fsm_controller,
+                                                               $scope.channel_controller,
                                                                $scope);
   $scope.time_controller.delegate_channel = new fsm.Channel($scope.time_controller,
                                                             $scope.buttons_controller,
@@ -168,6 +176,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.transitions = [
   ];
 
+  $scope.channels = [
+  ];
 
 
     // Utility functions
@@ -278,6 +288,33 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         for(i = 0; i < groups.length; i++) {
             groups[i].selected = false;
         }
+    };
+    
+    $scope.select_fsms = function (multiple_selection) {
+
+        var groups = $scope.groups;
+        var i = 0;
+        var last_selected_fsm = null;
+
+        if (!multiple_selection) {
+            $scope.clear_selections();
+        }
+
+        for (i = 0; i < groups.length; i++) {
+            if (groups[i].type !== "fsm") {
+                continue;
+            }
+            if (groups[i].is_icon_selected($scope.scaledX, $scope.scaledY)) {
+                groups[i].selected = true;
+                last_selected_fsm = groups[i];
+                $scope.selected_groups.push(groups[i]);
+                if (!multiple_selection) {
+                    break;
+                }
+            }
+        }
+
+        return {last_selected_fsm: last_selected_fsm};
     };
 
     $scope.select_items = function (multiple_selection) {
@@ -656,7 +693,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.onClientId = function(data) {
         $scope.client_id = data;
-        $scope.send_initial_messages();
     };
 
     $scope.onDiagram = function(data) {
@@ -923,6 +959,10 @@ app.directive('state', function() {
 
 app.directive('fsmTransition', function() {
   return { restrict: 'A', templateUrl: 'widgets/transition.html' };
+});
+
+app.directive('fsmChannel', function() {
+  return { restrict: 'A', templateUrl: 'widgets/channel.html' };
 });
 
 app.directive('quadrants', function() {

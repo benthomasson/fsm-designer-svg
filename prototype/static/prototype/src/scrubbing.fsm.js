@@ -43,11 +43,19 @@ var Scrubbing = new _Scrubbing();
 exports.Scrubbing = Scrubbing;
 
 
+function _Disabled () {
+        this.name = 'Disabled';
+}
+inherits(_Disabled, _State);
+var Disabled = new _Disabled();
+exports.Disabled = Disabled;
+
+
 _Start.prototype.start = function (controller) {
 
-    controller.changeState(Ready);
+    controller.changeState(Disabled);
 };
-_Start.prototype.start.transitions = ['Ready'];
+_Start.prototype.start.transitions = ['Disabled'];
 
 
 _Ready.prototype.onMouseDown = function (controller, msg_type, message) {

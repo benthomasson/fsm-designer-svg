@@ -28,6 +28,14 @@ var Pause = new _Pause();
 exports.Pause = Pause;
 
 
+function _Disabled () {
+        this.name = 'Disabled';
+}
+inherits(_Disabled, _State);
+var Disabled = new _Disabled();
+exports.Disabled = Disabled;
+
+
 function show_replay($scope, replay) {
 
     if (replay.fsm_name === $scope.diagram_name) {
@@ -69,10 +77,9 @@ exports.show_replay = show_replay;
 
 _Start.prototype.start = function (controller) {
 
-    controller.changeState(Play);
-
+    controller.changeState(Disabled);
 };
-_Start.prototype.start.transitions = ['Play'];
+_Start.prototype.start.transitions = ['Disabled'];
 
 
 _Play.prototype.start = function (controller) {

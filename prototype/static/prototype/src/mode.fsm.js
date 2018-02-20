@@ -3,6 +3,7 @@ var fsm = require('./fsm.js');
 var move_fsm = require('./move.js');
 var group_fsm = require('./group.fsm.js');
 var fsm_fsm = require('./fsm.fsm.js');
+var channel_fsm = require('./channel.js');
 
 function _State () {
 }
@@ -69,10 +70,12 @@ _FSM.prototype.end = function(controller) {
     controller.scope.group_controller.changeState(group_fsm.Disabled);
     controller.scope.move_controller.changeState(move_fsm.Disabled);
     controller.scope.fsm_controller.changeState(fsm_fsm.Ready);
+    controller.scope.channel_controller.changeState(channel_fsm.Ready);
 };
 
 _FSM.prototype.start = function(controller) {
     controller.scope.group_controller.changeState(group_fsm.Ready);
     controller.scope.move_controller.changeState(move_fsm.Ready);
     controller.scope.fsm_controller.changeState(fsm_fsm.Disabled);
+    controller.scope.channel_controller.changeState(channel_fsm.Disabled);
 };

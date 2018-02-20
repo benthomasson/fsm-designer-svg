@@ -109,6 +109,49 @@ function TransitionUnSelected(sender, id) {
 }
 exports.TransitionUnSelected = TransitionUnSelected;
 
+function ChannelCreate(sender, id, from_id, to_id, label) {
+    this.msg_type = "ChannelCreate";
+    this.sender = sender;
+    this.id = id;
+    this.from_id = from_id;
+    this.to_id = to_id;
+    this.label = label;
+}
+exports.ChannelCreate = ChannelCreate;
+
+function ChannelDestroy(sender, id, from_id, to_id, label) {
+    this.msg_type = "ChannelDestroy";
+    this.sender = sender;
+    this.id = id;
+    this.from_id = from_id;
+    this.to_id = to_id;
+    this.label = label;
+}
+exports.ChannelDestroy = ChannelDestroy;
+
+function ChannelLabelEdit(sender, id, label, previous_label) {
+    this.msg_type = "ChannelLabelEdit";
+    this.sender = sender;
+    this.id = id;
+    this.label = label;
+    this.previous_label = previous_label;
+}
+exports.ChannelLabelEdit = ChannelLabelEdit;
+
+function ChannelSelected(sender, id) {
+    this.msg_type = "ChannelSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.ChannelSelected = ChannelSelected;
+
+function ChannelUnSelected(sender, id) {
+    this.msg_type = "ChannelUnSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.ChannelUnSelected = ChannelUnSelected;
+
 function Undo(sender, original_message) {
     this.msg_type = "Undo";
     this.sender = sender;

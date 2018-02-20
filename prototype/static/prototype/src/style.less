@@ -8,6 +8,7 @@
 @dark-widget-detail: #707070;
 @widget-body: #D7D7D7;
 @transition: #707070;
+@channel: #707070;
 @debug-copynot: rgb(77,200,242);
 @button-body: #f6f6f6;
 @button-text: #707070;
@@ -43,6 +44,11 @@ svg path {
 }
 
 svg path.transition {
+    fill: none;
+    stroke: @dark-widget-detail;
+}
+
+svg path.channel {
     fill: none;
     stroke: @dark-widget-detail;
 }
@@ -94,6 +100,11 @@ svg rect.debug {
 
 svg line.transition {
     stroke: @transition;
+    stroke-width: 2;
+}
+
+svg line.channel {
+    stroke: @channel;
     stroke-width: 2;
 }
 
@@ -157,12 +168,23 @@ path.transition {
     stroke: @dark-widget-detail;
 }
 
+path.channel {
+    fill: @dark-widget-detail;
+    stroke: @dark-widget-detail;
+}
+
 path.selected {
     fill: @selected-blue;
     stroke: @selected-blue;
 }
 
 path.transition-selected {
+    fill: none;
+    stroke: @selected-blue;
+    stroke-width: 6;
+}
+
+path.channel-selected {
     fill: none;
     stroke: @selected-blue;
     stroke-width: 6;
@@ -285,6 +307,11 @@ path.arrow-selected {
 }
 
 .FSM__fsm-transition {
+    fill: none;
+    stroke: @light-widget-detail;
+}
+
+.FSM__fsm-channel {
     fill: none;
     stroke: @light-widget-detail;
 }

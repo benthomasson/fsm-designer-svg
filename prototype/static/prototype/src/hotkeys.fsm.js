@@ -79,6 +79,14 @@ _Enabled.prototype.onKeyDown = function(controller, msg_type, $event) {
         scope.first_channel.send("NewTransition", $event);
         return;
     }
+    else if ($event.key === 't') {
+        scope.first_channel.send("NewTransition", $event);
+        return;
+    }
+    else if ($event.key === 'c') {
+        scope.first_channel.send("NewChannel", $event);
+        return;
+    }
     else if ($event.key === 's') {
         scope.first_channel.send("NewState", $event);
         return;

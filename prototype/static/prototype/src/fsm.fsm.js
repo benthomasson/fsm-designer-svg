@@ -275,6 +275,8 @@ _Move.prototype.onMouseMove = function (controller) {
         groups[i].x2 = groups[i].x2 + diffX;
         groups[i].y2 = groups[i].y2 + diffY;
 
+        groups[i].update_xy();
+
         c_messages.push(new messages.GroupMove(controller.scope.client_id,
                                                groups[i].id,
                                                groups[i].x1,

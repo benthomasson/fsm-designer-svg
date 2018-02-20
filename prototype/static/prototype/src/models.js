@@ -334,9 +334,17 @@ function Group(id, name, type, x1, y1, x2, y2, selected) {
     this.links = [];
     this.groups = [];
     this.streams = [];
-    this.icon_size = type === 'site' ? 500 : 100;
+    this.icon_size = 100;
+    this.x = x1;
+    this.y = y1;
+    this.update_xy();
 }
 exports.Group = Group;
+
+Group.prototype.update_xy = function () {
+    this.x = this.centerX();
+    this.y = this.centerY();
+};
 
 Group.prototype.toJSON = function () {
 
@@ -582,4 +590,199 @@ Slider.prototype.is_selected = function (x, y) {
             y > this.y - 20 &&
             y < this.y + this.height + 20);
 
+};
+
+function Channel(id, from_fsm, to_fsm, label) {
+    this.id = id;
+    this.from_fsm = from_fsm;
+    this.to_fsm = to_fsm;
+    this.selected = false;
+    this.remote_selected = false;
+    this.label = label;
+    this.offset = 0;
+}
+exports.Channel = Channel;
+
+Channel.prototype.toJSON = function () {
+    return {to_fsm: this.to_fsm.id,
+            from_fsm: this.from_fsm.id};
+};
+
+Channel.prototype.slope_rad = function () {
+    //Return the slope in radians for this transition.
+    var x1 = this.from_fsm.x;
+    var y1 = this.from_fsm.y;
+    var x2 = this.to_fsm.x;
+    var y2 = this.to_fsm.y;
+    return Math.atan2(y2 - y1, x2 - x1) + Math.PI;
+};
+
+Channel.prototype.slope = function () {
+    //Return the slope in degrees for this transition.
+    var x1 = this.from_fsm.x;
+    var y1 = this.from_fsm.y;
+    var x2 = this.to_fsm.x;
+    var y2 = this.to_fsm.y;
+    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 180;
+};
+
+Channel.prototype.flip_text_rotate = function () {
+    var slope = this.slope();
+    if (slope > 90 && slope < 270) {
+        return 180;
+    } else {
+        return 0;
+    }
+};
+
+Channel.prototype.flip_text_offset = function () {
+    var slope = this.slope();
+    if (slope > 90 && slope < 270) {
+        return 10;
+    } else {
+        return 0;
+    }
+};
+
+Channel.prototype.pslope = function () {
+    //Return the slope of a perpendicular line to this
+    //transition
+    var x1 = this.from_fsm.x;
+    var y1 = this.from_fsm.y;
+    var x2 = this.to_fsm.x;
+    var y2 = this.to_fsm.y;
+    var slope = (y2 - y1)/(x2 - x1);
+    //var intercept = - slope * x1;
+    var pslope = 1/slope;
+    return Math.atan(pslope)  * 180 / Math.PI + 180;
+};
+
+Channel.prototype.perpendicular = function (x, y) {
+    //Find the perpendicular line through x, y to this transition.
+    var x1 = this.from_fsm.x;
+    var y1 = this.from_fsm.y;
+    var x2 = this.to_fsm.x;
+    var y2 = this.to_fsm.y;
+    var slope = (y2 - y1)/(x2 - x1);
+    var intercept = y1 - slope * x1;
+    var pslope = -1/slope;
+    var pintercept = y - pslope * x;
+
+    var xi = (pintercept - intercept) / (slope - pslope);
+    var yi = pslope * xi + pintercept;
+    return {x1:x, y1:y, x2: xi, y2: yi};
+};
+
+Channel.prototype.is_selected = function (x, y) {
+    // Is the distance to the mouse location less than 25 if on the label side
+    // or 5 on the other from the shortest line to the transition?
+    //console.log("is_selected");
+    var phi = this.slope_rad();
+    //console.log({"phi": phi});
+    //console.log({'x': this.from_fsm.x, 'y': this.from_fsm.y});
+    //console.log({'x': this.to_fsm.x, 'y': this.to_fsm.y});
+    //console.log({'x': x, 'y': y});
+    var p1 = util.cartesianToPolar(this.from_fsm.x, this.from_fsm.y);
+    var p2 = util.cartesianToPolar(this.to_fsm.x, this.to_fsm.y);
+    var p3 = util.cartesianToPolar(x, y);
+    //console.log(p1);
+    p1.theta -= phi;
+    //console.log(p1);
+    //console.log(p2);
+    p2.theta -= phi;
+    //console.log(p2);
+    p3.theta -= phi;
+
+    p1 = util.polarToCartesian_rad(0, 0, p1.r, p1.theta);
+    p2 = util.polarToCartesian_rad(0, 0, p2.r, p2.theta);
+    p3 = util.polarToCartesian_rad(0, 0, p3.r, p3.theta);
+    p2.y -= this.arc_offset2();
+    //console.log(p1);
+    //console.log(p2);
+    //console.log(p3);
+    var max_x = Math.max(p1.x, p2.x);
+    var min_x = Math.min(p1.x, p2.x);
+    var max_y = Math.max(p1.y, p2.y) + 5;
+    var min_y = Math.min(p1.y, p2.y) - 25 ;
+
+    return p3.x > min_x && p3.x < max_x && p3.y > min_y && p3.y < max_y;
+};
+exports.pDistance = pDistance;
+
+Channel.prototype.length = function () {
+    //Return the length of this transition.
+    var x1 = this.from_fsm.x;
+    var y1 = this.from_fsm.y;
+    var x2 = this.to_fsm.x;
+    var y2 = this.to_fsm.y;
+    return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
+};
+
+
+Channel.prototype.inter_length = function () {
+    //Return the length of this transition between states.
+    return this.length() - this.from_fsm.icon_size - this.to_fsm.icon_size;
+};
+
+Channel.prototype.arc_r = function () {
+    return this.inter_length();
+};
+
+Channel.prototype.arc_r2 = function () {
+    var offset_to_r = [2, 1, 0.75, 0.6, 0.55, 0.53, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+    return this.length() * offset_to_r[this.offset];
+};
+
+Channel.prototype.arc_offset = function () {
+    var r = this.arc_r();
+    var offset =  r - (Math.sin(this.arc_angle_rad()) * r);
+    return offset;
+};
+
+Channel.prototype.arc_offset2 = function () {
+    var r = this.arc_r2();
+    var theta = Math.acos((this.length() / 2) / r);
+    var offset =  r * (1 - Math.sin(theta));
+    return offset;
+};
+
+Channel.prototype.arc_angle_rad = function () {
+    return Math.acos((this.inter_length() / 2) / this.arc_r());
+};
+
+Channel.prototype.arc_angle_tan_rad = function () {
+    return Math.PI/2 - Math.acos((this.inter_length() / 2) / this.arc_r());
+};
+
+Channel.prototype.arc_angle_tan = function () {
+    return this.arc_angle_tan_rad() * 180 / Math.PI;
+};
+
+Channel.prototype.arc_angle_tan_rad2 = function () {
+    var r = this.arc_r2();
+    var l = this.length();
+    var phi = this.end_arc_angle_rad();
+    return Math.PI/2 - Math.acos((l/2 - Math.cos(phi) * this.to_fsm.icon_size) / r);
+};
+
+Channel.prototype.arc_angle_tan2 = function () {
+    return this.arc_angle_tan_rad2() * 180 / Math.PI;
+};
+
+Channel.prototype.end_arc_angle_rad = function () {
+    var r = this.arc_r2();
+    var l = this.length();
+    return Math.acos((this.to_fsm.icon_size / 2) / r) - Math.acos((l/2)/r);
+};
+
+Channel.prototype.end_arc_angle = function () {
+    return this.end_arc_angle_rad() * 180 / Math.PI;
+};
+
+Channel.prototype.start_arc_angle_rad = function () {
+    return Math.acos((this.from_fsm.icon_size / 2) / this.arc_r2()) - Math.acos((this.length()/2)/this.arc_r2());
+};
+
+Channel.prototype.start_arc_angle = function () {
+    return this.start_arc_angle_rad() * 180 / Math.PI;
 };
