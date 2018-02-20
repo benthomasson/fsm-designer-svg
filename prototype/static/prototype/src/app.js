@@ -271,10 +271,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         var states = $scope.states;
         var transitions = $scope.transitions;
         var groups = $scope.groups;
+        var channels = $scope.channels;
         $scope.selected_items = [];
         $scope.selected_states = [];
         $scope.selected_transitions = [];
         $scope.selected_groups = [];
+        $scope.selected_channels = [];
         for (i = 0; i < states.length; i++) {
             if (states[i].selected) {
                 $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
@@ -284,6 +286,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         for (i = 0; i < transitions.length; i++) {
             transitions[i].selected = false;
             $scope.send_control_message(new messages.TransitionUnSelected($scope.client_id, transitions[i].id));
+        }
+        for (i = 0; i < channels.length; i++) {
+            channels[i].selected = false;
+            $scope.send_control_message(new messages.ChannelUnSelected($scope.client_id, channels[i].id));
         }
         for(i = 0; i < groups.length; i++) {
             groups[i].selected = false;
@@ -315,6 +321,36 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         }
 
         return {last_selected_fsm: last_selected_fsm};
+    };
+
+    $scope.select_channels = function (multiple_selection) {
+
+        var i = 0;
+        var last_selected_channel = null;
+
+        $scope.pressedX = $scope.mouseX;
+        $scope.pressedY = $scope.mouseY;
+        $scope.pressedScaledX = $scope.scaledX;
+        $scope.pressedScaledY = $scope.scaledY;
+
+        if (!multiple_selection) {
+            $scope.clear_selections();
+        }
+
+        for (i = 0; i < $scope.channels.length; i++) {
+            if($scope.channels[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                $scope.channels[i].selected = true;
+                $scope.send_control_message(new messages.TransitionSelected($scope.client_id, $scope.channels[i].id));
+                last_selected_channel = $scope.channels[i];
+                if ($scope.selected_channels.indexOf($scope.channels[i]) === -1) {
+                    $scope.selected_channels.push($scope.channels[i]);
+                    if (!multiple_selection) {
+                        break;
+                    }
+                }
+            }
+        }
+        return {last_selected_channel: last_selected_channel};
     };
 
     $scope.select_items = function (multiple_selection) {

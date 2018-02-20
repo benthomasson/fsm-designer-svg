@@ -107,7 +107,7 @@
 </g>
 <!-- End Arrow -->
 <!-- Text -->
-<g ng-if="current_scale > 0.5 && channel.to_fsm !== null"
+<g ng-if="current_scale <= 0.5 && channel.to_fsm !== null"
    ng-attr-transform="translate({{channel.from_fsm.x}},
                                 {{channel.from_fsm.y}})
                       rotate({{channel.slope()}})

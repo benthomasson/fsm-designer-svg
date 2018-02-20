@@ -296,3 +296,4 @@ _EditLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
     }
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];
+

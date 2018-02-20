@@ -1,26 +1,42 @@
-finite_state_machine_id: 82
+diagram_id: 50
 name: channel_fsm
 states:
-- id: 4
+- id: 7
+  label: Selected2
+  x: -480
+  y: 68
+- id: 9
+  label: EditLabel
+  x: -226
+  y: 312
+- id: 8
+  label: Selected3
+  x: -546
+  y: 343
+- id: 1
   label: Connecting
   x: 344
   y: 312
-- id: 5
+- id: 2
   label: Selecting
   x: 311
   y: 23
-- id: 1
+- id: 3
   label: Ready
   x: 36
   y: 28
-- id: 3
+- id: 4
   label: Connected
   x: 55
   y: 317
-- id: 2
+- id: 5
   label: Start
   x: 43
   y: -188
+- id: 6
+  label: Selected1
+  x: -274
+  y: -147
 transitions:
 - from_state: Ready
   label: onNewChannel
@@ -40,3 +56,27 @@ transitions:
 - from_state: Selecting
   label: onMouseUp
   to_state: Connecting
+- from_state: Selected2
+  label: onKeyDown
+  to_state: Ready
+- from_state: Selected2
+  label: onMouseDown
+  to_state: Ready
+- from_state: Ready
+  label: onMouseDown
+  to_state: Selected1
+- from_state: EditLabel
+  label: onMouseDown
+  to_state: Ready
+- from_state: Selected3
+  label: onMouseUp
+  to_state: EditLabel
+- from_state: Selected2
+  label: onMouseDown
+  to_state: Selected3
+- from_state: Selected1
+  label: onMouseUp
+  to_state: Selected2
+- from_state: EditLabel
+  label: onKeyDown
+  to_state: Selected2
