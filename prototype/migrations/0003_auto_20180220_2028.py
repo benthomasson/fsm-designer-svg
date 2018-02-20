@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+import yaml
+
+
+messages = yaml.load('''
 messages:
     - {msg_type: MultipleMessage, fields: [msg_type, sender, messages]}
     - {msg_type: StateMove, fields: [msg_type, sender, id, x, y, previous_x, previous_y]}
@@ -27,4 +35,24 @@ messages:
     - {msg_type: GroupSelected, fields: [msg_type, sender, id]}
     - {msg_type: GroupUnSelected, fields: [msg_type, sender, id]}
     - {msg_type: GroupMembership, fields: [msg_type, sender, id, members]}
+                     ''')
 
+
+def populate_message_types(apps, schema_editor):
+
+    MessageType = apps.get_model('prototype', 'MessageType')
+    for message in messages['messages']:
+        MessageType.objects.get_or_create(name=message['msg_type'])
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('prototype', '0002_fsmtrace_order'),
+    ]
+
+    operations = [
+        migrations.RunPython(
+            code=populate_message_types,
+        ),
+    ]
