@@ -38,6 +38,7 @@ transform_transition = partial(transform_dict, transition_map)
 transform_state_in = partial(transform_dict, state_map_in)
 transform_channel = partial(transform_dict, channel_map)
 
+
 @channel_session
 def ws_connect(message):
     # Accept connection
@@ -75,9 +76,9 @@ def ws_connect(message):
     fsms = list(FiniteStateMachine.objects
                 .filter(diagram_id=diagram_id).values())
     channels = list(FSMChannel.objects
-                           .filter(Q(from_fsm__diagram_id=diagram_id) |
-                                   Q(to_fsm__diagram_id=diagram_id))
-                           .values('from_fsm__id', 'to_fsm__id', 'label', 'id', 'outbox', 'inbox'))
+                              .filter(Q(from_fsm__diagram_id=diagram_id) |
+                                      Q(to_fsm__diagram_id=diagram_id))
+                              .values('from_fsm__id', 'to_fsm__id', 'label', 'id', 'outbox', 'inbox'))
     channels = map(transform_channel, channels)
     snapshot = dict(sender=0,
                     states=states,
@@ -146,7 +147,7 @@ class _Persistence(object):
         message_value = data[1]
         try:
             message_type_id = MessageType.objects.get(name=message_type).pk
-        except ObjectDoesNotExist, e:
+        except ObjectDoesNotExist:
             print ("Missing message type", message_type)
             print "Unsupported message ", message_type
             return
@@ -218,7 +219,6 @@ class _Persistence(object):
                 .update(transition_id_seq=transition['id']))
 
     def onTransitionLabelEdit(self, transition, diagram_id, client_id):
-        print transition
         Transition.objects.filter(from_state__diagram_id=diagram_id,
                                   id=transition['id']).update(label=transition['label'])
 
@@ -243,6 +243,9 @@ class _Persistence(object):
             (Diagram.objects
                     .filter(diagram_id=diagram_id, fsm_id_seq__lt=group['id'])
                     .update(fsm_id_seq=group['id']))
+
+    def onGroupLabelEdit(self, group, diagram_id, client_id):
+        FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=group['id']).update(name=group['name'])
 
     def onGroupDestroy(self, state, diagram_id, client_id):
         FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=state['id']).delete()
@@ -270,6 +273,19 @@ class _Persistence(object):
         (Diagram.objects
                 .filter(diagram_id=diagram_id, channel_id_seq__lt=channel['id'])
                 .update(channel_id_seq=channel['id']))
+
+    def onChannelLabelEdit(self, channel, diagram_id, client_id):
+        FSMChannel.objects.filter(from_fsm__diagram_id=diagram_id,
+                                  id=channel['id']).update(label=channel['label'])
+
+    def onChannelDestroy(self, channel, diagram_id, client_id):
+        fsm_map = dict(FiniteStateMachine.objects
+                         .filter(diagram_id=diagram_id,
+                                 id__in=[channel['from_id'], channel['to_id']])
+                         .values_list('id', 'pk'))
+        FSMChannel.objects.filter(id=channel['id'],
+                                  from_fsm_id=fsm_map[channel['from_id']],
+                                  to_fsm_id=fsm_map[channel['to_id']]).delete()
 
     def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
@@ -316,7 +332,8 @@ class _Persistence(object):
             if handler is not None:
                 handler(message, diagram_id, client_id)
             else:
-                logger.warning("Unsupported message %s", message['msg_type'])
+                print ("Unsupported message %s" % message['msg_type'])
+
 
 persistence = _Persistence()
 

@@ -131,7 +131,7 @@ _Connecting.prototype.onMouseUp = function (controller) {
                                               controller.scope.new_channel.to_fsm.id),
                                               '');
         controller.scope.new_channel = null;
-        controller.scope.update_offsets();
+        controller.scope.update_channel_offsets();
         controller.changeState(Connected);
     } else {
         var index = controller.scope.channels.indexOf(controller.scope.new_channel);
@@ -199,6 +199,7 @@ _Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
                                                                                   channels[i].label));
                 }
         }
+        controller.scope.update_channel_offsets();
     } else {
         controller.delegate_channel.send(msg_type, $event);
     }

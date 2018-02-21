@@ -334,7 +334,7 @@ function Group(id, name, type, x1, y1, x2, y2, selected) {
     this.links = [];
     this.groups = [];
     this.streams = [];
-    this.icon_size = 100;
+    this.icon_size = 200;
     this.x = x1;
     this.y = y1;
     this.update_xy();
@@ -640,7 +640,7 @@ Channel.prototype.flip_text_rotate = function () {
 Channel.prototype.flip_text_offset = function () {
     var slope = this.slope();
     if (slope > 90 && slope < 270) {
-        return 10;
+        return 20;
     } else {
         return 0;
     }

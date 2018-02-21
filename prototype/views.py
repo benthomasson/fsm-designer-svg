@@ -4,6 +4,7 @@ from django.http import JsonResponse
 import yaml
 import json
 from prototype.models import Diagram, State, Transition, FSMTrace, FSMTraceReplay
+from prototype.models import FiniteStateMachine, Channel
 
 from functools import partial
 
@@ -34,6 +35,14 @@ transition_map = dict(from_state__name="from_state",
                       to_state__name="to_state",
                       label="label")
 
+channel_map = dict(from_fsm__name="from_fsm",
+                   to_fsm__name="to_fsm",
+                   from_fsm__id="from_fsm_id",
+                   to_fsm__id="to_fsm_id",
+                   inbox="inbox",
+                   outbox="outbox",
+                   label="type")
+
 
 def transform_dict(dict_map, d):
     return {to_key: d[from_key] for from_key, to_key in dict_map.iteritems()}
@@ -41,6 +50,7 @@ def transform_dict(dict_map, d):
 
 transform_state = partial(transform_dict, state_map)
 transform_transition = partial(transform_dict, transition_map)
+transform_channel = partial(transform_dict, channel_map)
 
 
 def download(request):
@@ -62,6 +72,23 @@ def download(request):
                                                                        .values('from_state__name',
                                                                                'to_state__name',
                                                                                'label')))
+        data['fsms'] = list(FiniteStateMachine.objects
+                                              .filter(diagram_id=diagram_id)
+                                              .values('x1',
+                                                      'y1',
+                                                      'x2',
+                                                      'y2',
+                                                      'name',
+                                                      'id'))
+        data['channels'] = map(transform_channel, list(Channel.objects
+                                                              .filter(from_fsm__diagram_id=diagram_id)
+                                                              .values('from_fsm__name',
+                                                                      'to_fsm__name',
+                                                                      'from_fsm__id',
+                                                                      'to_fsm__id',
+                                                                      'inbox',
+                                                                      'outbox',
+                                                                      'label')))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
@@ -131,7 +158,9 @@ def download_trace(request):
                                             client_id=client_id).order_by('order').values())
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_id, client_id, trace_id)
+        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_id,
+                                                                                                client_id,
+                                                                                                trace_id)
         return response
     else:
         return HttpResponse(form.errors)
@@ -150,7 +179,8 @@ def upload_trace(request):
             diagram_id = form.cleaned_data['diagram_id']
             replay = FSMTraceReplay(replay_data=json.dumps(data))
             replay.save()
-            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'.format(diagram_id, replay.pk))
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'.format(diagram_id,
+                                                                                                             replay.pk))
         else:
             return HttpResponse(form.errors)
     else:

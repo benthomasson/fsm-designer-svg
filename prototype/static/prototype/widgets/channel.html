@@ -113,7 +113,7 @@
                       rotate({{channel.slope()}})
                       translate({{-channel.length()/2}}, 0)
                       translate(0, {{-channel.arc_offset2()}})
-                      translate(0, -5)
+                      translate(0, -20)
                       rotate({{channel.flip_text_rotate()}})
                       translate(0, {{channel.flip_text_offset()}})
                       ">
@@ -121,8 +121,8 @@
       filter="url(#selected)"
       text-anchor="middle"
       x="0"
-      y="0"> {{channel.label}}</text>
-<text text-anchor="middle" x="0" y="0">{{channel.label}}{{channel.edit_label?'_':''}}</text>
+      y="0"  font-size="36"> {{channel.label}}</text>
+<text text-anchor="middle" x="0" y="0" font-size="36">{{channel.label}}{{channel.edit_label?'_':''}}</text>
 </g>
 </g>
 <!-- End Text -->
