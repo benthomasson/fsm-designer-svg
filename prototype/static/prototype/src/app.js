@@ -736,6 +736,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         $scope.diagram_name = data.name;
         $scope.state_id_seq = util.natural_numbers(data.state_id_seq);
         $scope.transition_id_seq = util.natural_numbers(data.transition_id_seq);
+        $scope.group_id_seq = util.natural_numbers(data.fsm_id_seq);
+        $scope.channel_id_seq = util.natural_numbers(data.channel_id_seq);
         var search_data = {diagram_id: data.diagram_id};
         if ($scope.replay_id !== 0) {
             search_data.replay_id = $scope.replay_id;
@@ -805,11 +807,16 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.onSnapshot = function (data) {
 
+        console.log(data);
+
         //Erase the existing state
         $scope.states = [];
         $scope.transitions = [];
+        $scope.groups = [];
+        $scope.channels = [];
 
         var state_map = {};
+        var fsm_map = {};
         var i = 0;
         var state = null;
         var new_state = null;
@@ -847,7 +854,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                 state_map[state.id] = new_state;
             }
         }
-        window.state_map = state_map;
 
         //Build the transitions
         var transition = null;
@@ -862,6 +868,51 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                                                           state_map[transition.to_state],
                                                           transition.label));
         }
+
+        //Build the fsm
+        var group = null;
+		var max_group_id = null;
+        var new_group = null;
+        for (i = 0; i < data.fsms.length; i++) {
+            group = data.fsms[i];
+            if (max_group_id === null || group.id > max_group_id) {
+                max_group_id = group.id;
+            }
+            new_group = new models.Group(group.id,
+                                         group.name,
+                                         'fsm',
+                                         group.x1,
+                                         group.y1,
+                                         group.x2,
+                                         group.y2,
+                                         false);
+            $scope.groups.push(new_group);
+            if (typeof(fsm_map[group.id]) === "undefined") {
+                fsm_map[group.id] = new_group;
+            }
+        }
+
+        //Update group membership
+
+        for (i = 0; i < $scope.groups.length; i++) {
+            $scope.groups[i].update_membership($scope.states, $scope.groups);
+        }
+
+
+        //Build the channels
+        var channel = null;
+        for (i = 0; i < data.channels.length; i++) {
+            channel = data.channels[i];
+            if (max_transition_id === null || channel.id > max_transition_id) {
+                max_transition_id = channel.id;
+            }
+            console.log(channel);
+            $scope.channels.push(new models.Channel(channel.id,
+                                                    fsm_map[channel.from_fsm],
+                                                    fsm_map[channel.to_fsm],
+                                                    channel.label));
+        }
+
 
         var diff_x;
         var diff_y;

@@ -2,6 +2,8 @@
 from channels import Group, Channel
 from channels.sessions import channel_session
 from prototype.models import Diagram, State, Transition, Client, History, MessageType
+from prototype.models import FiniteStateMachine
+from prototype.models import Channel as FSMChannel
 from prototype.models import FSMTrace
 import urlparse
 from django.db.models import Q
@@ -24,10 +26,17 @@ state_map_in = dict(x='x',
                     label='name',
                     id='id')
 
+channel_map = dict(from_fsm__id="from_fsm",
+                   to_fsm__id="to_fsm",
+                   label="label",
+                   outbox="outbox",
+                   inbox="inbox",
+                   id='id')
+
 
 transform_transition = partial(transform_dict, transition_map)
 transform_state_in = partial(transform_dict, state_map_in)
-
+transform_channel = partial(transform_dict, channel_map)
 
 @channel_session
 def ws_connect(message):
@@ -63,9 +72,18 @@ def ws_connect(message):
                                          Q(to_state__diagram_id=diagram_id))
                                  .values('from_state__id', 'to_state__id', 'label', 'id'))
     transitions = map(transform_transition, transitions)
+    fsms = list(FiniteStateMachine.objects
+                .filter(diagram_id=diagram_id).values())
+    channels = list(FSMChannel.objects
+                           .filter(Q(from_fsm__diagram_id=diagram_id) |
+                                   Q(to_fsm__diagram_id=diagram_id))
+                           .values('from_fsm__id', 'to_fsm__id', 'label', 'id', 'outbox', 'inbox'))
+    channels = map(transform_channel, channels)
     snapshot = dict(sender=0,
                     states=states,
-                    transitions=transitions)
+                    transitions=transitions,
+                    fsms=fsms,
+                    channels=channels)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
     history_message_ignore_types = ['StateSelected',
                                     'StateUnSelected',
@@ -108,6 +126,9 @@ def console_printer(message):
 
 class _Persistence(object):
 
+    def get_handler(self, message_type):
+        return getattr(self, "on{0}".format(message_type), None)
+
     def handle(self, message):
         diagram_id = message.get('diagram')
         if diagram_id is None:
@@ -134,7 +155,7 @@ class _Persistence(object):
                 message_type_id=message_type_id,
                 message_id=data[1].get('message_id', 0),
                 message_data=message['text']).save()
-        handler = getattr(self, "on{0}".format(message_type), None)
+        handler = self.get_handler(message_type)
         if handler is not None:
             handler(message_value, diagram_id, client_id)
         else:
@@ -166,8 +187,8 @@ class _Persistence(object):
         d.y = state['y']
         d.save()
         (Diagram.objects
-                           .filter(diagram_id=diagram_id)
-                           .update(state_id_seq=state['id']))
+                .filter(diagram_id=diagram_id)
+                .update(state_id_seq=state['id']))
 
     def onStateDestroy(self, state, diagram_id, client_id):
         State.objects.filter(diagram_id=diagram_id, id=state['id']).delete()
@@ -193,8 +214,8 @@ class _Persistence(object):
                                          from_state_id=state_map[transition['from_id']],
                                          to_state_id=state_map[transition['to_id']])
         (Diagram.objects
-                           .filter(diagram_id=diagram_id)
-                           .update(transition_id_seq=transition['id']))
+                .filter(diagram_id=diagram_id)
+                .update(transition_id_seq=transition['id']))
 
     def onTransitionLabelEdit(self, transition, diagram_id, client_id):
         print transition
@@ -209,6 +230,46 @@ class _Persistence(object):
         Transition.objects.filter(id=transition['id'],
                                   from_state_id=state_map[transition['from_id']],
                                   to_state_id=state_map[transition['to_id']]).delete()
+
+    def onGroupCreate(self, group, diagram_id, client_id):
+        if group['type'] == 'fsm':
+            FiniteStateMachine(diagram_id=diagram_id,
+                               id=group['id'],
+                               x1=group['x1'],
+                               x2=group['x2'],
+                               y1=group['y1'],
+                               y2=group['y2'],
+                               name=group['name']).save()
+            (Diagram.objects
+                    .filter(diagram_id=diagram_id, fsm_id_seq__lt=group['id'])
+                    .update(fsm_id_seq=group['id']))
+
+    def onGroupDestroy(self, state, diagram_id, client_id):
+        FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=state['id']).delete()
+
+    def onGroupMove(self, group, diagram_id, client_id):
+        FiniteStateMachine.objects.filter(diagram_id=diagram_id,
+                                          id=group['id']).update(x1=group['x1'],
+                                                                 x2=group['x2'],
+                                                                 y1=group['y1'],
+                                                                 y2=group['y2'])
+
+    def onChannelCreate(self, channel, diagram_id, client_id):
+        if 'sender' in channel:
+            del channel['sender']
+        if 'message_id' in channel:
+            del channel['message_id']
+        fsm_map = dict(FiniteStateMachine.objects
+                       .filter(diagram_id=diagram_id,
+                               id__in=[channel['from_id'], channel['to_id']])
+                       .values_list('id', 'pk'))
+        FSMChannel.objects.get_or_create(id=channel['id'],
+                                         from_fsm_id=fsm_map[channel['from_id']],
+                                         to_fsm_id=fsm_map[channel['to_id']],
+                                         defaults=dict(inbox="", outbox="", label=""))
+        (Diagram.objects
+                .filter(diagram_id=diagram_id, channel_id_seq__lt=channel['id'])
+                .update(channel_id_seq=channel['id']))
 
     def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
@@ -226,6 +287,14 @@ class _Persistence(object):
         'Ignore TransitionSelected messages'
         pass
 
+    def onChannelSelected(self, message_value, diagram_id, client_id):
+        'Ignore ChannelSelected messages'
+        pass
+
+    def onChannelUnSelected(self, message_value, diagram_id, client_id):
+        'Ignore ChannelSelected messages'
+        pass
+
     def onUndo(self, message_value, diagram_id, client_id):
         undo_persistence.handle(message_value['original_message'], diagram_id, client_id)
 
@@ -240,6 +309,14 @@ class _Persistence(object):
                  order=message_value['order'],
                  client_id=client_id,
                  message_type=message_value['recv_message_type']).save()
+
+    def onMultipleMessage(self, message_value, diagram_id, client_id):
+        for message in message_value['messages']:
+            handler = self.get_handler(message['msg_type'])
+            if handler is not None:
+                handler(message, diagram_id, client_id)
+            else:
+                logger.warning("Unsupported message %s", message['msg_type'])
 
 persistence = _Persistence()
 
