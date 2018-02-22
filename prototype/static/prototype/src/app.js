@@ -518,14 +518,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         $scope.control_socket.send(data);
     };
 
-    $scope.onDownloadButton = function (button) {
+    $scope.onDownloadFsmButton = function (button) {
         console.log(button.label);
-        window.open("/prototype/download?diagram_id=" + $scope.diagram_id);
+        if ($scope.selected_groups.length === 1) {
+            window.open("/prototype/download?diagram_id=" + $scope.diagram_id + "&finite_state_machine_id=" + $scope.selected_groups[0].id);
+        } else {
+            window.open("/prototype/download?diagram_id=" + $scope.diagram_id);
+        }
     };
 
-    $scope.onUploadButton = function (button) {
+    $scope.onDownloadPipelineButton = function (button) {
         console.log(button.label);
-        window.open("/prototype/upload", "_top");
+        window.open("/prototype/download_pipeline?diagram_id=" + $scope.diagram_id);
+    };
+
+    $scope.onUploadPipelineButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/upload_pipeline", "_top");
+    };
+
+    $scope.onUploadFsmButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/upload?diagram_id=" + $scope.diagram_id, "_top");
     };
 
     $scope.onDownloadTraceButton = function (button) {
@@ -545,10 +559,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton, $scope),
-      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope),
-      new models.Button("DownloadTrace", 130, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
-      new models.Button("UploadTrace", 190, 10, 60, 50, $scope.onUploadTraceButton, $scope),
+      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadPipelineButton, $scope),
+      //new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope),
+      new models.Button("DownloadPipeline", 130, 10, 60, 50, $scope.onDownloadFsmButton, $scope),
+      new models.Button("UploadPipeline", 190, 10, 60, 50, $scope.onUploadButton, $scope),
+      new models.Button("DownloadTrace", 250, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
+      new models.Button("UploadTrace", 310, 10, 60, 50, $scope.onUploadTraceButton, $scope),
       new models.Button("PlayPause", 60, $scope.graph.height - 105, 20, 20, $scope.onPlayPause, $scope)
     ];
 

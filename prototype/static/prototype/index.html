@@ -50,13 +50,17 @@
         </g>
         <g ng-if="!hide_buttons">
             <g transform="translate(10, 10) scale(0.025)" download></g>
-            <g transform="translate(35, 70)"><text text-anchor="middle"> FSM</text></g>
+            <g transform="translate(35, 70)"><text text-anchor="middle"> Pipeline</text></g>
             <g transform="translate(70, 7) scale(0.025)" upload></g>
-            <g transform="translate(95, 70)"><text text-anchor="middle"> FSM</text></g>
+            <g transform="translate(95, 70)"><text text-anchor="middle"> Pipeline</text></g>
             <g transform="translate(130, 10) scale(0.025)" download></g>
-            <g transform="translate(155, 70)"><text text-anchor="middle" > Trace</text></g>
+            <g transform="translate(155, 70)"><text text-anchor="middle"> FSM</text></g>
             <g transform="translate(190, 7) scale(0.025)" upload></g>
-            <g transform="translate(215, 70)"><text text-anchor="middle"> Trace</text></g>
+            <g transform="translate(215, 70)"><text text-anchor="middle"> FSM</text></g>
+            <g transform="translate(250, 10) scale(0.025)" download></g>
+            <g transform="translate(275, 70)"><text text-anchor="middle" > Trace</text></g>
+            <g transform="translate(310, 7) scale(0.025)" upload></g>
+            <g transform="translate(335, 70)"><text text-anchor="middle"> Trace</text></g>
             <g ng-if="diagram_name && diagram_name!=='diagram'" transform="translate(275, 30) scale(1.5)"><text> FSM | {{diagram_name}}</text></g>
             <g ng-if="replay_data.length > 0">
                 <g fsm-play-pause></g>

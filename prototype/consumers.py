@@ -2,7 +2,7 @@
 from channels import Group, Channel
 from channels.sessions import channel_session
 from prototype.models import Diagram, State, Transition, Client, History, MessageType
-from prototype.models import FiniteStateMachine
+from prototype.models import FiniteStateMachine, FiniteStateMachineState
 from prototype.models import Channel as FSMChannel
 from prototype.models import FSMTrace
 import urlparse
@@ -257,6 +257,27 @@ class _Persistence(object):
                                                                  y1=group['y1'],
                                                                  y2=group['y2'])
 
+    def onGroupMembership(self, group_membership, diagram_id, client_id):
+        members = set(group_membership['members'])
+        fsm = FiniteStateMachine.objects.get(diagram_id=diagram_id, id=group_membership['id'])
+        existing = set(FiniteStateMachineState.objects
+                                              .filter(finite_state_machine=fsm)
+                                              .values_list('state__id', flat=True))
+        new = members - existing
+        removed = existing - members
+
+        (FiniteStateMachineState.objects
+                                .filter(finite_state_machine__finite_state_machine_id=fsm.finite_state_machine_id,
+                                        state__id__in=list(removed)).delete())
+
+        state_map = dict(State.objects.filter(diagram_id=diagram_id, id__in=list(new)).values_list('id', 'state_id'))
+        new_entries = []
+        for i in new:
+            new_entries.append(FiniteStateMachineState(finite_state_machine=fsm,
+                                                       state_id=state_map[i]))
+        if new_entries:
+            FiniteStateMachineState.objects.bulk_create(new_entries)
+
     def onChannelCreate(self, channel, diagram_id, client_id):
         if 'sender' in channel:
             del channel['sender']
@@ -280,9 +301,9 @@ class _Persistence(object):
 
     def onChannelDestroy(self, channel, diagram_id, client_id):
         fsm_map = dict(FiniteStateMachine.objects
-                         .filter(diagram_id=diagram_id,
-                                 id__in=[channel['from_id'], channel['to_id']])
-                         .values_list('id', 'pk'))
+                                         .filter(diagram_id=diagram_id,
+                                                 id__in=[channel['from_id'], channel['to_id']])
+                                         .values_list('id', 'pk'))
         FSMChannel.objects.filter(id=channel['id'],
                                   from_fsm_id=fsm_map[channel['from_id']],
                                   to_fsm_id=fsm_map[channel['to_id']]).delete()

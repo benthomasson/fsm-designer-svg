@@ -15,6 +15,9 @@ from django import forms
 class DiagramForm(forms.Form):
     diagram_id = forms.IntegerField()
 
+class DiagramFSMForm(forms.Form):
+    diagram_id = forms.IntegerField()
+    finite_state_machine_id = forms.IntegerField(required=False)
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
@@ -55,23 +58,47 @@ transform_channel = partial(transform_dict, channel_map)
 
 def download(request):
     data = dict(states=[], transitions=[])
-    form = DiagramForm(request.GET)
+    form = DiagramFSMForm(request.GET)
+    if form.is_valid():
+        diagram_id = form.cleaned_data['diagram_id']
+        finite_state_machine_id = form.cleaned_data['finite_state_machine_id'] or 0
+        diagram = Diagram.objects.get(pk=diagram_id)
+        data['name'] = diagram.name
+        data['diagram_id'] = diagram.pk
+        if finite_state_machine_id > 0:
+            states = State.objects.filter(diagram_id=diagram_id, finitestatemachinestate__finite_state_machine__id=finite_state_machine_id)
+            data['finite_state_machine_id'] = finite_state_machine_id
+            data['name'] = FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=finite_state_machine_id).values_list('name', flat=True)[0]
+        else:
+            states = State.objects.filter(diagram_id=diagram_id)
+        data['states'] = map(transform_state, list(states.filter(diagram_id=diagram_id)
+                                                         .values('x',
+                                                                 'y',
+                                                                 'name',
+                                                                 'id')
+                                                         .order_by('name')))
+        data['transitions'] = map(transform_transition, list(Transition.objects
+                                                                       .filter(from_state__diagram_id=diagram_id)
+                                                                       .values('from_state__name',
+                                                                               'to_state__name',
+                                                                               'label')
+                                                                       .order_by('from_state__name', 'label')))
+        response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
+                                content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
+        return response
+    else:
+        return HttpResponse(form.errors)
+
+
+def download_pipeline(request):
+    data = dict(states=[], transitions=[])
+    form = DiagramForm(request.GET, initial={'finite_state_machine_id': 0})
     if form.is_valid():
         diagram_id = form.cleaned_data['diagram_id']
         diagram = Diagram.objects.get(pk=diagram_id)
         data['name'] = diagram.name
         data['diagram_id'] = diagram.pk
-        data['states'] = map(transform_state, list(State.objects
-                                                        .filter(diagram_id=diagram_id)
-                                                        .values('x',
-                                                                'y',
-                                                                'name',
-                                                                'id')))
-        data['transitions'] = map(transform_transition, list(Transition.objects
-                                                                       .filter(from_state__diagram_id=diagram_id)
-                                                                       .values('from_state__name',
-                                                                               'to_state__name',
-                                                                               'label')))
         data['fsms'] = list(FiniteStateMachine.objects
                                               .filter(diagram_id=diagram_id)
                                               .values('x1',
