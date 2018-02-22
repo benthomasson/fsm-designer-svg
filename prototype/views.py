@@ -111,7 +111,7 @@ def download(request):
                                                                        .order_by('from_state__name', 'label')))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
+        response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(data['name'])
         return response
     else:
         return HttpResponse(form.errors)
