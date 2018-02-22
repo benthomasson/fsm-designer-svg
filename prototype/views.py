@@ -79,7 +79,10 @@ def download(request):
         diagram_id = form.cleaned_data['diagram_id']
         finite_state_machine_id = form.cleaned_data['finite_state_machine_id'] or 0
         diagram = Diagram.objects.get(pk=diagram_id)
-        data['name'] = diagram.name
+        if finite_state_machine_id:
+            data['name'] = FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=finite_state_machine_id).values_list('name', flat=True)[0]
+        else:
+            data['name'] = diagram.name
         data['diagram_id'] = diagram.pk
         if finite_state_machine_id > 0:
             states = (State.objects
@@ -98,8 +101,10 @@ def download(request):
                                                                  'name',
                                                                  'id')
                                                          .order_by('name')))
+        state_pks = states.values_list('state_id', flat=True)
         data['transitions'] = map(transform_transition, list(Transition.objects
-                                                                       .filter(from_state__diagram_id=diagram_id)
+                                                                       .filter(from_state_id__in=state_pks)
+                                                                       .filter(to_state_id__in=state_pks)
                                                                        .values('from_state__name',
                                                                                'to_state__name',
                                                                                'label')
@@ -229,7 +234,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
     elif finite_state_machine_id:
         with transaction.atomic():
             fsm = FiniteStateMachine(diagram_id=diagram.pk,
-                                     name=diagram.name,
+                                     name=data.get('name', 'fsm'),
                                      x1=minX,
                                      y1=minY,
                                      x2=maxX,
@@ -248,6 +253,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
         with transaction.atomic():
             FiniteStateMachineState.objects.bulk_create(fsmstates)
 
+    print fsm
     if fsm is not None:
         states_map = dict(State.objects
                                .filter(diagram_id=diagram.pk, finitestatemachinestate__finite_state_machine__id=fsm.id)
@@ -256,6 +262,8 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
         states_map = dict(State.objects
                                .filter(diagram_id=diagram.pk)
                                .values_list("name", "pk"))
+    print states
+    print states_map
     for i, transition in enumerate(data.get('transitions', [])):
         new_transition = Transition(label=transition['label'],
                                     id=i + diagram.transition_id_seq,
