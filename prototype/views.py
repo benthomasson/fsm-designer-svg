@@ -4,7 +4,9 @@ from django.http import JsonResponse
 import yaml
 import json
 from prototype.models import Diagram, State, Transition, FSMTrace, FSMTraceReplay
-from prototype.models import FiniteStateMachine, Channel
+from prototype.models import FiniteStateMachine, Channel, FiniteStateMachineState
+from django.db import transaction
+
 
 from functools import partial
 
@@ -21,9 +23,20 @@ class DiagramFSMForm(forms.Form):
     finite_state_machine_id = forms.IntegerField(required=False)
 
 
+class DiagramFSMForm2(forms.Form):
+    diagram_id = forms.IntegerField(required=False)
+    finite_state_machine_id = forms.IntegerField(required=False)
+
+
 class UploadFileForm(forms.Form):
     file = forms.FileField()
     diagram_id = forms.IntegerField(required=False)
+
+
+class UploadFSMFileForm(forms.Form):
+    file = forms.FileField()
+    diagram_id = forms.IntegerField(required=False)
+    finite_state_machine_id = forms.IntegerField(required=False)
 
 # Create your views here.
 
@@ -134,23 +147,44 @@ def download_pipeline(request):
         return HttpResponse(form.errors)
 
 
-def upload_diagram(data, diagram_id=None):
-    diagram = Diagram()
-    diagram.name = data.get('name', data.get("app", "diagram"))
-    diagram.save()
-    if len(data.get('fsms', [])) == 0:
+def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
+    if diagram_id is None:
+        with transaction.atomic():
+            diagram = Diagram()
+            diagram.name = data.get('name', data.get("app", "diagram"))
+            diagram.save()
+    else:
+        diagram = Diagram.objects.get(diagram_id=diagram_id)
+        print Diagram.objects.filter(diagram_id=diagram_id).values()
+    if finite_state_machine_id is None and len(data.get('fsms', [])) == 0:
         finite_state_machine_id = data.get('finite_state_machine_id', None)
     else:
         finite_state_machine_id = None
     states = []
+    state_ids = []
     transitions = []
     fsms = []
     channels = []
+    if finite_state_machine_id:
+        State.objects.filter(diagram_id=diagram.pk,
+                             finitestatemachinestate__finite_state_machine__id=finite_state_machine_id).delete()
+    offsetX = 0
+    offsetY = 0
+    existing_fsm = None
+    if finite_state_machine_id is not None:
+        existing_fsm = list(FiniteStateMachine.objects.filter(diagram_id=diagram.pk,
+                                                              id=finite_state_machine_id))
+        if len(existing_fsm) == 1:
+            existing_fsm = existing_fsm[0]
+            offsetX = existing_fsm.x1
+            offsetY = existing_fsm.y1
+        else:
+            existing_fsm = None
     minX, minY, maxX, maxY = None, None, None, None
     for i, state in enumerate(data.get('states', [])):
         new_state = State(diagram_id=diagram.pk,
                           name=state.get('label'),
-                          id=i + 1,
+                          id=i + diagram.state_id_seq,
                           x=state.get('x', 0),
                           y=state.get('y', 0))
         if minX is None or minX < new_state.x:
@@ -161,32 +195,86 @@ def upload_diagram(data, diagram_id=None):
             maxX = new_state.x - 100
         if maxY is None or maxY > new_state.y:
             maxY = new_state.y - 100
+        print new_state.id
+        state_ids.append(new_state.id)
         states.append(new_state)
-    State.objects.bulk_create(states)
-    states_map = dict(State.objects
-                           .filter(diagram_id=diagram.pk)
-                           .values_list("name", "pk"))
+    if existing_fsm is not None:
+        for state in states:
+            state.x -= minX
+            state.y -= minY
+            state.x += offsetX
+            state.y += offsetY
+        maxX -= minX
+        maxY -= minY
+        minX = 0
+        minY = 0
+    with transaction.atomic():
+        State.objects.bulk_create(states)
+    with transaction.atomic():
+        state_id_seq = diagram.state_id_seq + len(states)
+        print state_id_seq
+        (Diagram.objects
+                .filter(pk=diagram.pk, state_id_seq__lt=state_id_seq)
+                .update(state_id_seq=state_id_seq))
+    print Diagram.objects.filter(pk=diagram.pk).values('state_id_seq')
+
+    fsm = None
+    if existing_fsm:
+        with transaction.atomic():
+            (FiniteStateMachine.objects
+                               .filter(pk=existing_fsm.pk)
+                               .update(x2=existing_fsm.x1 + maxX,
+                                       y2=existing_fsm.y1 + maxY))
+        fsm = existing_fsm
+    elif finite_state_machine_id:
+        with transaction.atomic():
+            fsm = FiniteStateMachine(diagram_id=diagram.pk,
+                                     name=diagram.name,
+                                     x1=minX,
+                                     y1=minY,
+                                     x2=maxX,
+                                     y2=maxY,
+                                     id=finite_state_machine_id)
+            fsm.save()
+
+    if fsm is not None:
+        state_pks = State.objects.filter(diagram_id=diagram.pk,
+                                         id__in=state_ids).values_list('state_id', flat=True)
+        fsmstates = []
+        for state_pk in state_pks:
+            fsmstates.append(FiniteStateMachineState(finite_state_machine_id=fsm.pk,
+                                                     state_id=state_pk))
+
+        with transaction.atomic():
+            FiniteStateMachineState.objects.bulk_create(fsmstates)
+
+    if fsm is not None:
+        states_map = dict(State.objects
+                               .filter(diagram_id=diagram.pk, finitestatemachinestate__finite_state_machine__id=fsm.id)
+                               .values_list("name", "pk"))
+    else:
+        states_map = dict(State.objects
+                               .filter(diagram_id=diagram.pk)
+                               .values_list("name", "pk"))
     for i, transition in enumerate(data.get('transitions', [])):
         new_transition = Transition(label=transition['label'],
-                                    id=i + 1,
+                                    id=i + diagram.transition_id_seq,
                                     from_state_id=states_map[transition['from_state']],
                                     to_state_id=states_map[transition['to_state']])
         transitions.append(new_transition)
 
-    Transition.objects.bulk_create(transitions)
-    diagram.state_id_seq = len(states)
-    diagram.transition_id_seq = len(transitions)
-    diagram.save()
-    if finite_state_machine_id:
-        fsm = FiniteStateMachine(diagram_id=diagram.pk,
-                                 name=diagram.name,
-                                 x1=minX,
-                                 y1=minY,
-                                 x2=maxX,
-                                 y2=maxY,
-                                 id=finite_state_machine_id)
-        fsm.save()
+    with transaction.atomic():
+        Transition.objects.bulk_create(transitions)
+    transition_id_seq = diagram.transition_id_seq + len(transitions)
+    with transaction.atomic():
+        (Diagram.objects
+                .filter(pk=diagram.pk, transition_id_seq__lt=transition_id_seq)
+                .update(transition_id_seq=transition_id_seq))
+
+    maxFsmId = 1
     for fsm in data.get('fsms', []):
+        if fsm['id'] > maxFsmId:
+            maxFsmId = fsm['id']
         new_fsm = FiniteStateMachine(diagram_id=diagram.pk,
                                      name=fsm.get('name', ''),
                                      id=fsm['id'],
@@ -196,20 +284,28 @@ def upload_diagram(data, diagram_id=None):
                                      y2=fsm.get('y2', 0))
 
         fsms.append(new_fsm)
-    FiniteStateMachine.objects.bulk_create(fsms)
+    with transaction.atomic():
+        FiniteStateMachine.objects.bulk_create(fsms)
+    with transaction.atomic():
+        Diagram.objects.filter(pk=diagram.pk, fsm_id_seq=maxFsmId).update(fsm_id_seq=maxFsmId)
     fsms_map = dict(FiniteStateMachine.objects
                                       .filter(diagram_id=diagram.pk)
                                       .values_list("name", "pk"))
     for i, channel in enumerate(data.get('channels', [])):
         new_channel = Channel(label=channel.get('label', ''),
-                              id=i + 1,
+                              id=i + diagram.channel_id_seq,
                               from_fsm_id=fsms_map[channel['from_fsm']],
                               to_fsm_id=fsms_map[channel['to_fsm']],
                               inbox=channel.get('inbox', ''),
                               outbox=channel.get('outbox', ''))
         channels.append(new_channel)
 
-    Channel.objects.bulk_create(channels)
+    with transaction.atomic():
+        Channel.objects.bulk_create(channels)
+    channel_id_seq = diagram.channel_id_seq + len(channels)
+    with transaction.atomic():
+        Diagram.objects.filter(pk=diagram.pk, channel_id_seq__lt=channel_id_seq).update(channel_id_seq=channel_id_seq)
+    print Diagram.objects.filter(diagram_id=diagram_id).values()
     return diagram.pk
 
 
@@ -217,14 +313,20 @@ def upload(request):
     if request.method == 'POST':
         print request.POST
         print request.FILES
-        form = UploadFileForm(request.POST, request.FILES)
+        form = UploadFSMFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
             diagram_id = form.cleaned_data['diagram_id']
-            diagram_id = upload_diagram(data, diagram_id=diagram_id)
+            finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
+            diagram_id = upload_diagram(data, diagram_id=diagram_id, finite_state_machine_id=finite_state_machine_id)
             return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_id))
     else:
-        form = UploadFileForm()
+        form = DiagramFSMForm2(request.GET)
+        if form.is_valid():
+            diagram_id = form.cleaned_data['diagram_id']
+            finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
+        form = UploadFSMFileForm(initial=dict(diagram_id=diagram_id,
+                                              finite_state_machine_id=finite_state_machine_id))
     return render(request, 'prototype/upload.html', {'form': form})
 
 

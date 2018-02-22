@@ -578,7 +578,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                                      data.label,
                                      data.x,
                                      data.y);
-        $scope.state_id_seq = util.natural_numbers(data.id);
         $scope.states.push(state);
     };
 
@@ -994,7 +993,6 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         //Update the state_id_seq to be greater than all state ids to prevent duplicate ids.
         if (max_state_id !== null) {
             console.log(['max_state_id', max_state_id]);
-            $scope.state_id_seq = util.natural_numbers(max_state_id);
         }
 
         if (max_transition_id !== null) {

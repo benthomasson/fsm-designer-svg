@@ -188,7 +188,7 @@ class _Persistence(object):
         d.y = state['y']
         d.save()
         (Diagram.objects
-                .filter(diagram_id=diagram_id)
+                .filter(diagram_id=diagram_id, state_id_seq__lt=state['id'])
                 .update(state_id_seq=state['id']))
 
     def onStateDestroy(self, state, diagram_id, client_id):
