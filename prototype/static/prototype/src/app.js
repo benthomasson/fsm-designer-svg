@@ -105,7 +105,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         catch(err) {
 			$scope.initial_messages.push(message);
         }
-    };  
+    };
   //Define the FSMs
   $scope.hotkeys_controller = new fsm.FSMController($scope, 'hotkeys_fsm', hotkeys_fsm.Start, $scope);
   $scope.view_controller = new fsm.FSMController($scope, 'view_fsm', view.Start, $scope);
@@ -559,10 +559,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadPipelineButton, $scope),
-      //new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton, $scope),
-      new models.Button("DownloadPipeline", 130, 10, 60, 50, $scope.onDownloadFsmButton, $scope),
-      new models.Button("UploadPipeline", 190, 10, 60, 50, $scope.onUploadButton, $scope),
+      new models.Button("DownloadPipeline", 10, 10, 60, 50, $scope.onDownloadPipelineButton, $scope),
+      new models.Button("UploadPipeline", 70, 10, 60, 50, $scope.onUploadPipelineButton, $scope),
+      new models.Button("DownloadFSM", 130, 10, 60, 50, $scope.onDownloadFsmButton, $scope),
+      new models.Button("UploadFSM", 190, 10, 60, 50, $scope.onUploadFsmButton, $scope),
       new models.Button("DownloadTrace", 250, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
       new models.Button("UploadTrace", 310, 10, 60, 50, $scope.onUploadTraceButton, $scope),
       new models.Button("PlayPause", 60, $scope.graph.height - 105, 20, 20, $scope.onPlayPause, $scope)

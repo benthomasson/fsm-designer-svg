@@ -15,12 +15,15 @@ from django import forms
 class DiagramForm(forms.Form):
     diagram_id = forms.IntegerField()
 
+
 class DiagramFSMForm(forms.Form):
     diagram_id = forms.IntegerField()
     finite_state_machine_id = forms.IntegerField(required=False)
 
+
 class UploadFileForm(forms.Form):
     file = forms.FileField()
+    diagram_id = forms.IntegerField(required=False)
 
 # Create your views here.
 
@@ -66,9 +69,14 @@ def download(request):
         data['name'] = diagram.name
         data['diagram_id'] = diagram.pk
         if finite_state_machine_id > 0:
-            states = State.objects.filter(diagram_id=diagram_id, finitestatemachinestate__finite_state_machine__id=finite_state_machine_id)
+            states = (State.objects
+                           .filter(diagram_id=diagram_id,
+                                   finitestatemachinestate__finite_state_machine__id=finite_state_machine_id))
             data['finite_state_machine_id'] = finite_state_machine_id
-            data['name'] = FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=finite_state_machine_id).values_list('name', flat=True)[0]
+            data['name'] = (FiniteStateMachine.objects
+                                              .filter(diagram_id=diagram_id,
+                                                      id=finite_state_machine_id)
+                                              .values_list('name', flat=True)[0])
         else:
             states = State.objects.filter(diagram_id=diagram_id)
         data['states'] = map(transform_state, list(states.filter(diagram_id=diagram_id)
@@ -106,7 +114,8 @@ def download_pipeline(request):
                                                       'x2',
                                                       'y2',
                                                       'name',
-                                                      'id'))
+                                                      'id')
+                                              .order_by('name'))
         data['channels'] = map(transform_channel, list(Channel.objects
                                                               .filter(from_fsm__diagram_id=diagram_id)
                                                               .values('from_fsm__name',
@@ -115,7 +124,8 @@ def download_pipeline(request):
                                                                       'to_fsm__id',
                                                                       'inbox',
                                                                       'outbox',
-                                                                      'label')))
+                                                                      'label')
+                                                              .order_by('from_fsm__name', 'to_fsm__name', 'label')))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
@@ -124,18 +134,33 @@ def download_pipeline(request):
         return HttpResponse(form.errors)
 
 
-def upload_diagram(data):
+def upload_diagram(data, diagram_id=None):
     diagram = Diagram()
     diagram.name = data.get('name', data.get("app", "diagram"))
     diagram.save()
+    if len(data.get('fsms', [])) == 0:
+        finite_state_machine_id = data.get('finite_state_machine_id', None)
+    else:
+        finite_state_machine_id = None
     states = []
     transitions = []
+    fsms = []
+    channels = []
+    minX, minY, maxX, maxY = None, None, None, None
     for i, state in enumerate(data.get('states', [])):
         new_state = State(diagram_id=diagram.pk,
                           name=state.get('label'),
                           id=i + 1,
                           x=state.get('x', 0),
                           y=state.get('y', 0))
+        if minX is None or minX < new_state.x:
+            minX = new_state.x + 100
+        if minY is None or minY < new_state.y:
+            minY = new_state.y + 100
+        if maxX is None or maxX > new_state.x:
+            maxX = new_state.x - 100
+        if maxY is None or maxY > new_state.y:
+            maxY = new_state.y - 100
         states.append(new_state)
     State.objects.bulk_create(states)
     states_map = dict(State.objects
@@ -152,10 +177,58 @@ def upload_diagram(data):
     diagram.state_id_seq = len(states)
     diagram.transition_id_seq = len(transitions)
     diagram.save()
+    if finite_state_machine_id:
+        fsm = FiniteStateMachine(diagram_id=diagram.pk,
+                                 name=diagram.name,
+                                 x1=minX,
+                                 y1=minY,
+                                 x2=maxX,
+                                 y2=maxY,
+                                 id=finite_state_machine_id)
+        fsm.save()
+    for fsm in data.get('fsms', []):
+        new_fsm = FiniteStateMachine(diagram_id=diagram.pk,
+                                     name=fsm.get('name', ''),
+                                     id=fsm['id'],
+                                     x1=fsm.get('x1', 0),
+                                     x2=fsm.get('x2', 0),
+                                     y1=fsm.get('y1', 0),
+                                     y2=fsm.get('y2', 0))
+
+        fsms.append(new_fsm)
+    FiniteStateMachine.objects.bulk_create(fsms)
+    fsms_map = dict(FiniteStateMachine.objects
+                                      .filter(diagram_id=diagram.pk)
+                                      .values_list("name", "pk"))
+    for i, channel in enumerate(data.get('channels', [])):
+        new_channel = Channel(label=channel.get('label', ''),
+                              id=i + 1,
+                              from_fsm_id=fsms_map[channel['from_fsm']],
+                              to_fsm_id=fsms_map[channel['to_fsm']],
+                              inbox=channel.get('inbox', ''),
+                              outbox=channel.get('outbox', ''))
+        channels.append(new_channel)
+
+    Channel.objects.bulk_create(channels)
     return diagram.pk
 
 
 def upload(request):
+    if request.method == 'POST':
+        print request.POST
+        print request.FILES
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = yaml.load(request.FILES['file'].read())
+            diagram_id = form.cleaned_data['diagram_id']
+            diagram_id = upload_diagram(data, diagram_id=diagram_id)
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_id))
+    else:
+        form = UploadFileForm()
+    return render(request, 'prototype/upload.html', {'form': form})
+
+
+def upload_pipeline(request):
     if request.method == 'POST':
         print request.POST
         print request.FILES

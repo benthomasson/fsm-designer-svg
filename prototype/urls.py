@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^download_replay$', views.download_replay, name='download_replay'),
     url(r'^download_trace$', views.download_trace, name='download_trace'),
     url(r'^upload_trace$', views.upload_trace, name='upload_trace'),
+    url(r'^upload_pipeline$', views.upload_pipeline, name='upload_pipeline'),
     url(r'^download$', views.download, name='download'),
     url(r'^upload$', views.upload, name='upload'),
 ]
