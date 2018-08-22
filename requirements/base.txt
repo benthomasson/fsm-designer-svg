@@ -34,7 +34,7 @@ django-autoslug==1.9.3
 pytz==2015.7
 
 # Channels
-channels
+channels==1.1.8
 
 sqlparse==0.1.19
 
