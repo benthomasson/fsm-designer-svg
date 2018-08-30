@@ -34,6 +34,7 @@ class Diagram(models.Model):
     transition_id_seq = models.IntegerField(default=0)
     fsm_id_seq = models.IntegerField(default=0)
     channel_id_seq = models.IntegerField(default=0)
+    uuid = models.CharField(max_length=40, )
 
     def __unicode__(self):
         return self.name

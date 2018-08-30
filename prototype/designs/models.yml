@@ -65,6 +65,9 @@ models:
   - default: 0
     name: channel_id_seq
     type: IntegerField
+  - len: 40
+    name: uuid
+    type: CharField
   name: Diagram
   x: 225
   y: 152
@@ -224,4 +227,3 @@ view:
   panX: 0.0
   panY: 0.0
   scaleXY: 1.0
-
