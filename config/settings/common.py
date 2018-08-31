@@ -46,7 +46,6 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'fsm-designer-svg.users',  # custom users app
     # Your stuff: custom apps go here
-    'myapp',
     'prototype',
 )
 

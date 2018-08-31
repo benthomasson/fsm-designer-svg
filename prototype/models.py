@@ -56,8 +56,8 @@ class State(models.Model):
 class Transition(models.Model):
 
     transition_id = models.AutoField(primary_key=True,)
-    from_state = models.ForeignKey('State',  related_name='from_transition', )
-    to_state = models.ForeignKey('State',  related_name='to_transition', )
+    from_state = models.ForeignKey('State', related_name='from_transition', )
+    to_state = models.ForeignKey('State', related_name='to_transition', )
     label = models.CharField(max_length=200, )
     id = models.IntegerField()
 
@@ -98,8 +98,8 @@ class FiniteStateMachine(models.Model):
 class Channel(models.Model):
 
     channel_id = models.AutoField(primary_key=True,)
-    from_fsm = models.ForeignKey('FiniteStateMachine',  related_name='from_channel', )
-    to_fsm = models.ForeignKey('FiniteStateMachine',  related_name='to_channel', )
+    from_fsm = models.ForeignKey('FiniteStateMachine', related_name='from_channel', )
+    to_fsm = models.ForeignKey('FiniteStateMachine', related_name='to_channel', )
     label = models.CharField(max_length=200, )
     inbox = models.CharField(max_length=200, )
     outbox = models.CharField(max_length=200, )

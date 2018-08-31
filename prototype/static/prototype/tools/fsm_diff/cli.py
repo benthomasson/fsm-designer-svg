@@ -23,7 +23,6 @@ def fsm_diff(a, b, silent=True):
     missing_in_a = b_states - a_states
     missing_in_b = a_states - b_states
 
-
     if (missing_in_b) and not silent:
         print "Extra states in a:\n   ", "\n    ".join(list(missing_in_b))
 
@@ -37,7 +36,6 @@ def fsm_diff(a, b, silent=True):
 
     missing_in_a = b_transitions - a_transitions
     missing_in_b = a_transitions - b_transitions
-
 
     if (missing_in_b) and not silent:
         print "Extra transitions in a:\n   ", "\n    ".join(map(str, missing_in_b))

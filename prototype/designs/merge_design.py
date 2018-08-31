@@ -39,11 +39,9 @@ def main(args=None):
         for key, value in model.iteritems():
             a_models[model['name']][key] = value
 
-
     print (yaml.safe_dump(a, default_flow_style=False))
     return 0
 
-if __name__ == '__main__':
-    import sys
-    sys.exit(main(sys.argv[1:]))
 
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
