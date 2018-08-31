@@ -3,7 +3,7 @@ services:
     postgres:
       image: postgres:9.4
       volumes:
-          - /data/fsm-designer-svg-multiple-fsm/postgres:/var/lib/postgresql/data
+          - ~/data/fsm-designer-svg-multiple-fsm/postgres:/var/lib/postgresql/data
       env_file: .env
 
     django:
@@ -14,6 +14,7 @@ services:
       command: /runserver.sh
       env_file: .env
       volumes:
+          - .:/app
           - static-files:/app/staticfiles
 
     nginx:
