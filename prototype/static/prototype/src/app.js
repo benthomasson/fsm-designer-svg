@@ -22,7 +22,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
   window.scope = $scope;
 
-  $scope.diagram_id = $location.search().diagram_id || 0;
+  $scope.diagram_id = $location.search().diagram_id || '';
   $scope.replay_id = $location.search().replay_id || 0;
   $scope.replay_data = [];
   $scope.replay_index = -1;

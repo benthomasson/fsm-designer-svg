@@ -15,34 +15,34 @@ from django import forms
 
 
 class DiagramForm(forms.Form):
-    diagram_id = forms.IntegerField()
+    diagram_id = forms.CharField()
 
 
 class DiagramFSMForm(forms.Form):
-    diagram_id = forms.IntegerField()
+    diagram_id = forms.CharField()
     finite_state_machine_id = forms.IntegerField(required=False)
 
 
 class DiagramFSMForm2(forms.Form):
-    diagram_id = forms.IntegerField(required=False)
+    diagram_id = forms.CharField(required=False)
     finite_state_machine_id = forms.IntegerField(required=False)
 
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
-    diagram_id = forms.IntegerField(required=False)
+    diagram_id = forms.CharField(required=False)
 
 
 class UploadFSMFileForm(forms.Form):
     file = forms.FileField()
-    diagram_id = forms.IntegerField(required=False)
+    diagram_id = forms.CharField(required=False)
     finite_state_machine_id = forms.IntegerField(required=False)
 
 # Create your views here.
 
 
 def index(request):
-    return render(request, "prototype/index.html", dict(diagrams=Diagram.objects.all().order_by('-pk')))
+    return HttpResponseRedirect('/static/prototype/index.html')
 
 
 state_map = dict(x='x',
@@ -76,26 +76,28 @@ def download(request):
     data = dict(states=[], transitions=[])
     form = DiagramFSMForm(request.GET)
     if form.is_valid():
-        diagram_id = form.cleaned_data['diagram_id']
+        diagram_uuid = form.cleaned_data['diagram_id']
         finite_state_machine_id = form.cleaned_data['finite_state_machine_id'] or 0
-        diagram = Diagram.objects.get(pk=diagram_id)
+        diagram = Diagram.objects.get(uuid=diagram_uuid)
         if finite_state_machine_id:
-            data['name'] = FiniteStateMachine.objects.filter(diagram_id=diagram_id, id=finite_state_machine_id).values_list('name', flat=True)[0]
+            data['name'] = (FiniteStateMachine.objects
+                                              .filter(diagram_id=diagram.pk, id=finite_state_machine_id)
+                                              .values_list('name', flat=True)[0])
         else:
             data['name'] = diagram.name
-        data['diagram_id'] = diagram.pk
+        data['diagram_uuid'] = diagram.uuid
         if finite_state_machine_id > 0:
             states = (State.objects
-                           .filter(diagram_id=diagram_id,
+                           .filter(diagram_id=diagram.pk,
                                    finitestatemachinestate__finite_state_machine__id=finite_state_machine_id))
             data['finite_state_machine_id'] = finite_state_machine_id
             data['name'] = (FiniteStateMachine.objects
-                                              .filter(diagram_id=diagram_id,
+                                              .filter(diagram_id=diagram.pk,
                                                       id=finite_state_machine_id)
                                               .values_list('name', flat=True)[0])
         else:
-            states = State.objects.filter(diagram_id=diagram_id)
-        data['states'] = map(transform_state, list(states.filter(diagram_id=diagram_id)
+            states = State.objects.filter(diagram_id=diagram.pk)
+        data['states'] = map(transform_state, list(states.filter(diagram_id=diagram.pk)
                                                          .values('x',
                                                                  'y',
                                                                  'name',
@@ -121,12 +123,12 @@ def download_pipeline(request):
     data = dict(states=[], transitions=[])
     form = DiagramForm(request.GET, initial={'finite_state_machine_id': 0})
     if form.is_valid():
-        diagram_id = form.cleaned_data['diagram_id']
-        diagram = Diagram.objects.get(pk=diagram_id)
+        diagram_uuid = form.cleaned_data['diagram_id']
+        diagram = Diagram.objects.get(uuid=diagram_uuid)
         data['name'] = diagram.name
-        data['diagram_id'] = diagram.pk
+        data['diagram_uuid'] = diagram.uuid
         data['fsms'] = list(FiniteStateMachine.objects
-                                              .filter(diagram_id=diagram_id)
+                                              .filter(diagram_id=diagram.pk)
                                               .values('x1',
                                                       'y1',
                                                       'x2',
@@ -135,7 +137,7 @@ def download_pipeline(request):
                                                       'id')
                                               .order_by('name'))
         data['channels'] = map(transform_channel, list(Channel.objects
-                                                              .filter(from_fsm__diagram_id=diagram_id)
+                                                              .filter(from_fsm__diagram_id=diagram.pk)
                                                               .values('from_fsm__name',
                                                                       'to_fsm__name',
                                                                       'from_fsm__id',
@@ -313,7 +315,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
     channel_id_seq = diagram.channel_id_seq + len(channels)
     with transaction.atomic():
         Diagram.objects.filter(pk=diagram.pk, channel_id_seq__lt=channel_id_seq).update(channel_id_seq=channel_id_seq)
-    print Diagram.objects.filter(diagram_id=diagram_id).values()
+    print Diagram.objects.filter(diagram_id=diagram.pk).values()
     return diagram.pk
 
 
@@ -324,16 +326,17 @@ def upload(request):
         form = UploadFSMFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
-            diagram_id = form.cleaned_data['diagram_id']
+            diagram_uuid = form.cleaned_data['diagram_id']
+            diagram = Diagram.objects.get(uuid=diagram_uuid)
             finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
-            diagram_id = upload_diagram(data, diagram_id=diagram_id, finite_state_machine_id=finite_state_machine_id)
-            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_id))
+            diagram_uuid = upload_diagram(data, diagram_id=diagram.pk, finite_state_machine_id=finite_state_machine_id)
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_uuid))
     else:
         form = DiagramFSMForm2(request.GET)
         if form.is_valid():
-            diagram_id = form.cleaned_data['diagram_id']
+            diagram_uuid = form.cleaned_data['diagram_id']
             finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
-        form = UploadFSMFileForm(initial=dict(diagram_id=diagram_id,
+        form = UploadFSMFileForm(initial=dict(diagram_uuid=diagram_uuid,
                                               finite_state_machine_id=finite_state_machine_id))
     return render(request, 'prototype/upload.html', {'form': form})
 
@@ -345,15 +348,15 @@ def upload_pipeline(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
-            diagram_id = upload_diagram(data)
-            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_id))
+            diagram_uuid = upload_diagram(data)
+            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_uuid))
     else:
         form = UploadFileForm()
     return render(request, 'prototype/upload.html', {'form': form})
 
 
 class FSMTraceForm(forms.Form):
-    diagram_id = forms.IntegerField()
+    diagram_id = forms.CharField()
     trace_id = forms.IntegerField()
     client_id = forms.IntegerField()
 
@@ -361,14 +364,14 @@ class FSMTraceForm(forms.Form):
 def download_trace(request):
     form = FSMTraceForm(request.GET)
     if form.is_valid():
-        diagram_id = form.cleaned_data['diagram_id']
+        diagram_uuid = form.cleaned_data['diagram_id']
         trace_id = form.cleaned_data['trace_id']
         client_id = form.cleaned_data['client_id']
         data = list(FSMTrace.objects.filter(trace_session_id=trace_id,
                                             client_id=client_id).order_by('order').values())
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_id,
+        response['Content-Disposition'] = 'attachment; filename="trace_{0}_{1}_{2}.yml"'.format(diagram_uuid,
                                                                                                 client_id,
                                                                                                 trace_id)
         return response
@@ -378,7 +381,7 @@ def download_trace(request):
 
 class UploadTraceFileForm(forms.Form):
     file = forms.FileField()
-    diagram_id = forms.IntegerField()
+    diagram_id = forms.CharField()
 
 
 def upload_trace(request):
@@ -386,20 +389,21 @@ def upload_trace(request):
         form = UploadTraceFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
-            diagram_id = form.cleaned_data['diagram_id']
+            diagram_uuid = form.cleaned_data['diagram_id']
             replay = FSMTraceReplay(replay_data=json.dumps(data))
             replay.save()
-            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'.format(diagram_id,
-                                                                                                             replay.pk))
+            return (HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}&replay_id={1}'
+                    .format(diagram_uuid,
+                            replay.pk)))
         else:
             return HttpResponse(form.errors)
     else:
         form2 = DiagramForm(request.GET)
         if form2.is_valid():
-            diagram_id = form2.cleaned_data['diagram_id']
-            form = UploadTraceFileForm(initial=dict(diagram_id=diagram_id))
+            diagram_uuid = form2.cleaned_data['diagram_id']
+            form = UploadTraceFileForm(initial=dict(diagram_id=diagram_uuid))
             form.fields['diagram_id'].widget = forms.HiddenInput()
-            return render(request, 'prototype/upload_trace.html', {'form': form, 'diagram_id': diagram_id})
+            return render(request, 'prototype/upload_trace.html', {'form': form, 'diagram_id': diagram_uuid})
         else:
             return HttpResponse(form.errors)
 

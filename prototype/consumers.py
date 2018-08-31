@@ -1,4 +1,5 @@
 # In consumers.py
+from __future__ import print_function
 from channels import Group, Channel
 from channels.sessions import channel_session
 from prototype.models import Diagram, State, Transition, Client, History, MessageType
@@ -9,6 +10,7 @@ import urlparse
 from django.db.models import Q
 from . views import transform_state, transform_dict
 from django.core.exceptions import ObjectDoesNotExist
+import uuid
 
 import json
 # Connected to websocket.connect
@@ -34,6 +36,15 @@ channel_map = dict(from_fsm__id="from_fsm",
                    id='id')
 
 
+diagram_map = dict(uuid='diagram_id',
+                   name='name',
+                   fsm_id_seq='fsm_id_seq',
+                   channel_id_seq='channel_id_seq',
+                   state_id_seq='state_id_seq',
+                   transition_id_seq='transition_id_seq')
+
+
+transform_diagram = partial(transform_dict, diagram_map)
 transform_transition = partial(transform_dict, transition_map)
 transform_state_in = partial(transform_dict, state_map_in)
 transform_channel = partial(transform_dict, channel_map)
@@ -44,15 +55,9 @@ def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
     data = urlparse.parse_qs(message.content['query_string'])
-    diagram_id = data.get('diagram_id', ['null'])
-    try:
-        diagram_id = int(diagram_id[0])
-    except ValueError:
-        diagram_id = None
-    if not diagram_id:
-        diagram_id = None
+    diagram_uuid = data.get('diagram_id', ['xxxx'])[0]
     diagram, created = Diagram.objects.get_or_create(
-        diagram_id=diagram_id, defaults=dict(name="diagram"))
+        uuid=diagram_uuid, defaults=dict(name="diagram", uuid=str(uuid.uuid4())))
     diagram_id = diagram.diagram_id
     message.channel_session['diagram_id'] = diagram_id
     Group("diagram-%s" % diagram_id).add(message.reply_channel)
@@ -60,11 +65,11 @@ def ws_connect(message):
     client.save()
     message.channel_session['client_id'] = client.pk
     message.reply_channel.send({"text": json.dumps(["id", client.pk])})
-    message.reply_channel.send({"text": json.dumps(["diagram_id", diagram_id])})
+    message.reply_channel.send({"text": json.dumps(["diagram_uuid", diagram.uuid])})
     diagram_data = diagram.__dict__.copy()
     if '_state' in diagram_data:
         del diagram_data['_state']
-    message.reply_channel.send({"text": json.dumps(["Diagram", diagram_data])})
+    message.reply_channel.send({"text": json.dumps(["Diagram", transform_diagram(diagram_data)])})
     states = list(State.objects
                   .filter(diagram_id=diagram_id).values())
     states = map(transform_state, states)
@@ -122,7 +127,7 @@ def ws_disconnect(message):
 
 
 def console_printer(message):
-    print message['text']
+    print (message['text'])
 
 
 class _Persistence(object):
@@ -133,15 +138,15 @@ class _Persistence(object):
     def handle(self, message):
         diagram_id = message.get('diagram')
         if diagram_id is None:
-            print "No diagram_id"
+            print ("No diagram_id")
             return
         client_id = message.get('client')
         if client_id is None:
-            print "No client_id"
+            print ("No client_id")
             return
         data = json.loads(message['text'])
         if client_id != data[1].get('sender'):
-            print "client_id mismatch expected:", client_id, "actual:", data[1].get('sender')
+            print ("client_id mismatch expected:", client_id, "actual:", data[1].get('sender'))
             return
         message_type = data[0]
         message_value = data[1]
@@ -149,7 +154,7 @@ class _Persistence(object):
             message_type_id = MessageType.objects.get(name=message_type).pk
         except ObjectDoesNotExist:
             print ("Missing message type", message_type)
-            print "Unsupported message ", message_type
+            print ("Unsupported message ", message_type)
             return
         History(diagram_id=diagram_id,
                 client_id=client_id,
@@ -160,7 +165,7 @@ class _Persistence(object):
         if handler is not None:
             handler(message_value, diagram_id, client_id)
         else:
-            print "Unsupported message ", message_type
+            print ("Unsupported message ", message_type)
 
     def onSnapshot(self, snapshot, diagram_id, client_id):
         state_map = dict()
@@ -371,7 +376,7 @@ class _UndoPersistence(object):
         if handler is not None:
             handler(message_value, diagram_id, client_id)
         else:
-            print "Unsupported undo message ", message_type
+            print ("Unsupported undo message ", message_type)
 
     def onSnapshot(self, snapshot, diagram_id, client_id):
         pass
@@ -431,7 +436,7 @@ class _RedoPersistence(object):
         if handler is not None:
             handler(message_value, diagram_id, client_id)
         else:
-            print "Unsupported redo message ", message_type
+            print ("Unsupported redo message ", message_type)
 
     def onStateSelected(self, message_value, diagram_id, client_id):
         'Ignore StateSelected messages'
