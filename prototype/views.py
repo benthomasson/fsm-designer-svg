@@ -1,8 +1,10 @@
+import yaml
+import json
+import uuid
+
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
-import yaml
-import json
 from prototype.models import Diagram, State, Transition, FSMTrace, FSMTraceReplay
 from prototype.models import FiniteStateMachine, Channel, FiniteStateMachineState
 from django.db import transaction
@@ -316,7 +318,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
     with transaction.atomic():
         Diagram.objects.filter(pk=diagram.pk, channel_id_seq__lt=channel_id_seq).update(channel_id_seq=channel_id_seq)
     print Diagram.objects.filter(diagram_id=diagram.pk).values()
-    return diagram.pk
+    return diagram.uuid
 
 
 def upload(request):
@@ -327,7 +329,8 @@ def upload(request):
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
             diagram_uuid = form.cleaned_data['diagram_id']
-            diagram = Diagram.objects.get(uuid=diagram_uuid)
+            diagram, created = Diagram.objects.get_or_create(
+                uuid=diagram_uuid, defaults=dict(name="diagram", uuid=str(uuid.uuid4())))
             finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
             diagram_uuid = upload_diagram(data, diagram_id=diagram.pk, finite_state_machine_id=finite_state_machine_id)
             return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_uuid))
