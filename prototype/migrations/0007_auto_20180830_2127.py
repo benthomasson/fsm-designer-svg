@@ -9,6 +9,7 @@ def add_uuids(apps, schema_editor):
     Diagram = apps.get_model('prototype', 'Diagram')
     for diagram in Diagram.objects.filter(uuid='0'):
         diagram.uuid = uuid.uuid4()
+        diagram.save()
 
 
 class Migration(migrations.Migration):
