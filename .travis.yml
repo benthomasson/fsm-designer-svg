@@ -4,7 +4,7 @@ python:
 install:
   - npm -g i jshint
   - pip install flake8
-  - npm install --prefix prototype/static/prototype
+  - npm install --prefix prototype_front_end
 script:
   - flake8 .
-  - jshint prototype/static/prototype/src/*.js
+  - jshint prototype_front_end/src/*.js
