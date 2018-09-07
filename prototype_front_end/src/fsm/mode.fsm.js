@@ -1,9 +1,9 @@
 var inherits = require('inherits');
-var fsm = require('./fsm.js');
-var move_fsm = require('./move.js');
+var fsm = require('../fsm.js');
+var move_fsm = require('./move.fsm.js');
 var group_fsm = require('./group.fsm.js');
 var fsm_fsm = require('./fsm.fsm.js');
-var channel_fsm = require('./channel.js');
+var channel_fsm = require('./channel.fsm.js');
 
 function _State () {
 }

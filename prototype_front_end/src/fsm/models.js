@@ -1,6 +1,5 @@
-var fsm = require('./fsm.js');
-var button = require('./button.js');
-var util = require('./util.js');
+var fsm = require('../fsm.js');
+var util = require('../util.js');
 var math = require('mathjs');
 
 function State(id, label, x, y) {
@@ -293,29 +292,6 @@ Transition.prototype.start_arc_angle = function () {
     return this.start_arc_angle_rad() * 180 / Math.PI;
 };
 
-
-function Button(label, x, y, width, height, callback, tracer) {
-    this.label = label;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.callback = callback;
-    this.is_pressed = false;
-    this.mouse_over = false;
-    this.fsm = new fsm.FSMController(this, 'button_fsm', button.Start, tracer);
-}
-exports.Button = Button;
-
-
-Button.prototype.is_selected = function (x, y) {
-
-    return (x > this.x &&
-            x < this.x + this.width &&
-            y > this.y &&
-            y < this.y + this.height);
-
-};
 
 function Group(id, name, type, x1, y1, x2, y2, selected) {
     this.id = id;

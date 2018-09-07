@@ -108,3 +108,13 @@ function distance (x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 exports.distance = distance;
+
+function rectangle_is_selected (x, y) {
+
+    return (x > this.x &&
+            x < this.x + this.width &&
+            y > this.y &&
+            y < this.y + this.height);
+
+}
+exports.rectangle_is_selected = rectangle_is_selected;

@@ -1,5 +1,5 @@
 var inherits = require('inherits');
-var fsm = require('./fsm.js');
+var fsm = require('../fsm.js');
 var replay = require('./replay.fsm.js');
 
 function _State () {

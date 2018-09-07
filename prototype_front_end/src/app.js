@@ -2,21 +2,23 @@
 //console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
-var view = require('./view.js');
-var move = require('./move.js');
-var hotkeys_fsm = require('./hotkeys.fsm.js');
-var transition = require('./transition.js');
-var channel_fsm = require('./channel.js');
-var buttons = require('./buttons.js');
-var time = require('./time.js');
-var mode_fsm = require('./mode.fsm.js');
-var group_fsm = require('./group.fsm.js');
-var fsm_fsm = require('./fsm.fsm.js');
-var replay_fsm = require('./replay.fsm.js');
-var scrubbing_fsm = require('./scrubbing.fsm.js');
+var view = require('./core/view.fsm.js');
+var move = require('./fsm/move.fsm.js');
+var hotkeys_fsm = require('./core/hotkeys.fsm.js');
+var transition = require('./fsm/transition.fsm.js');
+var channel_fsm = require('./fsm/channel.fsm.js');
+var buttons = require('./button/buttons.fsm.js');
+var time = require('./core/time.fsm.js');
+var mode_fsm = require('./fsm/mode.fsm.js');
+var group_fsm = require('./fsm/group.fsm.js');
+var fsm_fsm = require('./fsm/fsm.fsm.js');
+var replay_fsm = require('./fsm/replay.fsm.js');
+var scrubbing_fsm = require('./fsm/scrubbing.fsm.js');
 var util = require('./util.js');
-var models = require('./models.js');
-var messages = require('./messages.js');
+var b_models = require('./button/models.js');
+var fsm_models = require('./fsm/models.js');
+var core_messages = require('./core/messages.js');
+var fsm_messages = require('./fsm/messages.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window, $http) {
@@ -99,7 +101,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         message.sender = $scope.client_id;
         message.trace_id = $scope.trace_id;
         message.message_id = $scope.message_id_seq();
-        var data = messages.serialize(message);
+        var data = core_messages.serialize(message);
         try {
             $scope.control_socket.send(data);
         }
@@ -159,7 +161,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                                          $scope.scrubbing_controller,
                                          $scope);
 
-  $scope.replay_slider = new models.Slider(100,
+  $scope.replay_slider = new fsm_models.Slider(100,
                                            $scope.graph.height - 100,
                                            $scope.graph.width - 200,
                                            20);
@@ -295,25 +297,25 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         var channels = $scope.channels;
         for (i = 0; i < states.length; i++) {
             if (states[i].selected) {
-                $scope.send_control_message(new messages.StateUnSelected($scope.client_id, states[i].id));
+                $scope.send_control_message(new fsm_messages.StateUnSelected($scope.client_id, states[i].id));
             }
             states[i].selected = false;
         }
         for (i = 0; i < transitions.length; i++) {
             if (transitions[i].selected) {
-                $scope.send_control_message(new messages.TransitionUnSelected($scope.client_id, transitions[i].id));
+                $scope.send_control_message(new fsm_messages.TransitionUnSelected($scope.client_id, transitions[i].id));
             }
             transitions[i].selected = false;
         }
         for (i = 0; i < channels.length; i++) {
             if (channels[i].selected) {
-                $scope.send_control_message(new messages.ChannelUnSelected($scope.client_id, channels[i].id));
+                $scope.send_control_message(new fsm_messages.ChannelUnSelected($scope.client_id, channels[i].id));
             }
             channels[i].selected = false;
         }
         for(i = 0; i < groups.length; i++) {
             if (groups[i].selected) {
-                $scope.send_control_message(new messages.GroupUnSelected($scope.client_id, groups[i].id));
+                $scope.send_control_message(new fsm_messages.GroupUnSelected($scope.client_id, groups[i].id));
             }
             groups[i].selected = false;
         }
@@ -368,7 +370,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         for (i = 0; i < $scope.channels.length; i++) {
             if($scope.channels[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 $scope.channels[i].selected = true;
-                $scope.send_control_message(new messages.ChannelSelected($scope.client_id, $scope.channels[i].id));
+                $scope.send_control_message(new fsm_messages.ChannelSelected($scope.client_id, $scope.channels[i].id));
                 last_selected_channel = $scope.channels[i];
                 if ($scope.selected_channels.indexOf($scope.channels[i]) === -1) {
                     $scope.selected_channels.push($scope.channels[i]);
@@ -400,7 +402,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         for (i = states.length - 1; i >= 0; i--) {
             if (states[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 states[i].selected = true;
-                $scope.send_control_message(new messages.StateSelected($scope.client_id, states[i].id));
+                $scope.send_control_message(new fsm_messages.StateSelected($scope.client_id, states[i].id));
                 last_selected_state = states[i];
                 if ($scope.selected_items.indexOf(states[i]) === -1) {
                     $scope.selected_items.push(states[i]);
@@ -419,7 +421,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
             for (i = 0; i < $scope.transitions.length; i++) {
                 if($scope.transitions[i].is_selected($scope.scaledX, $scope.scaledY)) {
                     $scope.transitions[i].selected = true;
-                    $scope.send_control_message(new messages.TransitionSelected($scope.client_id, $scope.transitions[i].id));
+                    $scope.send_control_message(new fsm_messages.TransitionSelected($scope.client_id, $scope.transitions[i].id));
                     last_selected_transition = $scope.transitions[i];
                     if ($scope.selected_items.indexOf($scope.transitions[i]) === -1) {
                         $scope.selected_items.push($scope.transitions[i]);
@@ -560,13 +562,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
     // Buttons
 
     $scope.buttons = [
-      new models.Button("DownloadPipeline", 10, 10, 60, 50, $scope.onDownloadPipelineButton, $scope),
-      new models.Button("UploadPipeline", 70, 10, 60, 50, $scope.onUploadPipelineButton, $scope),
-      new models.Button("DownloadFSM", 130, 10, 60, 50, $scope.onDownloadFsmButton, $scope),
-      new models.Button("UploadFSM", 190, 10, 60, 50, $scope.onUploadFsmButton, $scope),
-      new models.Button("DownloadTrace", 250, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
-      new models.Button("UploadTrace", 310, 10, 60, 50, $scope.onUploadTraceButton, $scope),
-      new models.Button("PlayPause", 60, $scope.graph.height - 105, 20, 20, $scope.onPlayPause, $scope)
+      new b_models.Button("DownloadPipeline", 10, 10, 60, 50, $scope.onDownloadPipelineButton, $scope),
+      new b_models.Button("UploadPipeline", 70, 10, 60, 50, $scope.onUploadPipelineButton, $scope),
+      new b_models.Button("DownloadFSM", 130, 10, 60, 50, $scope.onDownloadFsmButton, $scope),
+      new b_models.Button("UploadFSM", 190, 10, 60, 50, $scope.onUploadFsmButton, $scope),
+      new b_models.Button("DownloadTrace", 250, 10, 60, 50, $scope.onDownloadTraceButton, $scope),
+      new b_models.Button("UploadTrace", 310, 10, 60, 50, $scope.onUploadTraceButton, $scope),
+      new b_models.Button("PlayPause", 60, $scope.graph.height - 105, 20, 20, $scope.onPlayPause, $scope)
     ];
 
 
@@ -575,7 +577,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
     };
 
     $scope.create_state = function(data) {
-        var state = new models.State(data.id,
+        var state = new fsm_models.State(data.id,
                                      data.label,
                                      data.x,
                                      data.y);
@@ -602,7 +604,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 
     $scope.create_transition = function(data) {
         var i = 0;
-        var new_transition = new models.Transition(null, null, null);
+        var new_transition = new fsm_models.Transition(null, null, null);
         new_transition.id = data.id;
         $scope.transition_id_seq = util.natural_numbers(data.id);
         for (i = 0; i < $scope.states.length; i++){
@@ -746,7 +748,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         }
 
         if (type === "StateDestroy") {
-            inverted_data = new messages.StateCreate(data.sender,
+            inverted_data = new fsm_messages.StateCreate(data.sender,
                                                       data.id,
                                                       data.previous_x,
                                                       data.previous_y,
@@ -889,7 +891,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                 max_y = state.y;
             }
             if (typeof(state_map[state.id]) === "undefined") {
-                new_state = new models.State(state.id,
+                new_state = new fsm_models.State(state.id,
                                                state.label,
                                                state.x,
                                                state.y);
@@ -906,7 +908,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                 max_transition_id = transition.id;
             }
             console.log(transition);
-            $scope.transitions.push(new models.Transition(transition.id,
+            $scope.transitions.push(new fsm_models.Transition(transition.id,
                                                           state_map[transition.from_state],
                                                           state_map[transition.to_state],
                                                           transition.label));
@@ -921,7 +923,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
             if (max_group_id === null || group.id > max_group_id) {
                 max_group_id = group.id;
             }
-            new_group = new models.Group(group.id,
+            new_group = new fsm_models.Group(group.id,
                                          group.name,
                                          'fsm',
                                          group.x1,
@@ -950,7 +952,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
                 max_transition_id = channel.id;
             }
             console.log(channel);
-            $scope.channels.push(new models.Channel(channel.id,
+            $scope.channels.push(new fsm_models.Channel(channel.id,
                                                     fsm_map[channel.from_fsm],
                                                     fsm_map[channel.to_fsm],
                                                     channel.label));
@@ -1027,7 +1029,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
         }
         message.sender = $scope.client_id;
         message.message_id = $scope.message_id_seq();
-        var data = messages.serialize(message);
+        var data = core_messages.serialize(message);
         //console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
         $scope.control_socket.send(data);
     };
@@ -1042,7 +1044,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
 	  	$scope.graph.right_column = $window.innerWidth - 300;
 	  	$scope.graph.height = $window.innerHeight;
 
-        $scope.replay_slider = new models.Slider(100,
+        $scope.replay_slider = new fsm_models.Slider(100,
                                                  $scope.graph.height - 100,
                                                  $scope.graph.width - 200,
                                                  20);

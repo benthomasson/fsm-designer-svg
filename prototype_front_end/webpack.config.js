@@ -61,7 +61,7 @@ module.exports = {
         ]
     },
     plugins: [
-         new HardSourceWebpackPlugin(),
+         //new HardSourceWebpackPlugin(),
          new webpack.ProvidePlugin({Hamster: 'hamsterjs'}),
          new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' })
     ]

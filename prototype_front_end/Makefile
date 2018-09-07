@@ -4,8 +4,8 @@ all: clean lessc lint main
 
 clean:
 	rm -f js/bundle.js
+	rm -f js/vendor.bundle.js
 	rm -f css/style.css
-	rm -rf node_modules
 
 install:
 	npm i
@@ -42,3 +42,4 @@ deploy: main
 	rsync -av css ../prototype/static/prototype/
 	rsync -av index.html ../prototype/static/prototype/
 	rsync -av favicon.ico ../prototype/static/prototype/
+	docker-compose run --rm django ./manage.py collectstatic --noinput
