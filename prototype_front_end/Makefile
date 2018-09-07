@@ -5,10 +5,13 @@ all: clean lessc lint main
 clean:
 	rm -f js/bundle.js
 	rm -f css/style.css
+	rm -rf node_modules
+
+install:
+	npm i
 
 main:
-	browserify src/main.js  --standalone main -o js/bundle.js
-	cp vendor/*.js js/
+	webpack
 
 lint:
 	jshint --verbose src/*js

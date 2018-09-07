@@ -17,6 +17,7 @@ var scrubbing_fsm = require('./scrubbing.fsm.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
+var ReconnectingWebSocket = require('reconnectingwebsocket');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window, $http) {
 
@@ -30,7 +31,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window, $http
   $scope.replay_play = false;
   $scope.initial_messages = [];
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
+  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.location = $location;

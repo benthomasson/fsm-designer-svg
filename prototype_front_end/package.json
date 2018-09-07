@@ -1,7 +1,7 @@
 {
   "name": "prototype",
   "version": "1.0.0",
-  "description": "A simple UI for designing finite state machines",
+  "description": "A tool for designing database schemas",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,13 +9,27 @@
   "author": "Ben Thomasson",
   "license": "ISC",
   "dependencies": {
+    "angular": "^1.7.3",
+    "angular-mousewheel": "^1.0.5",
+    "angular-ui-router": "^1.0.20",
+    "angular-xeditable": "^0.9.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
     "browserify": "",
+    "hamsterjs": "^1.1.3",
+    "hard-source-webpack-plugin": "^0.12.0",
     "inherits": "",
-    "require": "",
     "jshint": "",
     "less": "",
     "mathjs": "",
-    "titlecase": ""
+    "reconnectingwebsocket": "^1.0.0",
+    "require": "",
+    "text-width": "",
+    "titlecase": "^1.1.2",
+    "to-snake-case": "",
+    "webpack": "^3.11.0",
+    "yamljs": ""
   },
   "devDependencies": {
     "eslint": "^3.17.1",
