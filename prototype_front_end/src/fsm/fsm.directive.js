@@ -1,5 +1,7 @@
 
+const templateUrl = require('~fsm/fsm.partial.svg');
+
 var fsm = function() {
-  return { restrict: 'A', templateUrl: 'widgets/fsm.html' };
+  return { restrict: 'A', templateUrl};
 };
 exports.fsm = fsm;

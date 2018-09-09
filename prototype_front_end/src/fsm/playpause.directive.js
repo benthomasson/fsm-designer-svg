@@ -1,5 +1,7 @@
 
+const templateUrl = require('~fsm/playpause.partial.svg');
+
 var playpause = function() {
-  return { restrict: 'A', templateUrl: 'widgets/playpause.html' };
+  return { restrict: 'A', templateUrl};
 };
 exports.playpause = playpause;
