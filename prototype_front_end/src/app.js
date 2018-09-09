@@ -4,28 +4,24 @@ var controller = require('./controller.js');
 var cursor = require('./core/cursor.directive.js');
 var debug = require('./core/debug.directive.js');
 var help = require('./core/help.directive.js');
+var quadrants = require('./core/quadrants.directive.js');
+
+var state = require('./fsm/state.directive.js');
+var transition = require('./fsm/transition.directive.js');
+var channel = require('./fsm/channel.directive.js');
 
 var app = angular.module('triangular', ['monospaced.mousewheel'])
                  .controller('MainCtrl', controller.MainCtrl)
                  .directive('cursor', cursor.cursor)
                  .directive('debug', debug.debug)
-                 .directive('help', help.help);
+                 .directive('help', help.help)
+                 .directive('state', state.state)
+                 .directive('fsmTransition', transition.transition)
+                 .directive('fsmChannel', channel.channel)
+                 .directive('quadrants', quadrants.quadrants);
 
-app.directive('state', function() {
-  return { restrict: 'A', templateUrl: 'widgets/state.html' };
-});
 
-app.directive('fsmTransition', function() {
-  return { restrict: 'A', templateUrl: 'widgets/transition.html' };
-});
 
-app.directive('fsmChannel', function() {
-  return { restrict: 'A', templateUrl: 'widgets/channel.html' };
-});
-
-app.directive('quadrants', function() {
-  return { restrict: 'A', templateUrl: 'widgets/quadrants.html' };
-});
 
 app.directive('download', function() {
   return { restrict: 'A', templateUrl: 'widgets/download.svg' };
