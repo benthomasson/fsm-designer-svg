@@ -1,21 +1,15 @@
 
 //console.log = function () { };
-var app = angular.module('triangular', ['monospaced.mousewheel']);
 var controller = require('./controller.js');
+var cursor = require('./core/cursor.directive.js');
+var debug = require('./core/debug.directive.js');
+var help = require('./core/help.directive.js');
 
-app.controller('MainCtrl', controller.MainCtrl);
-
-app.directive('cursor', function() {
-  return { restrict: 'A', templateUrl: 'widgets/cursor.html' };
-});
-
-app.directive('debug', function() {
-  return { restrict: 'A', templateUrl: 'widgets/debug.html' };
-});
-
-app.directive('help', function() {
-  return { restrict: 'A', templateUrl: 'widgets/help.html' };
-});
+var app = angular.module('triangular', ['monospaced.mousewheel'])
+                 .controller('MainCtrl', controller.MainCtrl)
+                 .directive('cursor', cursor.cursor)
+                 .directive('debug', debug.debug)
+                 .directive('help', help.help);
 
 app.directive('state', function() {
   return { restrict: 'A', templateUrl: 'widgets/state.html' };
