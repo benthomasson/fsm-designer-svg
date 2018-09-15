@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('to_state', models.CharField(max_length=200)),
                 ('message_type', models.CharField(max_length=200)),
                 ('trace_session_id', models.IntegerField(default=0)),
-                ('client', models.ForeignKey(to='prototype.Client')),
+                ('client', models.ForeignKey(to='prototype.Client', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -78,8 +78,8 @@ class Migration(migrations.Migration):
                 ('message_id', models.IntegerField()),
                 ('message_data', models.TextField()),
                 ('undone', models.BooleanField(default=False)),
-                ('client', models.ForeignKey(to='prototype.Client')),
-                ('diagram', models.ForeignKey(to='prototype.Diagram')),
+                ('client', models.ForeignKey(to='prototype.Client', on_delete=models.CASCADE)),
+                ('diagram', models.ForeignKey(to='prototype.Diagram', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
                 ('id', models.IntegerField()),
                 ('x', models.IntegerField()),
                 ('y', models.IntegerField()),
-                ('diagram', models.ForeignKey(to='prototype.Diagram')),
+                ('diagram', models.ForeignKey(to='prototype.Diagram', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -106,14 +106,14 @@ class Migration(migrations.Migration):
                 ('transition_id', models.AutoField(serialize=False, primary_key=True)),
                 ('label', models.CharField(max_length=200)),
                 ('id', models.IntegerField()),
-                ('from_state', models.ForeignKey(related_name='from_transition', to='prototype.State')),
-                ('to_state', models.ForeignKey(related_name='to_transition', to='prototype.State')),
+                ('from_state', models.ForeignKey(related_name='from_transition', to='prototype.State', on_delete=models.CASCADE)),
+                ('to_state', models.ForeignKey(related_name='to_transition', to='prototype.State', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='history',
             name='message_type',
-            field=models.ForeignKey(to='prototype.MessageType'),
+            field=models.ForeignKey(to='prototype.MessageType', on_delete=models.CASCADE),
         ),
         migrations.RunPython(
             code=populate_message_types,

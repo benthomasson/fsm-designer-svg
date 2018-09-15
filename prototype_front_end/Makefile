@@ -42,4 +42,4 @@ deploy: main
 	rsync -av css ../prototype/static/prototype/
 	rsync -av index.html ../prototype/static/prototype/
 	rsync -av favicon.ico ../prototype/static/prototype/
-	docker-compose run --rm django ./manage.py collectstatic --noinput
+	docker-compose -f ../local.yml run --rm django ./manage.py collectstatic --noinput

@@ -32,7 +32,7 @@ var MainCtrl = function($scope, $document, $location, $window, $http) {
   $scope.replay_play = false;
   $scope.initial_messages = [];
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/prototype?diagram_id=" + $scope.diagram_id,
+  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/ws/prototype?diagram_id=" + $scope.diagram_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.location = $location;

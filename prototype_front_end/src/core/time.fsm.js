@@ -220,7 +220,7 @@ _Present.prototype.handle_oom = function(controller, data) {
 
 _Present.prototype.onMessage = function(controller, msg_type, message) {
 
-    //console.log(message.data);
+    console.log(message.data);
     var type_data = JSON.parse(message.data);
     var type = type_data[0];
     var data = type_data[1];
@@ -229,7 +229,7 @@ _Present.prototype.onMessage = function(controller, msg_type, message) {
     //Fix out of order messages
     //console.log(["RECV", data.sender, data.message_id]);
 
-    this.handle_oom(controller, data);
+    //this.handle_oom(controller, data);
 
     if (controller.scope.client_messages[data.sender] < data.message_id &&
         controller.scope.client_messages[data.sender] + 1 !== data.message_id) {
@@ -257,7 +257,7 @@ _Present.prototype.onMessage = function(controller, msg_type, message) {
     }
     controller.handle_message(type, data);
 
-    this.handle_oom(controller, data);
+    //this.handle_oom(controller, data);
 };
 
 _Present.prototype.onStateCreate = function(controller, msg_type, message) {

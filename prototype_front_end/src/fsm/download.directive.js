@@ -1,5 +1,5 @@
 
-const templateUrl = require('~fsm/upload.partial.svg');
+const templateUrl = require('~fsm/download.partial.svg');
 
 var download = function() {
   return { restrict: 'A', templateUrl};

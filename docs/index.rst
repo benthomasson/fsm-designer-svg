@@ -1,9 +1,9 @@
-.. fsm-designer-svg documentation master file, created by
+.. fsm_designer_svg documentation master file, created by
    sphinx-quickstart.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to fsm-designer-svg's documentation!
+Welcome to fsm_designer_svg's documentation!
 ====================================================================
 
 Contents:

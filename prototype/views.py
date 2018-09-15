@@ -66,7 +66,7 @@ channel_map = dict(from_fsm__name="from_fsm",
 
 
 def transform_dict(dict_map, d):
-    return {to_key: d[from_key] for from_key, to_key in dict_map.iteritems()}
+    return {to_key: d[from_key] for from_key, to_key in dict_map.items()}
 
 
 transform_state = partial(transform_dict, state_map)
@@ -99,20 +99,20 @@ def download(request):
                                               .values_list('name', flat=True)[0])
         else:
             states = State.objects.filter(diagram_id=diagram.pk)
-        data['states'] = map(transform_state, list(states.filter(diagram_id=diagram.pk)
+        data['states'] = list(map(transform_state, list(states.filter(diagram_id=diagram.pk)
                                                          .values('x',
                                                                  'y',
                                                                  'name',
                                                                  'id')
-                                                         .order_by('name')))
+                                                         .order_by('name'))))
         state_pks = states.values_list('state_id', flat=True)
-        data['transitions'] = map(transform_transition, list(Transition.objects
+        data['transitions'] = list(map(transform_transition, list(Transition.objects
                                                                        .filter(from_state_id__in=state_pks)
                                                                        .filter(to_state_id__in=state_pks)
                                                                        .values('from_state__name',
                                                                                'to_state__name',
                                                                                'label')
-                                                                       .order_by('from_state__name', 'label')))
+                                                                       .order_by('from_state__name', 'label'))))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(data['name'])
@@ -138,7 +138,7 @@ def download_pipeline(request):
                                                       'name',
                                                       'id')
                                               .order_by('name'))
-        data['channels'] = map(transform_channel, list(Channel.objects
+        data['channels'] = list(map(transform_channel, list(Channel.objects
                                                               .filter(from_fsm__diagram_id=diagram.pk)
                                                               .values('from_fsm__name',
                                                                       'to_fsm__name',
@@ -147,7 +147,7 @@ def download_pipeline(request):
                                                                       'inbox',
                                                                       'outbox',
                                                                       'label')
-                                                              .order_by('from_fsm__name', 'to_fsm__name', 'label')))
+                                                              .order_by('from_fsm__name', 'to_fsm__name', 'label'))))
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(diagram.name)
@@ -164,7 +164,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
             diagram.save()
     else:
         diagram = Diagram.objects.get(diagram_id=diagram_id)
-        print Diagram.objects.filter(diagram_id=diagram_id).values()
+        print(Diagram.objects.filter(diagram_id=diagram_id).values())
     if finite_state_machine_id is None and len(data.get('fsms', [])) == 0:
         finite_state_machine_id = data.get('finite_state_machine_id', None)
     else:
@@ -204,7 +204,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
             maxX = new_state.x - 100
         if maxY is None or maxY > new_state.y:
             maxY = new_state.y - 100
-        print new_state.id
+        print(new_state.id)
         state_ids.append(new_state.id)
         states.append(new_state)
     if existing_fsm is not None:
@@ -221,11 +221,11 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
         State.objects.bulk_create(states)
     with transaction.atomic():
         state_id_seq = diagram.state_id_seq + len(states)
-        print state_id_seq
+        print(state_id_seq)
         (Diagram.objects
                 .filter(pk=diagram.pk, state_id_seq__lt=state_id_seq)
                 .update(state_id_seq=state_id_seq))
-    print Diagram.objects.filter(pk=diagram.pk).values('state_id_seq')
+    print(Diagram.objects.filter(pk=diagram.pk).values('state_id_seq'))
 
     fsm = None
     if existing_fsm:
@@ -257,7 +257,7 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
         with transaction.atomic():
             FiniteStateMachineState.objects.bulk_create(fsmstates)
 
-    print fsm
+    print(fsm)
     if fsm is not None:
         states_map = dict(State.objects
                                .filter(diagram_id=diagram.pk, finitestatemachinestate__finite_state_machine__id=fsm.id)
@@ -266,8 +266,8 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
         states_map = dict(State.objects
                                .filter(diagram_id=diagram.pk)
                                .values_list("name", "pk"))
-    print states
-    print states_map
+    print(states)
+    print(states_map)
     for i, transition in enumerate(data.get('transitions', [])):
         new_transition = Transition(label=transition['label'],
                                     id=i + diagram.transition_id_seq,
@@ -317,14 +317,14 @@ def upload_diagram(data, diagram_id=None, finite_state_machine_id=None):
     channel_id_seq = diagram.channel_id_seq + len(channels)
     with transaction.atomic():
         Diagram.objects.filter(pk=diagram.pk, channel_id_seq__lt=channel_id_seq).update(channel_id_seq=channel_id_seq)
-    print Diagram.objects.filter(diagram_id=diagram.pk).values()
+    print(Diagram.objects.filter(diagram_id=diagram.pk).values())
     return diagram.uuid
 
 
 def upload(request):
     if request.method == 'POST':
-        print request.POST
-        print request.FILES
+        print(request.POST)
+        print(request.FILES)
         form = UploadFSMFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
@@ -346,8 +346,8 @@ def upload(request):
 
 def upload_pipeline(request):
     if request.method == 'POST':
-        print request.POST
-        print request.FILES
+        print(request.POST)
+        print(request.FILES)
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())

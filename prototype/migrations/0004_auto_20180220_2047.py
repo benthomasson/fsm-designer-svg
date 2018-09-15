@@ -29,25 +29,25 @@ class Migration(migrations.Migration):
                 ('y1', models.IntegerField()),
                 ('x2', models.IntegerField()),
                 ('y2', models.IntegerField()),
-                ('diagram', models.ForeignKey(to='prototype.Diagram')),
+                ('diagram', models.ForeignKey(to='prototype.Diagram', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
             name='FiniteStateMachineState',
             fields=[
                 ('finite_state_machine_state_id', models.AutoField(serialize=False, primary_key=True)),
-                ('finite_state_machine', models.ForeignKey(to='prototype.FiniteStateMachine')),
-                ('state', models.ForeignKey(to='prototype.State')),
+                ('finite_state_machine', models.ForeignKey(to='prototype.FiniteStateMachine', on_delete=models.CASCADE)),
+                ('state', models.ForeignKey(to='prototype.State', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='channel',
             name='from_fsm',
-            field=models.ForeignKey(related_name='from_channel', to='prototype.FiniteStateMachine'),
+            field=models.ForeignKey(related_name='from_channel', to='prototype.FiniteStateMachine', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='channel',
             name='to_fsm',
-            field=models.ForeignKey(related_name='to_channel', to='prototype.FiniteStateMachine'),
+            field=models.ForeignKey(related_name='to_channel', to='prototype.FiniteStateMachine', on_delete=models.CASCADE),
         ),
     ]
