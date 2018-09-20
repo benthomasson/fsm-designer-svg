@@ -7,7 +7,6 @@ class Debug extends Component {
       stroke: 'none'
     };
     var i = -1;
-
     function next_i () {
       i = i + 1;
       return 100 + i * 20;

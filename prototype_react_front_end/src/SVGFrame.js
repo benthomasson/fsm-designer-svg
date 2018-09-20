@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import Debug from './Debug'
-import Cursor from './Cursor'
-import fsm from './fsm'
+import Debug from './core/Debug'
+import Cursor from './core/Cursor'
+import fsm from './fsm.js'
+import Upload from './button/Upload'
+import Download from './button/Download'
+import Quadrants from './core/Quadrants'
+import Help from './core/Help'
 
 class SVGFrame extends Component {
 
@@ -13,7 +17,8 @@ class SVGFrame extends Component {
       lastKey: '',
       frameNumber: 0,
       cursorTransform: '',
-      showDebug: true
+      showDebug: true,
+      showHelp: true
     };
 
     this.onMouseMove = this.onMouseMove.bind(this);
@@ -82,18 +87,22 @@ class SVGFrame extends Component {
     };
     return (
       <div className="SVGFrame">
-        <svg id="frame" style={frameStyle}
-        height={this.state.frameHeight}
-        width={this.state.frameWidth}
-        onMouseMove={this.onMouseMove}
-        onMouseDown={this.onMouseMove}
-        onMouseUp={this.onMouseMove}
-        onMouseEnter={this.onMouseMove}
-        onMouseLeave={this.onMouseMove}
-        onWheel={this.onMouseWheel}
-        >
+        <svg  id="frame" style={frameStyle}
+              height={this.state.frameHeight}
+              width={this.state.frameWidth}
+              onMouseMove={this.onMouseMove}
+              onMouseDown={this.onMouseMove}
+              onMouseUp={this.onMouseMove}
+              onMouseEnter={this.onMouseMove}
+              onMouseLeave={this.onMouseMove}
+              onWheel={this.onMouseWheel}
+              >
           <Debug {...this.state} />
           <Cursor transform={this.state.cursorTransform} />
+          <Upload />
+          <Download />
+          <Quadrants {...this.state} />
+          <Help showHelp={this.state.showHelp} y={0} x={this.state.frameWidth - 200} />
         </svg>
       </div>
     );
