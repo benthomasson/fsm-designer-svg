@@ -5,7 +5,7 @@ function Channel(from_controller, to_controller, tracer) {
     this.tracer = tracer;
     this.from_controller = from_controller;
     this.to_controller = to_controller;
-    this.trace = false;
+    this.trace = true;
 }
 exports.Channel = Channel;
 
@@ -21,7 +21,7 @@ Channel.prototype.send = function(msg_type, message) {
 function NullChannel(from_controller, tracer) {
     this.tracer = tracer;
     this.from_controller = from_controller;
-    this.trace = false;
+    this.trace = true;
 }
 
 NullChannel.prototype.send = function(msg_type) {

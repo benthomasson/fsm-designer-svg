@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 
-import Colors from '../style/Colors';
-
 class Upload extends Component {
   render() {
-    var quadrantStyle = {
-      stroke: Colors['debugCopyNot'],
-      strokeWidth: 1
-    };
     var i = -1;
     function next_i () {
       i = i + 1;
