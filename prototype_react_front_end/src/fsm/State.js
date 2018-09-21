@@ -19,8 +19,12 @@ class Debug extends Component {
     var stateCircleStyle = {
       fill: Colors['widgetBody'],
       stroke: Colors['darkWidgetDetail'],
-      strokeWidth: 2
+      strokeWidth: 2,
+      cursor: 'pointer'
     };
+    if (this.props.moving) {
+      stateCircleStyle.cursor = 'move';
+    }
     return (
       <g transform={'translate(' + this.props.x + ',' + this.props.y + ')'}>
         {this.props.showDebug ?

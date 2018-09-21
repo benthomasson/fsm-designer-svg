@@ -15,6 +15,7 @@ function State(id, label, x, y) {
     this.remote_selected = false;
     this.edit_label = false;
     this.frame = 10;
+    this.moving = false;
 }
 exports.State = State;
 

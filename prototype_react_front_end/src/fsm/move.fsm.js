@@ -209,6 +209,22 @@ _Selected1.prototype.onMouseDown = function () {
 
 };
 
+_Move.prototype.start = function (controller) {
+
+    var states = controller.scope.state.selected_states;
+    for (var i = 0; i < states.length; i++) {
+      states[i].moving = true;
+    }
+};
+
+_Move.prototype.end = function (controller) {
+
+    var states = controller.scope.state.selected_states;
+    for (var i = 0; i < states.length; i++) {
+      states[i].moving = false;
+    }
+};
+
 _Move.prototype.onMouseMove = function (controller) {
 
     var states = controller.scope.state.selected_states;

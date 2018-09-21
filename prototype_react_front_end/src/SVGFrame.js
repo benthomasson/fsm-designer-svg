@@ -37,7 +37,7 @@ class SVGFrame extends Component {
       frameNumber: 0,
       showDebug: true,
       showHelp: true,
-      showCursor: true,
+      showCursor: false,
       states: [],
       transitions: [],
       selected_items: [],
@@ -270,7 +270,6 @@ class SVGFrame extends Component {
   render() {
     var frameStyle = {
       backgroundColor: '#ffffff',
-      cursor: 'none'
     };
     var states = [];
     for (var i=0; i< this.state.states.length; i++) {
