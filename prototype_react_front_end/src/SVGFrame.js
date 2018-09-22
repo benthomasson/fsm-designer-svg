@@ -6,9 +6,11 @@ import Upload from './button/Upload'
 import Download from './button/Download'
 import Quadrants from './core/Quadrants'
 import State from './fsm/State'
+//import Transition from './fsm/Transition'
 import Help from './core/Help'
 import hot_keys_fsm from './core/hotkeys.fsm'
 import move_fsm from './fsm/move.fsm'
+import transition_fsm from './fsm/transition.fsm'
 import util from './util'
 import fsm_messages from './fsm/messages'
 
@@ -50,16 +52,22 @@ class SVGFrame extends Component {
 
     this.trace_order_seq = util.natural_numbers(0);
     this.state_id_seq = util.natural_numbers(0);
+    this.transition_id_seq = util.natural_numbers(0);
 
     this.hotkeys_controller = new fsm.FSMController(this, 'hot_keys_fsm', hot_keys_fsm.Start, this);
     this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
+    this.transition_controller = new fsm.FSMController(this, 'transition_fsm', transition_fsm.Start, this);
 
     this.move_controller.delegate_channel = new fsm.Channel(this.move_controller,
                                                             this.hotkeys_controller,
                                                             this);
 
+    this.transition_controller.delegate_channel = new fsm.Channel(this.transition_controller,
+                                                                  this.move_controller,
+                                                                  this);
+
     this.first_channel = new fsm.Channel(null,
-                                         this.move_controller,
+                                         this.transition_controller,
                                          this);
 
     this.select_items = this.select_items.bind(this);
@@ -269,6 +277,26 @@ class SVGFrame extends Component {
         });
         return {last_selected_state: last_selected_state,
                 last_selected_transition: last_selected_transition};
+  };
+
+  update_offsets () {
+
+    var i = 0;
+    var transitions = this.state.transitions;
+    var map = {};
+    var transition = null;
+    var key = null;
+    for (i = 0; i < transitions.length; i++) {
+        transition = transitions[i];
+        key = "" + transition.from_state.id + "_" + transition.to_state.id;
+        map[key] = 0;
+    }
+    for (i = 0; i < transitions.length; i++) {
+        transition = transitions[i];
+        key = "" + transition.from_state.id + "_" + transition.to_state.id;
+        transition.offset = map[key];
+        map[key] = transition.offset + 1;
+    }
   };
 
   render() {

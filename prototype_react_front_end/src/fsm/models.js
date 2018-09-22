@@ -1,4 +1,3 @@
-var fsm = require('../fsm.js');
 var util = require('../util.js');
 var math = require('mathjs');
 

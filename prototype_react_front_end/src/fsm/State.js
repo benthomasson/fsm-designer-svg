@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Colors from '../style/Colors'
 
-class Debug extends Component {
+class State extends Component {
   render() {
     var debugStyle = {
       stroke: 'rgb(77,200,242)',
@@ -66,4 +66,4 @@ class Debug extends Component {
   }
 }
 
-export default Debug;
+export default State;
