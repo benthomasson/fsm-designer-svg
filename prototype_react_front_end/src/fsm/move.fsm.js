@@ -150,13 +150,13 @@ _Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
         var index = -1;
         var states = controller.scope.state.selected_states;
         var transitions = controller.scope.state.selected_transitions.slice();
-        var all_transitions = controller.scope.transitions.slice();
+        var all_transitions = controller.scope.state.transitions.slice();
         controller.scope.state.selected_states = [];
         controller.scope.state.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
-            index = controller.scope.states.indexOf(states[i]);
+            index = controller.scope.state.states.indexOf(states[i]);
             if (index !== -1) {
-                controller.scope.states.splice(index, 1);
+                controller.scope.state.states.splice(index, 1);
                 controller.scope.send_control_message(new messages.StateDestroy(controller.scope.client_id,
                                                                                  states[i].id,
                                                                                  states[i].x,

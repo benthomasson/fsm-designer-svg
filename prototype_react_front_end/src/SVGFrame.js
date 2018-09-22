@@ -217,7 +217,11 @@ class SVGFrame extends Component {
           pressedScaledY: this.state.scaledY
         });
 
-        if (!multiple_selection) {
+        if (multiple_selection) {
+          selected_items = this.state.selected_items.slice();
+          selected_states = this.state.selected_states.slice();
+          selected_transitions = this.state.selected_transitions.slice();
+        } else {
             this.clear_selections();
         }
 

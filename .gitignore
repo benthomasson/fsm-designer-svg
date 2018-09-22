@@ -273,3 +273,5 @@ fsm_designer_svg/media/
 .env
 .envs/*
 !.envs/.local/
+
+/prototype/static/
