@@ -22,6 +22,9 @@ class State extends Component {
       strokeWidth: 2,
       cursor: 'pointer'
     };
+    var stateTextStyle = {
+      fill: Colors['darkWidgetDetail']
+    };
     if (this.props.moving) {
       stateCircleStyle.cursor = 'move';
     }
@@ -60,7 +63,7 @@ class State extends Component {
             r="50"
             style={stateCircleStyle}>
         </circle>
-        <text textAnchor="middle" x="0" y="0">{this.props.label}</text>
+        <text style={stateTextStyle} textAnchor="middle" x="0" y="0">{this.props.label}</text>
       </g>
     );
   }

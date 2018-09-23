@@ -6,7 +6,7 @@ import Upload from './button/Upload'
 import Download from './button/Download'
 import Quadrants from './core/Quadrants'
 import State from './fsm/State'
-//import Transition from './fsm/Transition'
+import Transition from './fsm/Transition'
 import Help from './core/Help'
 import hot_keys_fsm from './core/hotkeys.fsm'
 import move_fsm from './fsm/move.fsm'
@@ -307,6 +307,10 @@ class SVGFrame extends Component {
     for (var i=0; i< this.state.states.length; i++) {
       states.push(<State {...this.state.states[i]} key={'state' + i} showDebug={this.state.showDebug}/>);
     }
+    var transitions = [];
+    for (i=0; i< this.state.transitions.length; i++) {
+      transitions.push(<Transition {...this.state.transitions[i]} key={'transition' + i} showDebug={this.state.showDebug} scaledX={this.state.scaledX} scaledY={this.state.scaledY} />);
+    }
     return (
       <div className='SVGFrame'>
         <svg  id='frame' style={frameStyle}
@@ -317,13 +321,27 @@ class SVGFrame extends Component {
               onMouseUp={this.onMouseUp}
               onWheel={this.onMouseWheel}
               >
+          <defs>
+            <filter x="0" y="0" width="1" height="1" id="selected">
+              <feFlood floodColor="#b3d8fd"/>
+              <feComposite in="SourceGraphic" operator="xor"/>
+            </filter>
+          </defs>
+          {transitions}
           {states}
-          <Debug {...this.state} x={100} move={this.move_controller}/>
-          <Cursor x={this.state.cursorPosX} y={this.state.cursorPosY} showCursor={this.state.showCursor}/>
+          <Debug {...this.state}
+                 x={100}
+                 move={this.move_controller}
+                 transition={this.transition_controller}/>
+          <Cursor x={this.state.cursorPosX}
+                  y={this.state.cursorPosY}
+                  showCursor={this.state.showCursor}/>
           <Upload />
           <Download />
           <Quadrants {...this.state} />
-          <Help showHelp={this.state.showHelp} y={0} x={this.state.frameWidth - 200} />
+          <Help showHelp={this.state.showHelp}
+                y={0}
+                x={this.state.frameWidth - 200} />
         </svg>
       </div>
     );

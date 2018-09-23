@@ -8,7 +8,8 @@ var colors = {
   dark: '#707070',
   debugCopyNot: 'rgb(77,200,242)',
   widgetBody: '#D7D7D7',
-  darkWidgetDetail: '#707070'
+  darkWidgetDetail: '#707070',
+  transition: '#707070'
 };
 
 export default colors;
