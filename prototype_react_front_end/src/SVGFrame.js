@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
 import Debug from './core/Debug'
 import Cursor from './core/Cursor'
-import fsm from './fsm.js'
 import Upload from './button/Upload'
 import Download from './button/Download'
 import Quadrants from './core/Quadrants'
 import State from './fsm/State'
 import Transition from './fsm/Transition'
 import Help from './core/Help'
-import hot_keys_fsm from './core/hotkeys.fsm'
-import move_fsm from './fsm/move.fsm'
-import transition_fsm from './fsm/transition.fsm'
-import util from './util'
-import fsm_messages from './fsm/messages'
 import models from './models'
 
 
