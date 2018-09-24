@@ -77,21 +77,21 @@ _Connecting.prototype.onMouseUp = function (controller) {
 
     var selected = controller.scope.select_items(false);
     if (selected.last_selected_state !== null) {
-        controller.scope.state.new_transition.to_state = selected.last_selected_state;
-        controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.state.client_id,
-            controller.scope.state.new_transition.id,
-                                                                            controller.scope.state.new_transition.from_state.id,
-                                                                            controller.scope.state.new_transition.to_state.id),
+        controller.scope.new_transition.to_state = selected.last_selected_state;
+        controller.scope.send_control_message(new messages.TransitionCreate(controller.scope.client_id,
+            controller.scope.new_transition.id,
+                                                                            controller.scope.new_transition.from_state.id,
+                                                                            controller.scope.new_transition.to_state.id),
                 '');
-        controller.scope.state.new_transition = null;
+        controller.scope.new_transition = null;
         controller.scope.update_offsets();
         controller.changeState(Connected);
     } else {
-        var index = controller.scope.state.transitions.indexOf(controller.scope.state.new_transition);
+        var index = controller.scope.transitions.indexOf(controller.scope.new_transition);
         if (index !== -1) {
-            controller.scope.state.transitions.splice(index, 1);
+            controller.scope.transitions.splice(index, 1);
         }
-        controller.scope.state.new_transition = null;
+        controller.scope.new_transition = null;
         controller.changeState(Ready);
     }
 };
@@ -105,8 +105,8 @@ _Selecting.prototype.onMouseUp = function (controller) {
 
     var selected = controller.scope.select_items(false);
     if (selected.last_selected_state !== null) {
-        controller.scope.state.new_transition = new models.Transition(controller.scope.transition_id_seq(), selected.last_selected_state, null, '');
-        controller.scope.state.transitions.push(controller.scope.state.new_transition);
+        controller.scope.new_transition = new models.Transition(controller.scope.transition_id_seq(), selected.last_selected_state, null, '');
+        controller.scope.transitions.push(controller.scope.new_transition);
         controller.changeState(Connecting);
     }
 };

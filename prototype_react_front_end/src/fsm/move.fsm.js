@@ -90,12 +90,12 @@ _Ready.prototype.onNewState = function(controller) {
 
     state = new models.State(controller.scope.state_id_seq(),
                                "State",
-                               scope.state.scaledX,
-                               scope.state.scaledY,
+                               scope.scaledX,
+                               scope.scaledY,
                                "state");
 
-    scope.state.states.push(state);
-    console.log(scope.state.states);
+    scope.states.push(state);
+    console.log(scope.states);
     scope.send_control_message(new messages.StateCreate(scope.client_id,
                                                          state.id,
                                                          state.x,
@@ -116,8 +116,8 @@ _Selected2.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     var last_selected = null;
 
-    if (controller.scope.state.selected_states.length === 1) {
-        var current_selected_state = controller.scope.state.selected_states[0];
+    if (controller.scope.selected_states.length === 1) {
+        var current_selected_state = controller.scope.selected_states[0];
         last_selected = controller.scope.select_items($event.shiftKey);
         if (current_selected_state === last_selected.last_selected_state) {
             controller.changeState(Selected3);
@@ -125,8 +125,8 @@ _Selected2.prototype.onMouseDown = function (controller, msg_type, $event) {
         }
     }
 
-    if (controller.scope.state.selected_transitions.length === 1) {
-        var current_selected_transition = controller.scope.state.selected_transitions[0];
+    if (controller.scope.selected_transitions.length === 1) {
+        var current_selected_transition = controller.scope.selected_transitions[0];
         last_selected = controller.scope.select_items($event.shiftKey);
         if (current_selected_transition === last_selected.last_selected_transition) {
             controller.changeState(Selected3);
@@ -148,15 +148,15 @@ _Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
         var i = 0;
         var j = 0;
         var index = -1;
-        var states = controller.scope.state.selected_states;
-        var transitions = controller.scope.state.selected_transitions.slice();
-        var all_transitions = controller.scope.state.transitions.slice();
-        controller.scope.state.selected_states = [];
-        controller.scope.state.selected_transitions = [];
+        var states = controller.scope.selected_states;
+        var transitions = controller.scope.selected_transitions.slice();
+        var all_transitions = controller.scope.transitions.slice();
+        controller.scope.selected_states = [];
+        controller.scope.selected_transitions = [];
         for (i = 0; i < states.length; i++) {
-            index = controller.scope.state.states.indexOf(states[i]);
+            index = controller.scope.states.indexOf(states[i]);
             if (index !== -1) {
-                controller.scope.state.states.splice(index, 1);
+                controller.scope.states.splice(index, 1);
                 controller.scope.send_control_message(new messages.StateDestroy(controller.scope.client_id,
                                                                                  states[i].id,
                                                                                  states[i].x,
@@ -211,7 +211,7 @@ _Selected1.prototype.onMouseDown = function () {
 
 _Move.prototype.start = function (controller) {
 
-    var states = controller.scope.state.selected_states;
+    var states = controller.scope.selected_states;
     for (var i = 0; i < states.length; i++) {
       states[i].moving = true;
     }
@@ -219,7 +219,7 @@ _Move.prototype.start = function (controller) {
 
 _Move.prototype.end = function (controller) {
 
-    var states = controller.scope.state.selected_states;
+    var states = controller.scope.selected_states;
     for (var i = 0; i < states.length; i++) {
       states[i].moving = false;
     }
@@ -227,10 +227,10 @@ _Move.prototype.end = function (controller) {
 
 _Move.prototype.onMouseMove = function (controller) {
 
-    var states = controller.scope.state.selected_states;
+    var states = controller.scope.selected_states;
 
-    var diffX = controller.scope.state.scaledX - controller.scope.state.pressedScaledX;
-    var diffY = controller.scope.state.scaledY - controller.scope.state.pressedScaledY;
+    var diffX = controller.scope.scaledX - controller.scope.pressedScaledX;
+    var diffY = controller.scope.scaledY - controller.scope.pressedScaledY;
     var i = 0;
     var previous_x, previous_y;
     for (i = 0; i < states.length; i++) {
@@ -246,8 +246,8 @@ _Move.prototype.onMouseMove = function (controller) {
                                                                       previous_y));
     }
     controller.scope.setState({
-      pressedScaledX: controller.scope.state.scaledX,
-      pressedScaledY: controller.scope.state.scaledY
+      pressedScaledX: controller.scope.scaledX,
+      pressedScaledY: controller.scope.scaledY
     });
 };
 
@@ -272,11 +272,11 @@ _Selected3.prototype.onMouseMove.transitions = ['Move'];
 
 
 _EditLabel.prototype.start = function (controller) {
-    controller.scope.state.selected_items[0].edit_label = true;
+    controller.scope.selected_items[0].edit_label = true;
 };
 
 _EditLabel.prototype.end = function (controller) {
-    controller.scope.state.selected_items[0].edit_label = false;
+    controller.scope.selected_items[0].edit_label = false;
 };
 
 _EditLabel.prototype.onMouseDown = function (controller, msg_type, $event) {
@@ -290,7 +290,7 @@ _EditLabel.prototype.onMouseDown.transitions = ['Ready'];
 _EditLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-  var item = controller.scope.state.selected_items[0];
+  var item = controller.scope.selected_items[0];
     var previous_label = item.label;
   if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
     item.label = item.label.slice(0, -1);
