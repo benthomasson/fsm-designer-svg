@@ -2,6 +2,7 @@ var util = require('./util.js');
 var fsm = require('./fsm.js');
 var hot_keys_fsm = require('./core/hotkeys.fsm.js');
 var move_fsm = require('./fsm/move.fsm.js');
+var group_fsm = require('./fsm/group.fsm.js');
 var transition_fsm = require('./fsm/transition.fsm.js');
 var time_fsm = require('./core/time.fsm.js');
 var view_fsm = require('./core/view.fsm.js');
@@ -49,7 +50,7 @@ function ApplicationScope (svgFrame) {
   this.client_id = 1;
   this.state = this;
   this.diagram_id = 0;
-  this.disconnected = false;
+  this.disconnected = true;
   this.websocket_host = "192.168.99.100:8000";
   this.first_channel = null;
   this.history = [];
@@ -77,6 +78,8 @@ function ApplicationScope (svgFrame) {
       console.log(message);
       self.svgFrame.forceUpdate();
     };
+  } else {
+    this.control_socket = {send: util.noop};
   }
 
   //Create sequences
@@ -84,10 +87,12 @@ function ApplicationScope (svgFrame) {
   this.state_id_seq = util.natural_numbers(0);
   this.transition_id_seq = util.natural_numbers(0);
   this.message_id_seq = util.natural_numbers(0);
+  this.group_id_seq = util.natural_numbers(0);
 
   //Create FSM controllers
   this.hotkeys_controller = new fsm.FSMController(this, 'hot_keys_fsm', hot_keys_fsm.Start, this);
   this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
+  this.group_controller = new fsm.FSMController(this, 'group_fsm', group_fsm.Start, this);
   this.transition_controller = new fsm.FSMController(this, 'transition_fsm', transition_fsm.Start, this);
   this.time_controller = new fsm.FSMController(this, 'time_fsm', time_fsm.Start, this);
   this.view_controller = new fsm.FSMController(this, 'view_fsm', view_fsm.Start, this);
@@ -99,6 +104,7 @@ function ApplicationScope (svgFrame) {
                       this.hotkeys_controller,
                       this.move_controller,
                       this.transition_controller,
+                      this.group_controller,
                       this.time_controller];
 
 

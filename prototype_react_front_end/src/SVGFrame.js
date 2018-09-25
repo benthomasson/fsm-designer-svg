@@ -63,17 +63,20 @@ class SVGFrame extends Component {
                          'scale(' + this.scope.current_scale + ')'}>
           {transitions}
           {states}
+          <Quadrants {...this.scope} />
           </g>
           <Debug {...this.scope}
                  x={100}
                  move={this.scope.move_controller}
-                 transition={this.scope.transition_controller}/>
+                 transition={this.scope.transition_controller}
+                 view={this.scope.view_controller}
+                 group={this.scope.group_controller}
+                 />
           <Cursor x={this.scope.cursorPosX}
                   y={this.scope.cursorPosY}
                   showCursor={this.scope.showCursor}/>
           <Upload />
           <Download />
-          <Quadrants {...this.scope} />
           <Help showHelp={this.scope.showHelp}
                 y={0}
                 x={this.scope.frameWidth - 200} />

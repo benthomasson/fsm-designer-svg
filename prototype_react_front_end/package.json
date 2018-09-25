@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@gouch/to-title-case": "^2.2.1",
     "history": "^4.7.2",
     "inherits": "^2.0.3",
     "mathjs": "^5.1.2",
