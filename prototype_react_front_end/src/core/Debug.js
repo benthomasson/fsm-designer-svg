@@ -20,6 +20,8 @@ class Debug extends Component {
           <text x={this.props.x} y={next_i()} style={debugStyle}>Mouse: ({this.props.mouseX}, {this.props.mouseY})</text>
           <text x={this.props.x} y={next_i()} style={debugStyle}>Pressed: ({this.props.pressedX}, {this.props.pressedY})</text>
           <text x={this.props.x} y={next_i()} style={debugStyle}>Pressed Scaled: ({this.props.pressedScaledX}, {this.props.pressedScaledY})</text>
+          <text x={this.props.x} y={next_i()} style={debugStyle}>Pan: ({this.props.panX}, {this.props.panY}) </text>
+          <text x={this.props.x} y={next_i()} style={debugStyle}>Scale: {this.props.current_scale} </text>
           <text x={this.props.x} y={next_i()} style={debugStyle}>Key: {this.props.lastKey} </text>
           <text x={this.props.x} y={next_i()} style={debugStyle}>Frame #: {this.props.frameNumber} </text>
           <text x={this.props.x} y={next_i()} style={debugStyle}># Selected: {this.props.selected_items.length} </text>

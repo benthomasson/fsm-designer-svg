@@ -49,6 +49,11 @@ class Group extends Component {
       stroke: Colors['debugCopyNot'],
       strokeWidth: 1,
     };
+    var textSelected = {
+    };
+    var textStyle = {
+      fill: Colors['buttonText'],
+    };
     return (
       <g>
 
@@ -171,6 +176,17 @@ class Group extends Component {
               x={this.left_extent()}
               y={this.top_extent()}
               style={groupStyle} />
+
+        <g transform={"translate(" + this.left_extent() + "," + this.top_extent() + ")"}>
+        {(this.props.selected && ! this.props.edit_label) ?
+          <text style={textSelected}
+                filter="url(#selected)"
+                textAnchor="left"
+                x="20"
+                y="32">{this.props.name}</text>
+        :  null}
+          <text style={textStyle} textAnchor="left" x="20" y="32">{this.props.name}{this.props.edit_label?'_':''}</text>
+        </g>
       </g>
     );
   }

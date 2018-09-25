@@ -10,7 +10,8 @@ var colors = {
   widgetBody: '#D7D7D7',
   darkWidgetDetail: '#707070',
   transition: '#707070',
-  group: '#707070'
+  group: '#707070',
+  buttonText: '#707070'
 };
 
 export default colors;
