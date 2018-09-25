@@ -5,8 +5,12 @@ var move_fsm = require('./fsm/move.fsm.js');
 var transition_fsm = require('./fsm/transition.fsm.js');
 var time_fsm = require('./core/time.fsm.js');
 var fsm_messages = require('./fsm/messages.js');
+var core_messages = require('./core/messages.js');
 var fsm_models = require('./fsm/models.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
+var history = require('history');
+
+
 
 function ApplicationScope (svgFrame) {
 
@@ -48,10 +52,19 @@ function ApplicationScope (svgFrame) {
   this.websocket_host = "192.168.99.100:8000";
   this.first_channel = null;
   this.history = [];
+  this.browser_history = history.createHashHistory({hashType: "hashbang"});
+  console.log(this.browser_history.location);
+
+  var split = this.browser_history.location.pathname.split('/');
+  var last = split[split.length - 1];
+  var split2 = last.split(':');
+  var last2 = split2[split2.length - 1];
+  this.diagram_id = last2;
 
 
   //Connect websocket
   if (!this.disconnected) {
+    console.log( "ws://" + this.websocket_host + "/ws/prototype?diagram_id=" + this.diagram_id);
     this.control_socket = new ReconnectingWebSocket(
       "ws://" + this.websocket_host + "/ws/prototype?diagram_id=" + this.diagram_id,
       null,
@@ -69,6 +82,7 @@ function ApplicationScope (svgFrame) {
   this.trace_order_seq = util.natural_numbers(0);
   this.state_id_seq = util.natural_numbers(0);
   this.transition_id_seq = util.natural_numbers(0);
+  this.message_id_seq = util.natural_numbers(0);
 
   //Create FSM controllers
   this.hotkeys_controller = new fsm.FSMController(this, 'hot_keys_fsm', hot_keys_fsm.Start, this);
@@ -111,7 +125,12 @@ function ApplicationScope (svgFrame) {
   this.onDiagram = this.onDiagram.bind(this);
   this.onClientId =  this.onClientId.bind(this);
   this.onSnapshot =  this.onSnapshot.bind(this);
+  this.update_offsets =  this.update_offsets.bind(this);
+  this.updateScaledXY =  this.updateScaledXY.bind(this);
+  this.updatePanAndScale =  this.updatePanAndScale.bind(this);
   this.update_channel_offsets =  this.update_channel_offsets.bind(this);
+  this.send_control_message =  this.send_control_message.bind(this);
+  this.send_trace_message =  this.send_trace_message.bind(this);
 }
 exports.ApplicationScope = ApplicationScope;
 
@@ -121,6 +140,11 @@ ApplicationScope.prototype.send_trace_message = function (message) {
 
 ApplicationScope.prototype.send_control_message = function (message) {
   console.log(message);
+  message.sender = this.client_id;
+  message.message_id = this.message_id_seq();
+  var data = core_messages.serialize(message);
+  console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
+  this.control_socket.send(data);
 };
 
 ApplicationScope.prototype.setState = function (o) {
@@ -317,6 +341,16 @@ ApplicationScope.prototype.select_items = function (multiple_selection) {
               last_selected_transition: last_selected_transition};
 };
 
+ApplicationScope.prototype.updateScaledXY = function() {
+  this.scaledX = (this.mouseX - this.panX) / this.current_scale;
+  this.scaledY = (this.mouseY - this.panY) / this.current_scale;
+};
+
+ApplicationScope.prototype.updatePanAndScale = function() {
+  //var g = document.getElementById('frame_g');
+  //g.setAttribute('transform','translate(' + this.panX + ',' + this.panY + ') scale(' + this.current_scale + ')');
+};
+
 ApplicationScope.prototype.update_offsets = function () {
 
   var i = 0;
@@ -354,8 +388,10 @@ ApplicationScope.prototype.onDiagram = function(data) {
   this.transition_id_seq = util.natural_numbers(data.transition_id_seq);
   this.group_id_seq = util.natural_numbers(data.fsm_id_seq);
   this.channel_id_seq = util.natural_numbers(data.channel_id_seq);
-  var search_data = {diagram_id: data.diagram_id};
-  //window.location.search = search_data;
+  var path_data = {pathname: '/diagram_id:' + data.diagram_id}
+  if (this.browser_history.location.pathname !== path_data.pathname) {
+    this.browser_history.push(path_data);
+  }
 };
 
 ApplicationScope.prototype.onClientId = function(data) {
