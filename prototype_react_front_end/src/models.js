@@ -4,6 +4,7 @@ var hot_keys_fsm = require('./core/hotkeys.fsm.js');
 var move_fsm = require('./fsm/move.fsm.js');
 var transition_fsm = require('./fsm/transition.fsm.js');
 var time_fsm = require('./core/time.fsm.js');
+var view_fsm = require('./core/view.fsm.js');
 var fsm_messages = require('./fsm/messages.js');
 var core_messages = require('./core/messages.js');
 var fsm_models = require('./fsm/models.js');
@@ -89,11 +90,13 @@ function ApplicationScope (svgFrame) {
   this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
   this.transition_controller = new fsm.FSMController(this, 'transition_fsm', transition_fsm.Start, this);
   this.time_controller = new fsm.FSMController(this, 'time_fsm', time_fsm.Start, this);
+  this.view_controller = new fsm.FSMController(this, 'view_fsm', view_fsm.Start, this);
 
 
   //Wire up controllers
   //
-  this.controllers = [this.hotkeys_controller,
+  this.controllers = [this.view_controller,
+                      this.hotkeys_controller,
                       this.move_controller,
                       this.transition_controller,
                       this.time_controller];
@@ -162,9 +165,9 @@ ApplicationScope.prototype.onMouseMove = function (e) {
     cursorPosY: e.pageY,
     mouseX: e.pageX,
     mouseY: e.pageY,
-    scaledX: e.pageX,
-    scaledY: e.pageY,
   });
+
+  this.updateScaledXY();
 
   e.preventDefault();
   this.svgFrame.forceUpdate();
@@ -177,9 +180,9 @@ ApplicationScope.prototype.onMouseDown = function (e) {
     cursorPosY: e.pageY,
     mouseX: e.pageX,
     mouseY: e.pageY,
-    scaledX: e.pageX,
-    scaledY: e.pageY,
   });
+
+  this.updateScaledXY();
 
   e.preventDefault();
   this.svgFrame.forceUpdate();
@@ -192,15 +195,17 @@ ApplicationScope.prototype.onMouseUp = function (e) {
     cursorPosY: e.pageY,
     mouseX: e.pageX,
     mouseY: e.pageY,
-    scaledX: e.pageX,
-    scaledY: e.pageY,
   });
+
+  this.updateScaledXY();
 
   e.preventDefault();
   this.svgFrame.forceUpdate();
 };
 
 ApplicationScope.prototype.onMouseWheel = function (e) {
+  //console.log(e);
+  this.first_channel.send("MouseWheel", [e, e.deltaY]);
   e.preventDefault();
   this.svgFrame.forceUpdate();
 };

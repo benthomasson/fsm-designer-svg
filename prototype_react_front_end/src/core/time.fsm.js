@@ -110,7 +110,7 @@ _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
     var $event = message[0];
     var delta = message[1];
 
-    if ($event.originalEvent.metaKey) {
+    if ($event.metaKey) {
         //console.log(delta);
         if (delta < 0) {
             this.undo(controller);
@@ -321,7 +321,7 @@ _Present.prototype.onMouseWheel = function (controller, msg_type, message) {
     var $event = message[0];
     var delta = message[1];
 
-    if ($event.originalEvent.metaKey) {
+    if ($event.metaKey) {
         //console.log(delta);
         if (delta < 0) {
             this.undo(controller);

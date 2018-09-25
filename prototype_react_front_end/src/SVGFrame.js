@@ -52,16 +52,18 @@ class SVGFrame extends Component {
               onMouseMove={this.scope.onMouseMove}
               onMouseDown={this.scope.onMouseDown}
               onMouseUp={this.scope.onMouseUp}
-              onWheel={this.scope.onMouseWheel}
-              >
+              onWheel={this.scope.onMouseWheel}>
           <defs>
             <filter x="0" y="0" width="1" height="1" id="selected">
               <feFlood floodColor="#b3d8fd"/>
               <feComposite in="SourceGraphic" operator="xor"/>
             </filter>
           </defs>
+          <g transform={'translate(' + this.scope.panX + ',' + this.scope.panY + ') ' +
+                         'scale(' + this.scope.current_scale + ')'}>
           {transitions}
           {states}
+          </g>
           <Debug {...this.scope}
                  x={100}
                  move={this.scope.move_controller}
