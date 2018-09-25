@@ -3,10 +3,16 @@ var fsm = require('./fsm.js');
 var hot_keys_fsm = require('./core/hotkeys.fsm.js');
 var move_fsm = require('./fsm/move.fsm.js');
 var transition_fsm = require('./fsm/transition.fsm.js');
+var time_fsm = require('./core/time.fsm.js');
 var fsm_messages = require('./fsm/messages.js');
+var fsm_models = require('./fsm/models.js');
+var ReconnectingWebSocket = require('reconnectingwebsocket');
 
 function ApplicationScope (svgFrame) {
 
+  var self = this;
+
+  //Initialize variables
   this.svgFrame = svgFrame;
   this.panX = 0;
   this.panY = 0;
@@ -37,35 +43,75 @@ function ApplicationScope (svgFrame) {
   this.groups = [];
   this.client_id = 1;
   this.state = this;
+  this.diagram_id = 0;
+  this.disconnected = false;
+  this.websocket_host = "192.168.99.100:8000";
+  this.first_channel = null;
+  this.history = [];
 
+
+  //Connect websocket
+  if (!this.disconnected) {
+    this.control_socket = new ReconnectingWebSocket(
+      "ws://" + this.websocket_host + "/ws/prototype?diagram_id=" + this.diagram_id,
+      null,
+      {debug: false, reconnectInterval: 300});
+    this.control_socket.onmessage = function(message) {
+      if (self.first_channel !== null) {
+        self.first_channel.send("Message", message);
+      }
+      console.log(message);
+      self.svgFrame.forceUpdate();
+    };
+  }
+
+  //Create sequences
   this.trace_order_seq = util.natural_numbers(0);
   this.state_id_seq = util.natural_numbers(0);
   this.transition_id_seq = util.natural_numbers(0);
 
+  //Create FSM controllers
   this.hotkeys_controller = new fsm.FSMController(this, 'hot_keys_fsm', hot_keys_fsm.Start, this);
   this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
   this.transition_controller = new fsm.FSMController(this, 'transition_fsm', transition_fsm.Start, this);
+  this.time_controller = new fsm.FSMController(this, 'time_fsm', time_fsm.Start, this);
 
-  this.move_controller.delegate_channel = new fsm.Channel(this.move_controller,
-                                                          this.hotkeys_controller,
+
+  //Wire up controllers
+  //
+  this.controllers = [this.hotkeys_controller,
+                      this.move_controller,
+                      this.transition_controller,
+                      this.time_controller];
+
+
+  for (var i = 0; i < this.controllers.length - 1; i++) {
+    var next_controller = this.controllers[i];
+    var current_controller = this.controllers[i+1];
+
+    current_controller.delegate_channel = new fsm.Channel(current_controller,
+                                                          next_controller,
                                                           this);
-
-  this.transition_controller.delegate_channel = new fsm.Channel(this.transition_controller,
-                                                                this.move_controller,
-                                                                this);
+  }
 
   this.first_channel = new fsm.Channel(null,
-                                       this.transition_controller,
+                                       this.controllers[this.controllers.length - 1],
                                        this);
 
-    this.select_items = this.select_items.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseWheel = this.onMouseWheel.bind(this);
-    this.timer = this.timer.bind(this);
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onResize = this.onResize.bind(this);
+  //bind functions
+  this.select_items = this.select_items.bind(this);
+  this.onMouseMove = this.onMouseMove.bind(this);
+  this.onMouseUp = this.onMouseUp.bind(this);
+  this.onMouseDown = this.onMouseDown.bind(this);
+  this.onMouseWheel = this.onMouseWheel.bind(this);
+  this.timer = this.timer.bind(this);
+  this.onKeyDown = this.onKeyDown.bind(this);
+  this.onResize = this.onResize.bind(this);
+  this.onHistory = this.onHistory.bind(this);
+  this.onDiagram = this.onDiagram.bind(this);
+  this.onClientId =  this.onClientId.bind(this);
+  this.onSnapshot =  this.onSnapshot.bind(this);
+  this.update_channel_offsets =  this.update_channel_offsets.bind(this);
 }
 exports.ApplicationScope = ApplicationScope;
 
@@ -288,5 +334,208 @@ ApplicationScope.prototype.update_offsets = function () {
       key = "" + transition.from_state.id + "_" + transition.to_state.id;
       transition.offset = map[key];
       map[key] = transition.offset + 1;
+  }
+};
+
+ApplicationScope.prototype.onHistory = function (data) {
+
+  this.history = [];
+  var i = 0;
+  for (i = 0; i < data.length; i++) {
+      //console.log(data[i]);
+      this.history.push(data[i]);
+  }
+};
+
+ApplicationScope.prototype.onDiagram = function(data) {
+  this.diagram_id = data.diagram_id;
+  this.diagram_name = data.name;
+  this.state_id_seq = util.natural_numbers(data.state_id_seq);
+  this.transition_id_seq = util.natural_numbers(data.transition_id_seq);
+  this.group_id_seq = util.natural_numbers(data.fsm_id_seq);
+  this.channel_id_seq = util.natural_numbers(data.channel_id_seq);
+  var search_data = {diagram_id: data.diagram_id};
+  //window.location.search = search_data;
+};
+
+ApplicationScope.prototype.onClientId = function(data) {
+  this.client_id = data;
+};
+
+
+ApplicationScope.prototype.onSnapshot = function (data) {
+
+  console.log(data);
+
+  //Erase the existing state
+  this.states = [];
+  this.transitions = [];
+  this.groups = [];
+  this.channels = [];
+
+  var state_map = {};
+  var fsm_map = {};
+  var i = 0;
+  var state = null;
+  var new_state = null;
+  var max_state_id = null;
+  var max_transition_id = null;
+  var min_x = null;
+  var min_y = null;
+  var max_x = null;
+  var max_y = null;
+
+  //Build the states
+  for (i = 0; i < data.states.length; i++) {
+      state = data.states[i];
+      if (max_state_id === null || state.id > max_state_id) {
+          max_state_id = state.id;
+      }
+      if (min_x === null || state.x < min_x) {
+          min_x = state.x;
+      }
+      if (min_y === null || state.y < min_y) {
+          min_y = state.y;
+      }
+      if (max_x === null || state.x > max_x) {
+          max_x = state.x;
+      }
+      if (max_y === null || state.y > max_y) {
+          max_y = state.y;
+      }
+      if (typeof(state_map[state.id]) === "undefined") {
+          new_state = new fsm_models.State(state.id,
+                                         state.label,
+                                         state.x,
+                                         state.y);
+          this.states.push(new_state);
+          state_map[state.id] = new_state;
+      }
+  }
+
+  //Build the transitions
+  var transition = null;
+  for (i = 0; i < data.transitions.length; i++) {
+      transition = data.transitions[i];
+      if (max_transition_id === null || transition.id > max_transition_id) {
+          max_transition_id = transition.id;
+      }
+      console.log(transition);
+      this.transitions.push(new fsm_models.Transition(transition.id,
+                                                    state_map[transition.from_state],
+                                                    state_map[transition.to_state],
+                                                    transition.label));
+  }
+
+  //Build the fsm
+  var group = null;
+var max_group_id = null;
+  var new_group = null;
+  for (i = 0; i < data.fsms.length; i++) {
+      group = data.fsms[i];
+      if (max_group_id === null || group.id > max_group_id) {
+          max_group_id = group.id;
+      }
+      new_group = new fsm_models.Group(group.id,
+                                   group.name,
+                                   'fsm',
+                                   group.x1,
+                                   group.y1,
+                                   group.x2,
+                                   group.y2,
+                                   false);
+      this.groups.push(new_group);
+      if (typeof(fsm_map[group.id]) === "undefined") {
+          fsm_map[group.id] = new_group;
+      }
+  }
+
+  //Update group membership
+
+  for (i = 0; i < this.groups.length; i++) {
+      this.groups[i].update_membership(this.states, this.groups);
+  }
+
+
+  //Build the channels
+  var channel = null;
+  for (i = 0; i < data.channels.length; i++) {
+      channel = data.channels[i];
+      if (max_transition_id === null || channel.id > max_transition_id) {
+          max_transition_id = channel.id;
+      }
+      console.log(channel);
+      this.channels.push(new fsm_models.Channel(channel.id,
+                                              fsm_map[channel.from_fsm],
+                                              fsm_map[channel.to_fsm],
+                                              channel.label));
+  }
+
+
+  var diff_x;
+  var diff_y;
+
+  // Calculate the new scale to show the entire diagram
+  if (min_x !== null && min_y !== null && max_x !== null && max_y !== null) {
+      console.log(['min_x', min_x]);
+      console.log(['min_y', min_y]);
+      console.log(['max_x', max_x]);
+      console.log(['max_y', max_y]);
+
+      diff_x = max_x - min_x;
+      diff_y = max_y - min_y;
+      console.log(['diff_x', diff_x]);
+      console.log(['diff_y', diff_y]);
+
+      console.log(['ratio_x', window.innerWidth/diff_x]);
+      console.log(['ratio_y', window.innerHeight/diff_y]);
+
+      this.current_scale = Math.min(2, Math.max(0.10, Math.min((window.innerWidth-200)/diff_x, (window.innerHeight-300)/diff_y)));
+      this.updateScaledXY();
+      this.updatePanAndScale();
+  }
+  // Calculate the new panX and panY to show the entire diagram
+  if (min_x !== null && min_y !== null) {
+      console.log(['min_x', min_x]);
+      console.log(['min_y', min_y]);
+      diff_x = max_x - min_x;
+      diff_y = max_y - min_y;
+      this.panX = this.current_scale * (-min_x - diff_x/2) + window.innerWidth/2;
+      this.panY = this.current_scale * (-min_y - diff_y/2) + window.innerHeight/2;
+      this.updateScaledXY();
+      this.updatePanAndScale();
+  }
+
+  //Update the state_id_seq to be greater than all state ids to prevent duplicate ids.
+  if (max_state_id !== null) {
+      console.log(['max_state_id', max_state_id]);
+  }
+
+  if (max_transition_id !== null) {
+      console.log(['max_transition_id', max_transition_id]);
+      this.transition_id_seq = util.natural_numbers(max_transition_id);
+  }
+
+  this.update_offsets();
+  this.update_channel_offsets();
+};
+
+ApplicationScope.prototype.update_channel_offsets = function () {
+
+  var i = 0;
+  var channels = this.channels;
+  var map = {};
+  var channel = null;
+  var key = null;
+  for (i = 0; i < channels.length; i++) {
+      channel = channels[i];
+      key = "" + channel.from_fsm.id + "_" + channel.to_fsm.id;
+      map[key] = 0;
+  }
+  for (i = 0; i < channels.length; i++) {
+      channel = channels[i];
+      key = "" + channel.from_fsm.id + "_" + channel.to_fsm.id;
+      channel.offset = map[key];
+      map[key] = channel.offset + 1;
   }
 };
