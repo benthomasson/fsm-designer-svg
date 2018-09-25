@@ -6,9 +6,11 @@ var group_fsm = require('./fsm/group.fsm.js');
 var transition_fsm = require('./fsm/transition.fsm.js');
 var time_fsm = require('./core/time.fsm.js');
 var view_fsm = require('./core/view.fsm.js');
+var buttons_fsm = require('./button/buttons.fsm.js');
 var fsm_messages = require('./fsm/messages.js');
 var core_messages = require('./core/messages.js');
 var fsm_models = require('./fsm/models.js');
+var button_models = require('./button/models.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
 var history = require('history');
 
@@ -40,6 +42,7 @@ function ApplicationScope (svgFrame) {
   this.showDebug = false;
   this.showHelp = true;
   this.showCursor = false;
+  this.showButtons = true;
   this.states = [];
   this.transitions = [];
   this.selected_items = [];
@@ -81,6 +84,7 @@ function ApplicationScope (svgFrame) {
   } else {
     this.control_socket = {send: util.noop};
   }
+  //Create Buttons
 
   //Create sequences
   this.trace_order_seq = util.natural_numbers(0);
@@ -89,11 +93,21 @@ function ApplicationScope (svgFrame) {
   this.message_id_seq = util.natural_numbers(0);
   this.group_id_seq = util.natural_numbers(0);
 
+  //Create Buttons
+  this.buttons_by_name = {
+    upload: new button_models.Button("UploadFSM", 20, 7, 60, 50, this.uploadButtonHandler, this),
+    download: new button_models.Button("DownloadFSM", 80, 10, 60, 50, this.downloadButtonHandler, this),
+  };
+
+  this.buttons = [this.buttons_by_name.upload,
+                  this.buttons_by_name.download];
+
   //Create FSM controllers
   this.hotkeys_controller = new fsm.FSMController(this, 'hot_keys_fsm', hot_keys_fsm.Start, this);
   this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
   this.group_controller = new fsm.FSMController(this, 'group_fsm', group_fsm.Start, this);
   this.transition_controller = new fsm.FSMController(this, 'transition_fsm', transition_fsm.Start, this);
+  this.buttons_controller = new fsm.FSMController(this, 'buttons_fsm', buttons_fsm.Start, this);
   this.time_controller = new fsm.FSMController(this, 'time_fsm', time_fsm.Start, this);
   this.view_controller = new fsm.FSMController(this, 'view_fsm', view_fsm.Start, this);
 
@@ -105,6 +119,7 @@ function ApplicationScope (svgFrame) {
                       this.move_controller,
                       this.transition_controller,
                       this.group_controller,
+                      this.buttons_controller,
                       this.time_controller];
 
 
@@ -140,8 +155,18 @@ function ApplicationScope (svgFrame) {
   this.update_channel_offsets =  this.update_channel_offsets.bind(this);
   this.send_control_message =  this.send_control_message.bind(this);
   this.send_trace_message =  this.send_trace_message.bind(this);
+  this.uploadButtonHandler =  this.uploadButtonHandler.bind(this);
+  this.downloadButtonHandler =  this.downloadButtonHandler.bind(this);
 }
 exports.ApplicationScope = ApplicationScope;
+
+ApplicationScope.prototype.uploadButtonHandler = function (message) {
+  console.log(message);
+};
+
+ApplicationScope.prototype.downloadButtonHandler = function (message) {
+  console.log(message);
+};
 
 ApplicationScope.prototype.send_trace_message = function (message) {
   console.log(message);

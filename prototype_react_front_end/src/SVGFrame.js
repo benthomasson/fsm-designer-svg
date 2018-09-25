@@ -86,11 +86,16 @@ class SVGFrame extends Component {
                  view={this.scope.view_controller}
                  group={this.scope.group_controller}
                  />
+          {this.scope.showCursor ?
           <Cursor x={this.scope.cursorPosX}
-                  y={this.scope.cursorPosY}
-                  showCursor={this.scope.showCursor}/>
-          <Upload x={20} y={7}/>
-          <Download x={80} y={10}/>
+                  y={this.scope.cursorPosY} />
+          : null}
+          {this.scope.showButtons ?
+          <g>
+          <Upload {...this.scope.buttons_by_name.upload} />
+          <Download {...this.scope.buttons_by_name.download} />
+          </g>
+          : null}
           <Help showHelp={this.scope.showHelp}
                 y={0}
                 x={this.scope.frameWidth - 200} />

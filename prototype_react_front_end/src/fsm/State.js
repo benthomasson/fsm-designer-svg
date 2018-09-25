@@ -22,6 +22,8 @@ class State extends Component {
       strokeWidth: 2,
       cursor: 'pointer'
     };
+    var textSelected = {
+    };
     var stateTextStyle = {
       fill: Colors['darkWidgetDetail']
     };
@@ -63,7 +65,14 @@ class State extends Component {
             r="50"
             style={stateCircleStyle}>
         </circle>
-        <text style={stateTextStyle} textAnchor="middle" x="0" y="0">{this.props.label}</text>
+        {(this.props.selected && ! this.props.edit_label) ?
+                  <text style={textSelected}
+                        filter="url(#selected)"
+                        textAnchor="middle"
+                        x="0"
+                        y="0">{this.props.label}</text>
+        :  null}
+        <text style={stateTextStyle} textAnchor="middle" x="0" y="0">{this.props.label}{this.props.edit_label?'_':''}</text>
       </g>
     );
   }
