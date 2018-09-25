@@ -5,6 +5,7 @@ import Upload from './button/Upload'
 import Download from './button/Download'
 import Quadrants from './core/Quadrants'
 import State from './fsm/State'
+import Group from './fsm/Group'
 import Transition from './fsm/Transition'
 import Help from './core/Help'
 import models from './models'
@@ -42,7 +43,19 @@ class SVGFrame extends Component {
     }
     var transitions = [];
     for (i=0; i< this.scope.transitions.length; i++) {
-      transitions.push(<Transition {...this.scope.transitions[i]} key={'transition' + i} showDebug={this.scope.showDebug} scaledX={this.scope.scaledX} scaledY={this.scope.scaledY} />);
+      transitions.push(<Transition {...this.scope.transitions[i]}
+                                   key={'transition' + i}
+                                   showDebug={this.scope.showDebug}
+                                   scaledX={this.scope.scaledX}
+                                   scaledY={this.scope.scaledY} />);
+    }
+    var groups = [];
+    for (i=0; i< this.scope.groups.length; i++) {
+      groups.push(<Group {...this.scope.groups[i]}
+                          key={'group' + i}
+                          showDebug={this.scope.showDebug}
+                          scaledX={this.scope.scaledX}
+                          scaledY={this.scope.scaledY} />);
     }
     return (
       <div className='SVGFrame'>
@@ -63,6 +76,7 @@ class SVGFrame extends Component {
                          'scale(' + this.scope.current_scale + ')'}>
           {transitions}
           {states}
+          {groups}
           <Quadrants {...this.scope} />
           </g>
           <Debug {...this.scope}

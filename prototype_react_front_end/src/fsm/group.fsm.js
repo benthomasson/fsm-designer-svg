@@ -1,6 +1,6 @@
 /* Copyright (c) 2017 Red Hat, Inc. */
+require('@gouch/to-title-case');
 var inherits = require('inherits');
-var titlecase = require('@gouch/to-title-case');
 var fsm = require('../fsm.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
