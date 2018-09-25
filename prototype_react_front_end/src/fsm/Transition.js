@@ -106,6 +106,22 @@ class Transition extends Component {
     var transitionTextStyle = {
       fill: Colors['darkWidgetDetail']
     };
+
+    var labelStyle = {
+      cursor: 'text',
+      fillOpacity: 0
+    }
+
+    var arrowSelectedStyle = {
+      fill: Colors['selectedBlue'],
+      stroke: Colors['selectedBlue']
+    };
+
+    var selectedTransitionStyle = {
+      fill: 'none',
+      stroke: Colors['selectedBlue'],
+      strokeWidth: 6
+    };
     return (
     <g>
       {this.props.showDebug ?
@@ -128,6 +144,9 @@ class Transition extends Component {
       <g transform={"translate(" + this.props.from_state.x + ',' +
                                    this.props.from_state.y + ')' +
                     'rotate(' + this.slope() + ")"}>
+      {this.props.selected ?
+        <path style={selectedTransitionStyle} d={"M0 0 A " + this.arc_r2() + ' ' + this.arc_r2() +' 0 0 0 ' + -this.length() + " 0"}></path>
+      : null}
       <path style={transitionStyle} d={"M0 0 A " + this.arc_r2() + ' ' + this.arc_r2() +' 0 0 0 ' + -this.length() + " 0"}></path>
       {this.props.showDebug ?
       <g>
@@ -172,6 +191,9 @@ class Transition extends Component {
               style={debugLineStyle}></line>
          : null}
           <g transform="translate(-19, -9)">
+            {this.props.selected ?
+             <path transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" style={arrowSelectedStyle}/>
+            : null}
             <path d="M0,0 L0,18 L18,9 z" style={arrowStyle}/>
           </g>
         </g>
@@ -184,6 +206,7 @@ class Transition extends Component {
                      "translate(0, -5)" +
                      "rotate(" + this.flip_text_rotate() + ")" +
                      "translate( 0," + this.flip_text_offset() + ") "}>
+        <rect style={labelStyle} x="-30" y="-20" width="60" height="30"/>
         {(this.props.selected && !this.props.edit_label) ?
         <text style={transitionTextStyle}
               filter="url(#selected)"
