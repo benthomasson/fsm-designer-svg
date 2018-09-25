@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import util from '../util'
 
 import Colors from '../style/Colors'
 
@@ -37,8 +38,17 @@ class Group extends Component {
     var groupStyle = {
       stroke: Colors['group'],
       strokeWidth: 2,
-      fill: 'none'
+      fill: 'none',
+      cursor: 'move'
     };
+    var groupCornerStyle = util.clone(groupStyle);
+    groupCornerStyle.cursor = 'move';
+    groupCornerStyle.fill = Colors['light'];
+    groupCornerStyle.fillOpacity = 0;
+    var groupCornerStyleNESW = util.clone(groupCornerStyle);
+    groupCornerStyleNESW.cursor = 'nesw-resize';
+    var groupCornerStyleNWSE = util.clone(groupCornerStyle);
+    groupCornerStyleNWSE.cursor = 'nwse-resize';
     var selectedStyle = {
       stroke: Colors['selectedBlue'],
       strokeWidth: 6,
@@ -144,38 +154,40 @@ class Group extends Component {
         </g>
         : null }
 
+        <rect width={this.width()}
+              height={this.height()}
+              x={this.left_extent()}
+              y={this.top_extent()}
+              style={groupStyle} />
+
+
         { (this.props.highlighted || this.props.selected) ?
         <g>
         <rect width="10"
               height="10"
               x={this.left_extent()}
               y={this.top_extent()}
-              style={groupStyle} />
+              style={groupCornerStyleNWSE} />
 
         <rect width="10"
               height="10"
               x={this.right_extent() - 10}
               y={this.top_extent()}
-              style={groupStyle} />
+              style={groupCornerStyleNESW} />
 
         <rect width="10"
               height="10"
               x={this.right_extent() - 10}
               y={this.bottom_extent() - 10}
-              style={groupStyle} />
+              style={groupCornerStyleNWSE} />
 
         <rect width="10"
               height="10"
               x={this.left_extent()}
               y={this.bottom_extent() - 10}
-              style={groupStyle} />
+              style={groupCornerStyleNESW} />
         </g>
         : null }
-        <rect width={this.width()}
-              height={this.height()}
-              x={this.left_extent()}
-              y={this.top_extent()}
-              style={groupStyle} />
 
         <g transform={"translate(" + this.left_extent() + "," + this.top_extent() + ")"}>
         {(this.props.selected && ! this.props.edit_label) ?

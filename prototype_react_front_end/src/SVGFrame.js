@@ -36,6 +36,7 @@ class SVGFrame extends Component {
   render() {
     var frameStyle = {
       backgroundColor: '#ffffff',
+      cursor: (this.scope.selecting_state ? 'alias' : 'auto')
     };
     var states = [];
     for (var i=0; i< this.scope.states.length; i++) {

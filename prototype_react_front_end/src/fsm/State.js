@@ -20,7 +20,7 @@ class State extends Component {
       fill: Colors['widgetBody'],
       stroke: Colors['darkWidgetDetail'],
       strokeWidth: 2,
-      cursor: 'pointer'
+      cursor: 'move'
     };
     var textSelected = {
     };

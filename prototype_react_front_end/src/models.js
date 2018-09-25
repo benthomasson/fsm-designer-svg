@@ -57,6 +57,7 @@ function ApplicationScope (svgFrame) {
   this.websocket_host = "192.168.99.100:8000";
   this.first_channel = null;
   this.history = [];
+  this.selecting_state = false;
   this.browser_history = history.createHashHistory({hashType: "hashbang"});
   console.log(this.browser_history.location);
 

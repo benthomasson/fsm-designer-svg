@@ -4,6 +4,11 @@ function noop () {
 }
 exports.noop = noop;
 
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+exports.clone = clone;
+
 function natural_numbers (start) {
     var counter = start;
     return function () {return counter += 1;};

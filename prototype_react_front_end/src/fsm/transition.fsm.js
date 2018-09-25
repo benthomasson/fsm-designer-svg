@@ -69,6 +69,13 @@ _Connected.prototype.start = function (controller) {
 };
 _Connected.prototype.start.transitions = ['Ready'];
 
+_Connecting.prototype.start = function (controller) {
+  controller.scope.selecting_state = true;
+};
+
+_Connecting.prototype.end = function (controller) {
+  controller.scope.selecting_state = false;
+};
 
 _Connecting.prototype.onMouseDown = function () {
 };
@@ -97,6 +104,13 @@ _Connecting.prototype.onMouseUp = function (controller) {
 };
 _Connecting.prototype.onMouseUp.transitions = ['Ready', 'Connected'];
 
+_Selecting.prototype.start = function (controller) {
+  controller.scope.selecting_state = true;
+};
+
+_Selecting.prototype.end = function (controller) {
+  controller.scope.selecting_state = false;
+};
 
 _Selecting.prototype.onMouseDown = function () {
 };

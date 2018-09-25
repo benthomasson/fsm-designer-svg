@@ -88,7 +88,8 @@ class Transition extends Component {
     var transitionStyle = {
       stroke: Colors['transition'],
       strokeWidth: 2,
-      fill: 'none'
+      fill: 'none',
+      cursor: 'text'
     };
     var debugCircleStyle = {
       fill: Colors['debugCopyNot'],
