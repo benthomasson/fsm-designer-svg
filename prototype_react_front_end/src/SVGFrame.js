@@ -89,8 +89,8 @@ class SVGFrame extends Component {
           <Cursor x={this.scope.cursorPosX}
                   y={this.scope.cursorPosY}
                   showCursor={this.scope.showCursor}/>
-          <Upload />
-          <Download />
+          <Upload x={20} y={7}/>
+          <Download x={80} y={10}/>
           <Help showHelp={this.scope.showHelp}
                 y={0}
                 x={this.scope.frameWidth - 200} />
