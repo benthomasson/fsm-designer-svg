@@ -77,7 +77,7 @@ function ApplicationScope (svgFrame) {
   this.state = this;
   this.diagram_id = 0;
   this.disconnected = process.env.REACT_APP_DISCONNECTED === 'true';
-  this.websocket_host = "192.168.99.100:8000";
+  this.websocket_host = process.env.REACT_APP_WEBSOCKET_HOST ? process.env.REACT_APP_WEBSOCKET_HOST : window.location.host;
   this.first_channel = null;
   this.history = [];
   this.selecting_state = false;
