@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import Colors from '../style/Colors';
 import {textStyle, pathStyle, debugStyle} from '../style/Styles.js'
+
 
 class Upload extends Component {
   render() {
