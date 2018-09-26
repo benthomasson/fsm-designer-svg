@@ -181,6 +181,10 @@ Transition.prototype.perpendicular = function (x, y) {
 };
 
 Transition.prototype.is_selected = function (x, y) {
+
+    if (this.to_state === null) {
+      return false;
+    }
     // Is the distance to the mouse location less than 25 if on the label side
     // or 5 on the other from the shortest line to the transition?
     //console.log("is_selected");
