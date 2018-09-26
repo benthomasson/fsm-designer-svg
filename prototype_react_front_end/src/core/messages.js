@@ -1,7 +1,7 @@
 
 
 function serialize(message) {
-    return JSON.stringify([message.constructor.name, message]);
+    return JSON.stringify([message.msg_type, message]);
 }
 exports.serialize = serialize;
 

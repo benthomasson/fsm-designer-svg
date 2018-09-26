@@ -93,8 +93,8 @@ class SVGFrame extends Component {
           : null}
           {this.scope.showButtons ?
           <g>
-          <Upload {...this.scope.buttons_by_name.upload} />
-          <Download {...this.scope.buttons_by_name.download} />
+          <Upload {...this.scope.buttons_by_name.upload} showDebug={this.scope.showDebug}/>
+          <Download {...this.scope.buttons_by_name.download} showDebug={this.scope.showDebug} />
           </g>
           : null}
           <Help showHelp={this.scope.showHelp}

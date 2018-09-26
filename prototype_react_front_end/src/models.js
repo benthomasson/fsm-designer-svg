@@ -18,6 +18,28 @@ var history = require('history');
 
 function ApplicationScope (svgFrame) {
 
+  //bind functions
+  this.select_items = this.select_items.bind(this);
+  this.onMouseMove = this.onMouseMove.bind(this);
+  this.onMouseUp = this.onMouseUp.bind(this);
+  this.onMouseDown = this.onMouseDown.bind(this);
+  this.onMouseWheel = this.onMouseWheel.bind(this);
+  this.timer = this.timer.bind(this);
+  this.onKeyDown = this.onKeyDown.bind(this);
+  this.onResize = this.onResize.bind(this);
+  this.onHistory = this.onHistory.bind(this);
+  this.onDiagram = this.onDiagram.bind(this);
+  this.onClientId =  this.onClientId.bind(this);
+  this.onSnapshot =  this.onSnapshot.bind(this);
+  this.update_offsets =  this.update_offsets.bind(this);
+  this.updateScaledXY =  this.updateScaledXY.bind(this);
+  this.updatePanAndScale =  this.updatePanAndScale.bind(this);
+  this.update_channel_offsets =  this.update_channel_offsets.bind(this);
+  this.send_control_message =  this.send_control_message.bind(this);
+  this.send_trace_message =  this.send_trace_message.bind(this);
+  this.uploadButtonHandler =  this.uploadButtonHandler.bind(this);
+  this.downloadButtonHandler =  this.downloadButtonHandler.bind(this);
+
   var self = this;
 
   //Initialize variables
@@ -48,6 +70,7 @@ function ApplicationScope (svgFrame) {
   this.selected_items = [];
   this.selected_states = [];
   this.selected_transitions = [];
+  this.selected_groups = [];
   this.channels = [];
   this.groups = [];
   this.client_id = 1;
@@ -85,7 +108,6 @@ function ApplicationScope (svgFrame) {
   } else {
     this.control_socket = {send: util.noop};
   }
-  //Create Buttons
 
   //Create sequences
   this.trace_order_seq = util.natural_numbers(0);
@@ -96,8 +118,8 @@ function ApplicationScope (svgFrame) {
 
   //Create Buttons
   this.buttons_by_name = {
-    upload: new button_models.Button("UploadFSM", 20, 7, 60, 50, this.uploadButtonHandler, this),
-    download: new button_models.Button("DownloadFSM", 80, 10, 60, 50, this.downloadButtonHandler, this),
+    upload: new button_models.Button("UploadFSM", 20, 7, 50, 70, this.uploadButtonHandler, this),
+    download: new button_models.Button("DownloadFSM", 80, 10, 50, 70, this.downloadButtonHandler, this),
   };
 
   this.buttons = [this.buttons_by_name.upload,
@@ -137,36 +159,21 @@ function ApplicationScope (svgFrame) {
                                        this.controllers[this.controllers.length - 1],
                                        this);
 
-  //bind functions
-  this.select_items = this.select_items.bind(this);
-  this.onMouseMove = this.onMouseMove.bind(this);
-  this.onMouseUp = this.onMouseUp.bind(this);
-  this.onMouseDown = this.onMouseDown.bind(this);
-  this.onMouseWheel = this.onMouseWheel.bind(this);
-  this.timer = this.timer.bind(this);
-  this.onKeyDown = this.onKeyDown.bind(this);
-  this.onResize = this.onResize.bind(this);
-  this.onHistory = this.onHistory.bind(this);
-  this.onDiagram = this.onDiagram.bind(this);
-  this.onClientId =  this.onClientId.bind(this);
-  this.onSnapshot =  this.onSnapshot.bind(this);
-  this.update_offsets =  this.update_offsets.bind(this);
-  this.updateScaledXY =  this.updateScaledXY.bind(this);
-  this.updatePanAndScale =  this.updatePanAndScale.bind(this);
-  this.update_channel_offsets =  this.update_channel_offsets.bind(this);
-  this.send_control_message =  this.send_control_message.bind(this);
-  this.send_trace_message =  this.send_trace_message.bind(this);
-  this.uploadButtonHandler =  this.uploadButtonHandler.bind(this);
-  this.downloadButtonHandler =  this.downloadButtonHandler.bind(this);
 }
 exports.ApplicationScope = ApplicationScope;
 
 ApplicationScope.prototype.uploadButtonHandler = function (message) {
   console.log(message);
+  window.open("/prototype/upload?diagram_id=" + this.diagram_id, "_top");
 };
 
 ApplicationScope.prototype.downloadButtonHandler = function (message) {
   console.log(message);
+  if (this.selected_groups.length === 1) {
+      window.open("/prototype/download?diagram_id=" + this.diagram_id + "&finite_state_machine_id=" + this.selected_groups[0].id);
+  } else {
+      window.open("/prototype/download?diagram_id=" + this.diagram_id, "_blank");
+  }
 };
 
 ApplicationScope.prototype.send_trace_message = function (message) {
@@ -178,7 +185,7 @@ ApplicationScope.prototype.send_control_message = function (message) {
   message.sender = this.client_id;
   message.message_id = this.message_id_seq();
   var data = core_messages.serialize(message);
-  console.log(["Sending", message.constructor.name, message.sender, message.message_id]);
+  console.log(["Sending", message.msg_type, message.sender, message.message_id]);
   this.control_socket.send(data);
 };
 

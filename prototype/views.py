@@ -333,7 +333,7 @@ def upload(request):
                 uuid=diagram_uuid, defaults=dict(name="diagram", uuid=str(uuid.uuid4())))
             finite_state_machine_id = form.cleaned_data['finite_state_machine_id']
             diagram_uuid = upload_diagram(data, diagram_id=diagram.pk, finite_state_machine_id=finite_state_machine_id)
-            return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_uuid))
+            return HttpResponseRedirect('/#!/diagram_id:{0}'.format(diagram_uuid))
     else:
         form = DiagramFSMForm2(request.GET)
         if form.is_valid():

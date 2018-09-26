@@ -301,13 +301,13 @@ _EditLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
   } else if ($event.keyCode === 13) { //Enter
         controller.changeState(Selected2);
     }
-    if (item.constructor.name === "State") {
+    if (item.class_name === "State") {
         controller.scope.send_control_message(new messages.StateLabelEdit(controller.scope.client_id,
                                                                            item.id,
                                                                            item.label,
                                                                            previous_label));
     }
-    if (item.constructor.name === "Transition") {
+    if (item.class_name === "Transition") {
         controller.scope.send_control_message(new messages.TransitionLabelEdit(controller.scope.client_id,
                                                                            item.id,
                                                                            item.label,

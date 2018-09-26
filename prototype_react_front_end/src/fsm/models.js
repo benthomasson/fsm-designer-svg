@@ -2,6 +2,7 @@ var util = require('../util.js');
 var math = require('mathjs');
 
 function State(id, label, x, y) {
+    this.class_name = "State";
     this.id = id;
     this.label = label;
     this.x = x;
@@ -43,6 +44,7 @@ State.prototype.toJSON = function () {
 };
 
 function Transition(id, from_state, to_state, label) {
+    this.class_name = "Transition";
     this.id = id;
     this.from_state = from_state;
     this.to_state = to_state;
