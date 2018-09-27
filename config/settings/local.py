@@ -12,6 +12,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "0.0.0.0",
     "127.0.0.1",
+    "192.168.99.100",
+    "fsm-designer-svg.com",
 ]
 
 # CACHES
