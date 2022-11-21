@@ -5,7 +5,7 @@ from django.db import migrations, models
 import yaml
 
 
-messages = yaml.load('''
+messages = yaml.safe_load('''
 messages:
     - {msg_type: StateMove, fields: [msg_type, sender, id, x, y, previous_x, previous_y]}
     - {msg_type: StateCreate, fields: [msg_type, sender, id, x, y, label]}

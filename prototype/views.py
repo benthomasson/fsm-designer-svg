@@ -328,7 +328,7 @@ def upload(request):
         print(request.FILES)
         form = UploadFSMFileForm(request.POST, request.FILES)
         if form.is_valid():
-            data = yaml.load(request.FILES['file'].read())
+            data = yaml.safe_load(request.FILES['file'].read())
             diagram_uuid = form.cleaned_data['diagram_id']
             diagram, created = Diagram.objects.get_or_create(
                 uuid=diagram_uuid, defaults=dict(name="diagram", uuid=str(uuid.uuid4())))
@@ -351,7 +351,7 @@ def upload_pipeline(request):
         print(request.FILES)
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            data = yaml.load(request.FILES['file'].read())
+            data = yaml.safe_load(request.FILES['file'].read())
             diagram_uuid = upload_diagram(data)
             return HttpResponseRedirect('/static/prototype/index.html#!?diagram_id={0}'.format(diagram_uuid))
     else:
@@ -392,7 +392,7 @@ def upload_trace(request):
     if request.method == 'POST':
         form = UploadTraceFileForm(request.POST, request.FILES)
         if form.is_valid():
-            data = yaml.load(request.FILES['file'].read())
+            data = yaml.safe_load(request.FILES['file'].read())
             diagram_uuid = form.cleaned_data['diagram_id']
             replay = FSMTraceReplay(replay_data=json.dumps(data))
             replay.save()

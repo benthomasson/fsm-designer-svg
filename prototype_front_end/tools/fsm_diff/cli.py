@@ -63,10 +63,10 @@ def main(args=None):
         logging.basicConfig(level=logging.WARNING)
 
     with open(parsed_args['<a>']) as f:
-        a = yaml.load(f.read())
+        a = yaml.safe_load(f.read())
 
     with open(parsed_args['<b>']) as f:
-        b = yaml.load(f.read())
+        b = yaml.safe_load(f.read())
 
     data = fsm_diff(a, b, silent=False)
 

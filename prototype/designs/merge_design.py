@@ -30,9 +30,9 @@ def main(args=None):
         logging.basicConfig(level=logging.WARNING)
 
     with open(parsed_args['<a>']) as f:
-        a = yaml.load(f.read())
+        a = yaml.safe_load(f.read())
     with open(parsed_args['<b>']) as f:
-        b = yaml.load(f.read())
+        b = yaml.safe_load(f.read())
 
     a_models = {x['name']: x for x in a.get('models', [])}
     for model in b.get('models', []):

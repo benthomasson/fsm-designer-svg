@@ -42,12 +42,12 @@ def main(args=None):
     p = Popen(['./extract.js', implementation], stdout=PIPE)
     output = p.communicate()[0]
     if p.returncode == 0:
-        b = yaml.load(output)
+        b = yaml.safe_load(output)
     else:
         return 1
 
     with open(parsed_args['<design>']) as f:
-        a = yaml.load(f.read())
+        a = yaml.safe_load(f.read())
 
     data = fsm_diff.cli.fsm_diff(a, b)
     data = transform_fsm.transform_fsm(data)

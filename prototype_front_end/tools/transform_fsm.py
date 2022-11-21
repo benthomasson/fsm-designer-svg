@@ -54,7 +54,7 @@ def main(args=None):
         logging.basicConfig(level=logging.WARNING)
 
     with open(parsed_args['<input>']) as f:
-        data = yaml.load(f.read())
+        data = yaml.safe_load(f.read())
 
     data = transform_fsm(data)
 

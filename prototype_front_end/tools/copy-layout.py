@@ -31,9 +31,9 @@ def main(args=None):
         logging.basicConfig(level=logging.WARNING)
 
     with open(parsed_args['<from>']) as f:
-        from_fsm = yaml.load(f.read())
+        from_fsm = yaml.safe_load(f.read())
     with open(parsed_args['<to>']) as f:
-        to_fsm = yaml.load(f.read())
+        to_fsm = yaml.safe_load(f.read())
 
     to_states = {x['label']: x for x in to_fsm.get('states', [])}
 
