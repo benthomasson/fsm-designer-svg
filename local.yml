@@ -35,6 +35,4 @@ services:
       - ./.envs/.local/.postgres
 
   redis:
-    image: redis:3.0
-    ports:
-        - "6379:6379"
+    image: redis:7.0

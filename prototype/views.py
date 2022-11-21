@@ -75,6 +75,7 @@ transform_channel = partial(transform_dict, channel_map)
 
 
 def download(request):
+    print('DOWNLOAD')
     data = dict(states=[], transitions=[])
     form = DiagramFSMForm(request.GET)
     if form.is_valid():
